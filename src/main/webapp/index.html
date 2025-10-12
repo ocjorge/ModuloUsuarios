@@ -1,10 +1,785 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Bienvenido al Modulo de usuarios</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    </head>
-    <body>
-        <h1>Hello World!</h1>
-    </body>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="es" lang="es">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sistema de Usuarios</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        /*<![CDATA[*/
+        :root {
+            --primary-color: #2c5aa0;
+            --secondary-color: #34495e;
+            --accent-color: #3498db;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --light-bg: #f8f9fa;
+            --dark-text: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--light-bg);
+            min-height: 100vh;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .main-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .content-wrapper {
+            margin-top: 80px;
+            padding: 20px;
+        }
+
+        .auth-box {
+            max-width: 450px;
+            margin: 50px auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 40px;
+        }
+
+        .auth-box h2 {
+            text-align: center;
+            color: var(--dark-text);
+            margin-bottom: 30px;
+        }
+
+        .form-control:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+
+        .btn-primary-custom {
+            background: var(--accent-color);
+            border: none;
+            padding: 12px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .btn-primary-custom:hover {
+            background: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .btn-logout {
+            background: var(--danger-color);
+            border: none;
+        }
+
+        .btn-logout:hover {
+            background: #c0392b;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .badge-activo {
+            background: var(--success-color);
+        }
+
+        .badge-inactivo {
+            background: var(--danger-color);
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85em;
+            margin: 2px;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-edit {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .btn-delete {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .user-detail-section {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .user-detail-section h4 {
+            color: var(--secondary-color);
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .password-toggle {
+            cursor: pointer;
+            position: absolute;
+            right: 10px;
+            top: 38px;
+            color: var(--secondary-color);
+        }
+
+        .form-group-custom {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .alert-custom {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 9999;
+            min-width: 300px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        /*]]>*/
+        footer {
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            padding: 15px 0;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            margin-top: 20px;
+        }
+        .footer-text {
+            margin: 5px 0;
+            color: #495057;
+            font-size: 14px;
+        }
+        .footer-copyright {
+            margin: 5px 0;
+            color: #6c757d;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PÁGINA DE LOGIN -->
+    <div id="loginPage" class="page active">
+        <div class="main-header">
+            <div class="container">
+                <h1 class="h4 mb-0">Sistema de Gestión de Usuarios</h1>
+            </div>
+        </div>
+        
+        <div class="content-wrapper">
+            <div class="auth-box">
+                <h2>Iniciar Sesión</h2>
+                <form id="loginForm" action="#" onsubmit="return handleLogin(event)">
+                    <div class="mb-3">
+                        <label for="loginUsername" class="form-label">Nombre de usuario</label>
+                        <input type="text" class="form-control" id="loginUsername" name="loginUsername" />
+                    </div>
+                    <div class="form-group-custom">
+                        <label for="loginPassword" class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" id="loginPassword" name="loginPassword" />
+                        <i class="fas fa-eye password-toggle" onclick="togglePassword('loginPassword', this)"><!-- icon --></i>
+                    </div>
+                    <button type="submit" class="btn btn-primary-custom w-100 mt-3">Iniciar Sesión</button>
+                </form>
+                <div class="text-center mt-3">
+                    <small>¿No tienes cuenta? <a href="#register" onclick="showPage('registerPage'); return false;">Regístrate aquí</a></small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PÁGINA DE REGISTRO -->
+    <div id="registerPage" class="page">
+        <div class="main-header">
+            <div class="container">
+                <h1 class="h4 mb-0">Registro de Empleados</h1>
+            </div>
+        </div>
+        
+        <div class="content-wrapper">
+            <div class="auth-box">
+                <h2>Registrar Empleado</h2>
+                <form id="registerForm" action="#" onsubmit="return handleRegister(event)">
+                    <div class="mb-3">
+                        <label for="registerEmail" class="form-label">Correo electrónico</label>
+                        <input type="text" class="form-control" id="registerEmail" name="registerEmail" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="registerName" class="form-label">Nombre completo</label>
+                        <input type="text" class="form-control" id="registerName" name="registerName" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="registerPhone" class="form-label">Teléfono</label>
+                        <input type="text" class="form-control" id="registerPhone" name="registerPhone" maxlength="10" />
+                    </div>
+                    <div class="form-group-custom">
+                        <label for="registerPassword" class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" id="registerPassword" name="registerPassword" />
+                        <i class="fas fa-eye password-toggle" onclick="togglePassword('registerPassword', this)"><!-- icon --></i>
+                    </div>
+                    <div class="form-group-custom">
+                        <label for="registerConfirmPassword" class="form-label">Confirmar Contraseña</label>
+                        <input type="password" class="form-control" id="registerConfirmPassword" name="registerConfirmPassword" />
+                        <i class="fas fa-eye password-toggle" onclick="togglePassword('registerConfirmPassword', this)"><!-- icon --></i>
+                    </div>
+                    <button type="submit" class="btn btn-primary-custom w-100 mt-3">Registrar Empleado</button>
+                </form>
+                <div class="text-center mt-3">
+                    <small>¿Ya tienes cuenta? <a href="#login" onclick="showPage('loginPage'); return false;">Inicia sesión</a></small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PÁGINA PRINCIPAL (LISTA DE USUARIOS) -->
+    <div id="mainPage" class="page">
+        <div class="main-header">
+            <div class="container d-flex justify-content-between align-items-center">
+                <h1 class="h4 mb-0">Usuarios</h1>
+                <div>
+                    <span class="me-3">Bienvenido, <strong id="currentUserName"><!-- nombre --></strong></span>
+                    <button class="btn btn-logout btn-sm" onclick="logout()" type="button">
+                        <i class="fas fa-sign-out-alt"><!-- icon --></i> Cerrar Sesión
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-wrapper">
+            <div class="table-container">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>Lista de Usuarios</h2>
+                    <div>
+                        <button class="btn btn-success me-2" onclick="showPage('newUserPage')" type="button">
+                            <i class="fas fa-plus"><!-- icon --></i> Nuevo Usuario
+                        </button>
+                        <button class="btn btn-info" onclick="filterUsers()" type="button">
+                            <i class="fas fa-filter"><!-- icon --></i> Filtrar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover" id="usersTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Correo</th>
+                                <th>Módulo</th>
+                                <th>Teléfono</th>
+                                <th>Estado</th>
+                                <th>Rol</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <!-- Los usuarios se cargarán dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PÁGINA DE NUEVO USUARIO -->
+    <div id="newUserPage" class="page">
+        <div class="main-header">
+            <div class="container d-flex justify-content-between align-items-center">
+                <h1 class="h4 mb-0">Nuevo Usuario</h1>
+                <button class="btn btn-logout btn-sm" onclick="showPage('mainPage')" type="button">
+                    <i class="fas fa-arrow-left"><!-- icon --></i> Volver
+                </button>
+            </div>
+        </div>
+
+        <div class="content-wrapper">
+            <div class="container" style="max-width: 900px;">
+                <form id="newUserForm" action="#" onsubmit="return handleNewUser(event)">
+                    <div class="user-detail-section">
+                        <h4>Información Personal</h4>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="newUserName">Nombre completo *</label>
+                                <input type="text" class="form-control" id="newUserName" name="newUserName" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="newUserEmail">Correo electrónico *</label>
+                                <input type="text" class="form-control" id="newUserEmail" name="newUserEmail" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="newUserPhone">Teléfono *</label>
+                                <input type="text" class="form-control" id="newUserPhone" name="newUserPhone" maxlength="10" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="newUserModule">Módulo</label>
+                                <input type="text" class="form-control" id="newUserModule" name="newUserModule" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="user-detail-section">
+                        <h4>Estado y Acceso</h4>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="newUserRole">Rol asignado *</label>
+                                <select class="form-select" id="newUserRole" name="newUserRole">
+                                    <option value="">Seleccione...</option>
+                                    <option value="Jefe">Jefe</option>
+                                    <option value="Gerente">Gerente</option>
+                                    <option value="Operador">Operador</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="newUserStatus">Estado de cuenta</label>
+                                <select class="form-select" id="newUserStatus" name="newUserStatus">
+                                    <option value="Activo">Activo</option>
+                                    <option value="Inactivo">Inactivo</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-success btn-lg me-2">
+                            <i class="fas fa-save"><!-- icon --></i> Guardar Usuario
+                        </button>
+                        <button type="button" class="btn btn-secondary btn-lg" onclick="showPage('mainPage')">
+                            <i class="fas fa-times"><!-- icon --></i> Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- PÁGINA DE EDITAR USUARIO -->
+    <div id="editUserPage" class="page">
+        <div class="main-header">
+            <div class="container d-flex justify-content-between align-items-center">
+                <h1 class="h4 mb-0">Editar Usuario</h1>
+                <button class="btn btn-logout btn-sm" onclick="showPage('mainPage')" type="button">
+                    <i class="fas fa-arrow-left"><!-- icon --></i> Volver
+                </button>
+            </div>
+        </div>
+
+        <div class="content-wrapper">
+            <div class="container" style="max-width: 900px;">
+                <form id="editUserForm" action="#" onsubmit="return handleEditUser(event)">
+                    <input type="hidden" id="editUserId" name="editUserId" />
+                    <div class="user-detail-section">
+                        <h4>Información Personal</h4>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="editUserName">Nombre completo *</label>
+                                <input type="text" class="form-control" id="editUserName" name="editUserName" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="editUserEmail">Correo electrónico *</label>
+                                <input type="text" class="form-control" id="editUserEmail" name="editUserEmail" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="editUserPhone">Teléfono *</label>
+                                <input type="text" class="form-control" id="editUserPhone" name="editUserPhone" maxlength="10" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="editUserModule">Módulo</label>
+                                <input type="text" class="form-control" id="editUserModule" name="editUserModule" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="user-detail-section">
+                        <h4>Estado y Acceso</h4>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="editUserRole">Rol asignado *</label>
+                                <select class="form-select" id="editUserRole" name="editUserRole">
+                                    <option value="Jefe">Jefe</option>
+                                    <option value="Gerente">Gerente</option>
+                                    <option value="Operador">Operador</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="editUserStatus">Estado de cuenta</label>
+                                <select class="form-select" id="editUserStatus" name="editUserStatus">
+                                    <option value="Activo">Activo</option>
+                                    <option value="Inactivo">Inactivo</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-success btn-lg me-2">
+                            <i class="fas fa-save"><!-- icon --></i> Actualizar Usuario
+                        </button>
+                        <button type="button" class="btn btn-secondary btn-lg" onclick="showPage('mainPage')">
+                            <i class="fas fa-times"><!-- icon --></i> Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js" type="text/javascript"><!-- script --></script>
+    <script type="text/javascript">
+        //<![CDATA[
+        // Datos simulados
+        var users = [
+            { id: 1, name: 'María', email: 'user@gmail.com', module: 'ERP', phone: '9900258789', status: 'Activo', role: 'Gerente' },
+            { id: 2, name: 'Emanuel', email: 'usuario@gmail.com.mx', module: 'Bancos', phone: '9911165670', status: 'Inactivo', role: 'Jefe' },
+            { id: 3, name: 'José', email: 'jt615257@gmail.com', module: 'Proveedores', phone: '9981298737', status: 'Activo', role: 'Operador' },
+            { id: 4, name: 'Shaggy', email: 'shaggy@buu.net', module: 'CRM', phone: '54948151', status: 'Inactivo', role: 'Gerente' },
+            { id: 5, name: 'Scrapy', email: 'sam@gmail.com', module: 'Usuarios', phone: '9975201478', status: 'Activo', role: 'Jefe' }
+        ];
+
+        var currentUser = null;
+
+        // Credenciales válidas de ejemplo (usuario: contraseña)
+        var validCredentials = {
+            'admin': 'admin123',
+            'usuario': 'password',
+            'KC': '12345'
+        };
+
+        // Función para mostrar páginas
+        function showPage(pageId) {
+            var pages = document.querySelectorAll('.page');
+            for (var i = 0; i < pages.length; i++) {
+                pages[i].classList.remove('active');
+            }
+            document.getElementById(pageId).classList.add('active');
+            
+            if (pageId === 'mainPage') {
+                loadUsers();
+            }
+        }
+
+        // Función para mostrar alertas
+        function showAlert(message, type) {
+            var alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-' + type + ' alert-dismissible fade show alert-custom';
+            alertDiv.innerHTML = message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(function() {
+                alertDiv.remove();
+            }, 4000);
+        }
+
+        // Toggle password visibility
+        function togglePassword(inputId, icon) {
+            var input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Login
+        function handleLogin(e) {
+            e.preventDefault();
+            var username = document.getElementById('loginUsername').value;
+            var password = document.getElementById('loginPassword').value;
+
+            if (validCredentials[username] && validCredentials[username] === password) {
+                currentUser = { name: username, email: username + '@sistema.com' };
+                document.getElementById('currentUserName').textContent = currentUser.name;
+                showAlert('¡Inicio de sesión exitoso!', 'success');
+                setTimeout(function() {
+                    showPage('mainPage');
+                }, 1000);
+            } else {
+                showAlert('Credenciales incorrectas. Intente nuevamente.', 'danger');
+            }
+            return false;
+        }
+
+        // Registro
+        function handleRegister(e) {
+            e.preventDefault();
+            var email = document.getElementById('registerEmail').value;
+            var name = document.getElementById('registerName').value;
+            var phone = document.getElementById('registerPhone').value;
+            var password = document.getElementById('registerPassword').value;
+            var confirmPassword = document.getElementById('registerConfirmPassword').value;
+
+            // Validar que las contraseñas coincidan
+            if (password !== confirmPassword) {
+                showAlert('Las contraseñas no coinciden', 'warning');
+                return false;
+            }
+
+            // Validar formato de teléfono
+            if (!/^[0-9]{10}$/.test(phone)) {
+                showAlert('El teléfono debe tener 10 dígitos', 'warning');
+                return false;
+            }
+
+            // Registro exitoso
+            showAlert('¡Registro exitoso! Ya puede iniciar sesión', 'success');
+            
+            // Limpiar formulario
+            document.getElementById('registerForm').reset();
+            
+            // Redirigir a login después de 2 segundos
+            setTimeout(function() {
+                showPage('loginPage');
+            }, 2000);
+            
+            return false;
+        }
+
+        // Cargar usuarios en tabla
+        function loadUsers() {
+            var tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '';
+            
+            for (var i = 0; i < users.length; i++) {
+                var user = users[i];
+                var row = document.createElement('tr');
+                row.innerHTML = '<td>' + user.name + '</td>' +
+                    '<td>' + user.email + '</td>' +
+                    '<td>' + user.module + '</td>' +
+                    '<td>' + user.phone + '</td>' +
+                    '<td><span class="badge badge-' + user.status.toLowerCase() + '">' + user.status + '</span></td>' +
+                    '<td>' + user.role + '</td>' +
+                    '<td>' +
+                        '<button class="action-btn btn-edit" onclick="editUser(' + user.id + ')" type="button">' +
+                            '<i class="fas fa-edit"></i> Editar' +
+                        '</button>' +
+                        '<button class="action-btn btn-delete" onclick="deleteUser(' + user.id + ')" type="button">' +
+                            '<i class="fas fa-trash"></i> Eliminar' +
+                        '</button>' +
+                    '</td>';
+                tbody.appendChild(row);
+            }
+        }
+
+        // Nuevo usuario
+        function handleNewUser(e) {
+            e.preventDefault();
+            
+            var newUser = {
+                id: users.length + 1,
+                name: document.getElementById('newUserName').value,
+                email: document.getElementById('newUserEmail').value,
+                phone: document.getElementById('newUserPhone').value,
+                module: document.getElementById('newUserModule').value,
+                role: document.getElementById('newUserRole').value,
+                status: document.getElementById('newUserStatus').value
+            };
+
+            users.push(newUser);
+            showAlert('Usuario creado exitosamente', 'success');
+            document.getElementById('newUserForm').reset();
+            setTimeout(function() {
+                showPage('mainPage');
+            }, 1000);
+            
+            return false;
+        }
+
+        // Editar usuario
+        function editUser(userId) {
+            var user = null;
+            for (var i = 0; i < users.length; i++) {
+                if (users[i].id === userId) {
+                    user = users[i];
+                    break;
+                }
+            }
+            
+            if (user) {
+                document.getElementById('editUserId').value = user.id;
+                document.getElementById('editUserName').value = user.name;
+                document.getElementById('editUserEmail').value = user.email;
+                document.getElementById('editUserPhone').value = user.phone;
+                document.getElementById('editUserModule').value = user.module;
+                document.getElementById('editUserRole').value = user.role;
+                document.getElementById('editUserStatus').value = user.status;
+                showPage('editUserPage');
+            }
+        }
+
+        // Actualizar usuario
+        function handleEditUser(e) {
+            e.preventDefault();
+            
+            var userId = parseInt(document.getElementById('editUserId').value);
+            var userIndex = -1;
+            
+            for (var i = 0; i < users.length; i++) {
+                if (users[i].id === userId) {
+                    userIndex = i;
+                    break;
+                }
+            }
+            
+            if (userIndex !== -1) {
+                users[userIndex] = {
+                    id: userId,
+                    name: document.getElementById('editUserName').value,
+                    email: document.getElementById('editUserEmail').value,
+                    phone: document.getElementById('editUserPhone').value,
+                    module: document.getElementById('editUserModule').value,
+                    role: document.getElementById('editUserRole').value,
+                    status: document.getElementById('editUserStatus').value
+                };
+                
+                showAlert('Usuario actualizado exitosamente', 'success');
+                setTimeout(function() {
+                    showPage('mainPage');
+                }, 1000);
+            }
+            
+            return false;
+        }
+
+        // Eliminar usuario
+        function deleteUser(userId) {
+            if (confirm('¿Está seguro de eliminar este usuario?')) {
+                var newUsers = [];
+                for (var i = 0; i < users.length; i++) {
+                    if (users[i].id !== userId) {
+                        newUsers.push(users[i]);
+                    }
+                }
+                users = newUsers;
+                loadUsers();
+                showAlert('Usuario eliminado exitosamente', 'info');
+            }
+        }
+
+        // Filtrar usuarios
+        function filterUsers() {
+            var filterText = prompt('Ingrese el nombre o email a buscar:');
+            if (filterText) {
+                var filtered = [];
+                for (var i = 0; i < users.length; i++) {
+                    var user = users[i];
+                    if (user.name.toLowerCase().indexOf(filterText.toLowerCase()) !== -1 ||
+                        user.email.toLowerCase().indexOf(filterText.toLowerCase()) !== -1) {
+                        filtered.push(user);
+                    }
+                }
+                
+                var tbody = document.getElementById('usersTableBody');
+                tbody.innerHTML = '';
+                
+                if (filtered.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center">No se encontraron resultados</td></tr>';
+                } else {
+                    for (var i = 0; i < filtered.length; i++) {
+                        var user = filtered[i];
+                        var row = document.createElement('tr');
+                        row.innerHTML = '<td>' + user.name + '</td>' +
+                            '<td>' + user.email + '</td>' +
+                            '<td>' + user.module + '</td>' +
+                            '<td>' + user.phone + '</td>' +
+                            '<td><span class="badge badge-' + user.status.toLowerCase() + '">' + user.status + '</span></td>' +
+                            '<td>' + user.role + '</td>' +
+                            '<td>' +
+                                '<button class="action-btn btn-edit" onclick="editUser(' + user.id + ')" type="button">' +
+                                    '<i class="fas fa-edit"></i> Editar' +
+                                '</button>' +
+                                '<button class="action-btn btn-delete" onclick="deleteUser(' + user.id + ')" type="button">' +
+                                    '<i class="fas fa-trash"></i> Eliminar' +
+                                '</button>' +
+                            '</td>';
+                        tbody.appendChild(row);
+                    }
+                }
+            }
+        }
+
+        // Logout
+        function logout() {
+            if (confirm('¿Está seguro de cerrar sesión?')) {
+                currentUser = null;
+                showAlert('Sesión cerrada correctamente', 'info');
+                setTimeout(function() {
+                    showPage('loginPage');
+                    document.getElementById('loginForm').reset();
+                }, 1000);
+            }
+        }
+
+        // Validación de solo números en teléfono
+        var telInputs = document.querySelectorAll('input[type="text"][maxlength="10"]');
+        for (var i = 0; i < telInputs.length; i++) {
+            telInputs[i].addEventListener('input', function(e) {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        }
+
+        // Validación de solo letras en nombre
+        var nameInputs = document.querySelectorAll('#registerName, #newUserName, #editUserName');
+        for (var i = 0; i < nameInputs.length; i++) {
+            nameInputs[i].addEventListener('input', function(e) {
+                this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '');
+            });
+        }
+        //]]>
+    </script>
+</body>
+        <footer>
+            <p class="footer-text">
+                Desarrollado por Hernandez Reyes Brisa, Ortiz Ceballos Jorge, Romero Corral Luis Carlos
+            </p>
+            <p class="footer-copyright">
+                &copy; 2025 Módulo de Usuarios. Todos los derechos reservados.
+            </p>
+    </footer>
 </html>
