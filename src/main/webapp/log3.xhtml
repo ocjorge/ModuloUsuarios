@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="es" lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Módulo de Usuarios - Iniciar Sesión</title>
+  <style type="text/css">
+    :root {
+      --primary-color: #2c5aa0;
+      --secondary-color: #34495e;
+      --accent-color: #3498db;
+      --success-color: #27ae60;
+      --danger-color: #e74c3c;
+      --warning-color: #f39c12;
+      --light-bg: #f8f9fa;
+      --dark-text: #2c3e50;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: var(--light-bg);
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background: var(--primary-color);
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .login-box {
+      background: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 350px;
+      margin: 120px auto 40px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: var(--dark-text);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      color: var(--secondary-color);
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      transition: border 0.3s;
+    }
+
+    input:focus {
+      border: 1px solid var(--accent-color);
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      background: var(--accent-color);
+      color: #fff;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #2173b8;
+    }
+
+    .extra {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+    
+    .message {
+      text-align: center;
+      margin-bottom: 15px;
+      padding: 10px;
+      border-radius: 4px;
+      font-size: 14px;
+      display: none; /* Oculto por defecto */
+    }
+    .message.error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    .message.success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Módulo de Usuarios</h1>
+  </header>
+
+  <div class="login-box">
+    <h2>Iniciar sesión</h2>
+    
+    <div id="login-message" class="message"></div>
+
+    <form id="loginForm" method="post" action="">
+      <label for="email">Correo electrónico</label>
+      <input type="email" id="email" name="email" required="required" />
+
+      <label for="password">Contraseña</label>
+      <input type="password" id="password" name="password" required="required" />
+
+      <button type="submit">Entrar</button>
+    </form>
+    <div class="extra">
+      ¿No tienes cuenta? <a href="registro.xhtml">Regístrate</a>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const messageDiv = document.getElementById('login-message');
+
+      messageDiv.style.display = 'none';
+      messageDiv.classList.remove('error', 'success');
+
+      fetch('http://localhost:8080/modulo-usuarios-javaee/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email: email, password: password })
+      })
+      .then(response => {
+        if (!response.ok) {
+          return response.json().then(errorData => {
+            throw new Error(errorData.message || 'Error de autenticación.');
+          });
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.status === 'success') {
+          messageDiv.textContent = data.message;
+          messageDiv.classList.add('success');
+          messageDiv.style.display = 'block';
+
+          localStorage.setItem('jwt_token', data.token);
+          localStorage.setItem('user_id', data.userId);
+          localStorage.setItem('user_email', data.email);
+          localStorage.setItem('user_type', data.userType);
+          localStorage.setItem('rol_interno', data.rolInterno);
+          localStorage.setItem('acceso_modulos', JSON.stringify(data.accesoModulos));
+
+          if (data.rolInterno === 'Gerente') {
+              window.location.href = 'prueba.xhtml';
+          } else {
+              // Aquí podrías tener más lógica de redirección para otros roles o tipos de usuario
+              window.location.href = 'dashboard.xhtml'; // Una página genérica de dashboard
+          }
+        } else {
+          messageDiv.textContent = data.message || 'Error desconocido.';
+          messageDiv.classList.add('error');
+          messageDiv.style.display = 'block';
+        }
+      })
+      .catch(error => {
+        messageDiv.textContent = error.message || 'Ocurrió un error al intentar iniciar sesión.';
+        messageDiv.classList.add('error');
+        messageDiv.style.display = 'block';
+        console.error('Error:', error);
+      });
+    });
+  </script>
+</body>
+</html>

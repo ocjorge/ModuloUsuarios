@@ -1,0 +1,635 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="es" lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Módulo de Usuarios</title>
+  <style type="text/css">
+    :root {
+      --color-primario: #2c5aa0;
+      --color-secundario: #34495e;
+      --color-acento: #3498db;
+      --color-exito: #27ae60;
+      --color-peligro: #e74c3c;
+      --color-advertencia: #f39c12;
+      --luz-bg: #f8f9fa;
+      --texto-oscuro: #2c3e50;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--luz-bg);
+      color: var(--texto-oscuro);
+    }
+
+    .header {
+      background-color: var(--color-primario);
+      color: white;
+      padding: 15px 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 1.5em;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .header-right span {
+      font-size: 0.95em;
+    }
+
+    .header-right .btn-logout {
+      background-color: var(--color-peligro);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: background-color 0.3s ease;
+    }
+
+    .header-right .btn-logout:hover {
+      background-color: #c0392b;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 30px;
+      background-color: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      color: var(--color-secundario);
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .buttons-nav {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .buttons-nav button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      text-transform: uppercase;
+      cursor: pointer;
+      color: white;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .buttons-nav .new-user {
+      background-color: var(--color-exito);
+    }
+    .buttons-nav .new-user:hover {
+      background-color: #1e8449;
+    }
+
+    .buttons-nav .filter {
+      background-color: var(--color-acento);
+    }
+    .buttons-nav .filter:hover {
+      background-color: #2d80c4;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: var(--luz-bg);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.9em;
+      cursor: pointer; /* Indica que la columna es clicable para ordenar */
+    }
+    th .sort-icon {
+        display: inline-block;
+        width: 0;
+        height: 0;
+        margin-left: 5px;
+        vertical-align: middle;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+    }
+    th.asc .sort-icon {
+        border-bottom: 5px solid var(--texto-oscuro);
+    }
+    th.desc .sort-icon {
+        border-top: 5px solid var(--texto-oscuro);
+    }
+
+
+    tr:hover {
+      background-color: #f1f7fe;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .actions button {
+      padding: 6px 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9em;
+      color: white;
+      text-transform: uppercase;
+    }
+
+    .actions .edit {
+      background-color: var(--color-acento);
+    }
+    .actions .edit:hover {
+      background-color: #2d80c4;
+    }
+
+    .actions .delete {
+      background-color: var(--color-peligro);
+    }
+    .actions .delete:hover {
+      background-color: #c0392b;
+    }
+
+    .badge {
+      padding: 4px 10px;
+      border-radius: 12px;
+      color: white;
+      font-size: 0.85em;
+      font-weight: bold;
+      text-align: center;
+    }
+    .activo {
+      background-color: var(--color-exito);
+    }
+    .inactivo {
+      background-color: var(--color-peligro);
+    }
+    .bloqueado {
+      background-color: var(--color-advertencia);
+    }
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+        gap: 5px;
+    }
+    .pagination button {
+        padding: 8px 12px;
+        border: 1px solid var(--color-acento);
+        background-color: white;
+        color: var(--color-acento);
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    .pagination button:hover:not(:disabled) {
+        background-color: var(--color-acento);
+        color: white;
+    }
+    .pagination button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    .filter-section {
+        background-color: #f0f0f0;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: none; /* Oculto por defecto */
+        flex-wrap: wrap;
+        gap: 15px;
+        align-items: flex-end;
+    }
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+    }
+    .filter-group label {
+        font-size: 0.9em;
+        margin-bottom: 5px;
+        color: var(--texto-oscuro);
+        font-weight: bold;
+    }
+    .filter-section input, .filter-section select {
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        min-width: 150px;
+    }
+    .filter-buttons button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        font-weight: bold;
+        cursor: pointer;
+        color: white;
+        transition: background-color 0.3s ease;
+    }
+    .filter-buttons .apply {
+        background-color: var(--color-acento);
+    }
+    .filter-buttons .clear {
+        background-color: var(--color-secundario); /* Cambiado de secondary a secundario */
+    }
+    .extra-fast-access {
+        text-align: right;
+        margin-bottom: 10px;
+    }
+    .extra-fast-access a {
+        color: var(--color-acento);
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 0.95em;
+    }
+    .extra-fast-access a:hover {
+        text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Módulo de Usuarios</h1>
+    <div class="header-right">
+      <span id="welcomeMessage"></span>
+      <button class="btn-logout" id="logoutBtn">Cerrar Sesión</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <h2>Lista de Usuarios</h2>
+
+    <div class="extra-fast-access">
+        <a href="#" id="myProfileLink">Mi Perfil</a>
+    </div>
+
+    <div class="buttons-nav">
+      <button class="new-user" id="newUserBtn">+ Nuevo Usuario</button>
+      <button class="filter" id="toggleFilterBtn">&#128269; Filtrar</button>
+    </div>
+
+    <div id="filterSection" class="filter-section">
+        <div class="filter-group">
+            <label for="filterName">Nombre</label>
+            <input type="text" id="filterName" />
+        </div>
+        <div class="filter-group">
+            <label for="filterEmail">Correo</label>
+            <input type="email" id="filterEmail" />
+        </div>
+        <div class="filter-group">
+            <label for="filterStatus">Estado</label>
+            <select id="filterStatus">
+                <option value="">Todos</option>
+                <option value="Activo">Activo</option>
+                <option value="Inactivo">Inactivo</option>
+                <option value="Bloqueado">Bloqueado</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label for="filterRole">Rol</label>
+            <select id="filterRole">
+                <option value="">Todos</option>
+                <option value="Gerente">Gerente</option>
+                <option value="Jefe">Jefe</option>
+                <option value="Operador">Operador</option>
+            </select>
+        </div>
+        <div class="filter-buttons">
+            <button class="apply" id="applyFilterBtn">Aplicar Filtros</button>
+            <button class="clear" id="clearFilterBtn">Limpiar Filtros</button>
+        </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th data-sort-by="nombreCompleto">Nombre <span class="sort-icon"></span></th>
+          <th data-sort-by="email">Correo <span class="sort-icon"></span></th>
+          <th>Tipo Usuario</th>
+          <th>Teléfono</th>
+          <th data-sort-by="estadoCuenta">Estado <span class="sort-icon"></span></th>
+          <th data-sort-by="rolInterno">Rol <span class="sort-icon"></span></th>
+          <th data-sort-by="ultimaSesion">Última Sesión <span class="sort-icon"></span></th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="userTableBody">
+        <!-- Los datos se cargarán aquí con JavaScript -->
+      </tbody>
+    </table>
+
+    <div class="pagination" id="paginationControls">
+        <button id="prevPageBtn" disabled="disabled">&laquo; Anterior</button>
+        <span id="pageInfo">Página 1 de 1</span>
+        <button id="nextPageBtn" disabled="disabled">Siguiente &raquo;</button>
+    </div>
+  </div>
+    
+        <footer>
+        <p>Desarrollado por Hernandez Reyes Brisa, Ortiz Ceballos Jorge, Romero Corral Luis Carlos</p>
+        <p>&copy; 2025 Módulo de Usuarios.</p>
+    </footer>
+
+  <script type="text/javascript">
+    const API_BASE_URL = 'http://localhost:8080/modulo-usuarios-javaee/api'; // Ajusta el puerto y context root
+    let currentPage = 0;
+    let pageSize = 10;
+    let currentSortBy = 'nombreCompleto';
+    let currentSortDir = 'asc';
+    let currentFilters = {};
+
+    function getToken() {
+      return localStorage.getItem('jwt_token');
+    }
+
+    function checkAuthAndRedirect() {
+      const token = getToken();
+      if (!token) {
+        window.location.href = 'log3(1).xhtml';
+        return false;
+      }
+      return true;
+    }
+
+    function displayWelcomeMessage() {
+      const userName = localStorage.getItem('user_email');
+      document.getElementById('welcomeMessage').textContent = `Bienvenido, ${userName ? userName.split('@')[0] : 'Usuario'}`;
+    }
+
+    async function fetchUsers() {
+      if (!checkAuthAndRedirect()) return;
+
+      const token = getToken();
+      const userTableBody = document.getElementById('userTableBody');
+      userTableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Cargando usuarios...</td></tr>';
+
+      const queryParams = new URLSearchParams({
+        page: currentPage,
+        size: pageSize,
+        sortBy: currentSortBy,
+        sortDir: currentSortDir,
+      });
+
+      for (const key in currentFilters) {
+          if (currentFilters[key]) {
+              queryParams.append(key, currentFilters[key]);
+          }
+      }
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/users?${queryParams.toString()}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          if (response.status === 401 || response.status === 403) {
+            alert('Su sesión ha expirado o no tiene permisos. Por favor, inicie sesión nuevamente.');
+            localStorage.clear();
+            window.location.href = 'log3(1).xhtml';
+            return;
+          }
+          throw new Error(`Error HTTP: ${response.status} - ${response.statusText}`);
+        }
+
+        const pageData = await response.json();
+        renderUsersTable(pageData.content);
+        renderPaginationControls(pageData.totalPages);
+
+      } catch (error) {
+        console.error('Error al cargar usuarios:', error);
+        userTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color: var(--color-peligro);">Error al cargar usuarios: ${error.message}</td></tr>`;
+      }
+    }
+
+    function renderUsersTable(users) {
+      const userTableBody = document.getElementById('userTableBody');
+      userTableBody.innerHTML = '';
+
+      if (users.length === 0) {
+          userTableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No se encontraron usuarios.</td></tr>';
+          return;
+      }
+
+      users.forEach(user => {
+        const row = userTableBody.insertRow();
+        row.insertCell().textContent = user.nombreCompleto;
+        row.insertCell().textContent = user.email;
+        row.insertCell().textContent = user.tipoUsuario;
+        row.insertCell().textContent = user.telefono || 'N/A';
+        
+        const statusCell = row.insertCell();
+        const statusSpan = document.createElement('span');
+        statusSpan.classList.add('badge');
+        statusSpan.classList.add(user.estadoCuenta.toLowerCase() === 'activo' ? 'activo' : (user.estadoCuenta.toLowerCase() === 'inactivo' ? 'inactivo' : 'bloqueado'));
+        statusSpan.textContent = user.estadoCuenta;
+        statusCell.appendChild(statusSpan);
+
+        row.insertCell().textContent = user.rolInterno || 'N/A';
+        row.insertCell().textContent = user.ultimaSesion ? new Date(user.ultimaSesion).toLocaleString() : 'Nunca';
+        
+        const actionsCell = row.insertCell();
+        const actionsDiv = document.createElement('div');
+        actionsDiv.classList.add('actions');
+
+        const editButton = document.createElement('button');
+        editButton.classList.add('edit');
+        editButton.textContent = 'Editar';
+        editButton.onclick = () => window.location.href = `detallesUsuarios.xhtml?id=${user.idUsuario}`;
+        actionsDiv.appendChild(editButton);
+
+        const deactivateButton = document.createElement('button');
+        deactivateButton.classList.add('delete');
+        deactivateButton.textContent = 'Desactivar';
+        deactivateButton.onclick = () => deactivateUser(user.idUsuario, user.email);
+        actionsDiv.appendChild(deactivateButton);
+        
+        actionsCell.appendChild(actionsDiv);
+      });
+    }
+
+    function renderPaginationControls(totalPages) {
+        const prevBtn = document.getElementById('prevPageBtn');
+        const nextBtn = document.getElementById('nextPageBtn');
+        const pageInfo = document.getElementById('pageInfo');
+
+        pageInfo.textContent = `Página ${currentPage + 1} de ${totalPages}`;
+        prevBtn.disabled = currentPage === 0;
+        nextBtn.disabled = currentPage >= totalPages - 1;
+
+        prevBtn.onclick = () => {
+            if (currentPage > 0) {
+                currentPage--;
+                fetchUsers();
+            }
+        };
+        nextBtn.onclick = () => {
+            if (currentPage < totalPages - 1) {
+                currentPage++;
+                fetchUsers();
+            }
+        };
+    }
+
+    async function deactivateUser(userId, userEmail) {
+        if (!checkAuthAndRedirect()) return;
+        
+        if (!confirm(`¿Está seguro de que desea desactivar al usuario ${userEmail}?`)) {
+            return;
+        }
+
+        const token = getToken();
+        try {
+            const response = await fetch(`${API_BASE_URL}/users/${userId}/deactivate`, {
+                method: 'PUT', // Cambiado a PUT para desactivación lógica
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.status === 204) {
+                alert(`Usuario ${userEmail} desactivado exitosamente.`);
+                fetchUsers();
+            } else if (response.status === 401 || response.status === 403) {
+                alert('Su sesión ha expirado o no tiene permisos para realizar esta acción.');
+                localStorage.clear();
+                window.location.href = 'log3(1).xhtml';
+            } else {
+                const errorData = await response.json();
+                alert(`Error al desactivar usuario: ${errorData.message || response.statusText}`);
+            }
+        } catch (error) {
+            console.error('Error al desactivar usuario:', error);
+            alert(`Error de red o desconocido al desactivar usuario: ${error.message}`);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      if (!checkAuthAndRedirect()) return;
+      displayWelcomeMessage();
+      fetchUsers();
+
+      document.querySelectorAll('th[data-sort-by]').forEach(header => {
+          header.addEventListener('click', () => {
+              const sortByField = header.getAttribute('data-sort-by');
+              if (currentSortBy === sortByField) {
+                  currentSortDir = (currentSortDir === 'asc' ? 'desc' : 'asc');
+              } else {
+                  currentSortBy = sortByField;
+                  currentSortDir = 'asc';
+              }
+              currentPage = 0;
+              fetchUsers();
+          });
+      });
+
+      document.getElementById('toggleFilterBtn').addEventListener('click', () => {
+          const filterSection = document.getElementById('filterSection');
+          filterSection.style.display = filterSection.style.display === 'flex' ? 'none' : 'flex';
+      });
+
+      document.getElementById('applyFilterBtn').addEventListener('click', () => {
+          currentFilters = {
+              nombreCompleto: document.getElementById('filterName').value,
+              email: document.getElementById('filterEmail').value,
+              estadoCuenta: document.getElementById('filterStatus').value,
+              rolInterno: document.getElementById('filterRole').value
+          };
+          currentPage = 0;
+          fetchUsers();
+      });
+
+      document.getElementById('clearFilterBtn').addEventListener('click', () => {
+          document.getElementById('filterName').value = '';
+          document.getElementById('filterEmail').value = '';
+          document.getElementById('filterStatus').value = '';
+          document.getElementById('filterRole').value = '';
+          currentFilters = {};
+          currentPage = 0;
+          fetchUsers();
+      });
+
+      document.getElementById("logoutBtn").addEventListener("click", async function(){
+        if (!checkAuthAndRedirect()) return;
+
+        const token = getToken();
+        if (!confirm("¿Estás seguro de que quieres cerrar sesión?")) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (response.ok) {
+                console.log("Sesión invalidada en el servidor.");
+            } else {
+                console.warn("Fallo al invalidar sesión en el servidor, pero se cerrará localmente.");
+            }
+            
+        } catch (error) {
+            console.error('Error al intentar cerrar sesión en el servidor:', error);
+        } finally {
+            localStorage.clear();
+            window.location.href = 'log3(1).xhtml';
+        }
+      });
+
+      document.getElementById('myProfileLink').addEventListener('click', (e) => {
+        e.preventDefault();
+        const userId = localStorage.getItem('user_id');
+        if (userId) {
+            window.location.href = `detallesUsuarios.xhtml?id=${userId}`;
+        } else {
+            alert('No se pudo encontrar el ID de usuario para acceder al perfil.');
+        }
+      });
+      
+      // Botón "Nuevo Usuario"
+      document.getElementById('newUserBtn').addEventListener('click', () => {
+          window.location.href = 'registro.xhtml'; // Redirige a la página de registro de empleados
+      });
+    });
+  </script>
+</body>
+</html>
