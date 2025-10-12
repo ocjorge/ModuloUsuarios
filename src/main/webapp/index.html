@@ -192,10 +192,10 @@
         <div class="content-wrapper">
             <div class="auth-box">
                 <h2>Iniciar Sesión</h2>
-                <form id="loginForm">
+                <form id="loginForm" onsubmit="return handleLogin(event)">
                     <div class="mb-3">
-                        <label for="loginEmail" class="form-label">Correo electrónico</label>
-                        <input type="email" class="form-control" id="loginEmail" required>
+                        <label for="loginUsername" class="form-label">Nombre de usuario</label>
+                        <input type="text" class="form-control" id="loginUsername" required>
                     </div>
                     <div class="form-group-custom">
                         <label for="loginPassword" class="form-label">Contraseña</label>
@@ -205,7 +205,7 @@
                     <button type="submit" class="btn btn-primary-custom w-100 mt-3">Iniciar Sesión</button>
                 </form>
                 <div class="text-center mt-3">
-                    <small>¿No tienes cuenta? <a href="#" onclick="showPage('registerPage')">Regístrate aquí</a></small>
+                    <small>¿No tienes cuenta? <a href="#" onclick="showPage('registerPage'); return false;">Regístrate aquí</a></small>
                 </div>
             </div>
         </div>
@@ -222,7 +222,7 @@
         <div class="content-wrapper">
             <div class="auth-box">
                 <h2>Registrar Empleado</h2>
-                <form id="registerForm">
+                <form id="registerForm" onsubmit="return handleRegister(event)">
                     <div class="mb-3">
                         <label for="registerEmail" class="form-label">Correo electrónico</label>
                         <input type="email" class="form-control" id="registerEmail" required>
@@ -248,7 +248,7 @@
                     <button type="submit" class="btn btn-primary-custom w-100 mt-3">Registrar Empleado</button>
                 </form>
                 <div class="text-center mt-3">
-                    <small>¿Ya tienes cuenta? <a href="#" onclick="showPage('loginPage')">Inicia sesión</a></small>
+                    <small>¿Ya tienes cuenta? <a href="#" onclick="showPage('loginPage'); return false;">Inicia sesión</a></small>
                 </div>
             </div>
         </div>
@@ -317,7 +317,7 @@
 
         <div class="content-wrapper">
             <div class="container" style="max-width: 900px;">
-                <form id="newUserForm">
+                <form id="newUserForm" onsubmit="return handleNewUser(event)">
                     <div class="user-detail-section">
                         <h4>Información Personal</h4>
                         <div class="row">
@@ -388,7 +388,7 @@
 
         <div class="content-wrapper">
             <div class="container" style="max-width: 900px;">
-                <form id="editUserForm">
+                <form id="editUserForm" onsubmit="return handleEditUser(event)">
                     <input type="hidden" id="editUserId">
                     <div class="user-detail-section">
                         <h4>Información Personal</h4>
@@ -459,10 +459,11 @@
 
         let currentUser = null;
 
-        // Credenciales válidas de ejemplo
+        // Credenciales válidas de ejemplo (usuario: contraseña)
         const validCredentials = {
-            'admin@sistema.com': 'admin123',
-            'user@gmail.com': 'password'
+            'admin': 'admin123',
+            'usuario': 'password',
+            'KC': '12345'
         };
 
         // Función para mostrar páginas
@@ -476,16 +477,13 @@
         }
 
         // Función para mostrar alertas
-        function showAlert(message, type = 'success') {
+        function showAlert(message, type) {
             const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type} alert-dismissible fade show alert-custom`;
-            alertDiv.innerHTML = `
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            `;
+            alertDiv.className = 'alert alert-' + type + ' alert-dismissible fade show alert-custom';
+            alertDiv.innerHTML = message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
             document.body.appendChild(alertDiv);
             
-            setTimeout(() => {
+            setTimeout(function() {
                 alertDiv.remove();
             }, 4000);
         }
@@ -505,23 +503,26 @@
         }
 
         // Login
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
+        function handleLogin(e) {
             e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
+            const username = document.getElementById('loginUsername').value;
             const password = document.getElementById('loginPassword').value;
 
-            if (validCredentials[email] && validCredentials[email] === password) {
-                currentUser = { name: email.split('@')[0], email: email };
+            if (validCredentials[username] && validCredentials[username] === password) {
+                currentUser = { name: username, email: username + '@sistema.com' };
                 document.getElementById('currentUserName').textContent = currentUser.name;
                 showAlert('¡Inicio de sesión exitoso!', 'success');
-                setTimeout(() => showPage('mainPage'), 1000);
+                setTimeout(function() {
+                    showPage('mainPage');
+                }, 1000);
             } else {
                 showAlert('Credenciales incorrectas. Intente nuevamente.', 'danger');
             }
-        });
+            return false;
+        }
 
         // Registro
-        document.getElementById('registerForm').addEventListener('submit', function(e) {
+        function handleRegister(e) {
             e.preventDefault();
             const email = document.getElementById('registerEmail').value;
             const name = document.getElementById('registerName').value;
@@ -532,61 +533,56 @@
             // Validar que las contraseñas coincidan
             if (password !== confirmPassword) {
                 showAlert('Las contraseñas no coinciden', 'warning');
-                return;
-            }
-
-            // Validar que el email no exista
-            if (validCredentials[email]) {
-                showAlert('Este correo ya está registrado', 'warning');
-                return;
+                return false;
             }
 
             // Validar formato de teléfono
             if (!/^[0-9]{10}$/.test(phone)) {
                 showAlert('El teléfono debe tener 10 dígitos', 'warning');
-                return;
+                return false;
             }
 
             // Registro exitoso
-            validCredentials[email] = password;
             showAlert('¡Registro exitoso! Ya puede iniciar sesión', 'success');
             
             // Limpiar formulario
-            this.reset();
+            document.getElementById('registerForm').reset();
             
             // Redirigir a login después de 2 segundos
-            setTimeout(() => showPage('loginPage'), 2000);
-        });
+            setTimeout(function() {
+                showPage('loginPage');
+            }, 2000);
+            
+            return false;
+        }
 
         // Cargar usuarios en tabla
         function loadUsers() {
             const tbody = document.getElementById('usersTableBody');
             tbody.innerHTML = '';
             
-            users.forEach(user => {
+            users.forEach(function(user) {
                 const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${user.name}</td>
-                    <td>${user.email}</td>
-                    <td>${user.module}</td>
-                    <td>${user.phone}</td>
-                    <td><span class="badge badge-${user.status.toLowerCase()}">${user.status}</span></td>
-                    <td>${user.role}</td>
-                    <td>
-                        <button class="action-btn btn-edit" onclick="editUser(${user.id})">
-                            <i class="fas fa-edit"></i> Editar
-                        </button>
-                        <button class="action-btn btn-delete" onclick="deleteUser(${user.id})">
-                            <i class="fas fa-trash"></i> Eliminar
-                        </button>
-                    </td>
-                `;
+                row.innerHTML = '<td>' + user.name + '</td>' +
+                    '<td>' + user.email + '</td>' +
+                    '<td>' + user.module + '</td>' +
+                    '<td>' + user.phone + '</td>' +
+                    '<td><span class="badge badge-' + user.status.toLowerCase() + '">' + user.status + '</span></td>' +
+                    '<td>' + user.role + '</td>' +
+                    '<td>' +
+                        '<button class="action-btn btn-edit" onclick="editUser(' + user.id + ')">' +
+                            '<i class="fas fa-edit"></i> Editar' +
+                        '</button>' +
+                        '<button class="action-btn btn-delete" onclick="deleteUser(' + user.id + ')">' +
+                            '<i class="fas fa-trash"></i> Eliminar' +
+                        '</button>' +
+                    '</td>';
                 tbody.appendChild(row);
             });
         }
 
         // Nuevo usuario
-        document.getElementById('newUserForm').addEventListener('submit', function(e) {
+        function handleNewUser(e) {
             e.preventDefault();
             
             const newUser = {
@@ -601,13 +597,17 @@
 
             users.push(newUser);
             showAlert('Usuario creado exitosamente', 'success');
-            this.reset();
-            setTimeout(() => showPage('mainPage'), 1000);
-        });
+            document.getElementById('newUserForm').reset();
+            setTimeout(function() {
+                showPage('mainPage');
+            }, 1000);
+            
+            return false;
+        }
 
         // Editar usuario
         function editUser(userId) {
-            const user = users.find(u => u.id === userId);
+            const user = users.find(function(u) { return u.id === userId; });
             if (user) {
                 document.getElementById('editUserId').value = user.id;
                 document.getElementById('editUserName').value = user.name;
@@ -621,11 +621,11 @@
         }
 
         // Actualizar usuario
-        document.getElementById('editUserForm').addEventListener('submit', function(e) {
+        function handleEditUser(e) {
             e.preventDefault();
             
             const userId = parseInt(document.getElementById('editUserId').value);
-            const userIndex = users.findIndex(u => u.id === userId);
+            const userIndex = users.findIndex(function(u) { return u.id === userId; });
             
             if (userIndex !== -1) {
                 users[userIndex] = {
@@ -639,27 +639,31 @@
                 };
                 
                 showAlert('Usuario actualizado exitosamente', 'success');
-                setTimeout(() => showPage('mainPage'), 1000);
+                setTimeout(function() {
+                    showPage('mainPage');
+                }, 1000);
             }
-        });
+            
+            return false;
+        }
 
         // Eliminar usuario
         function deleteUser(userId) {
             if (confirm('¿Está seguro de eliminar este usuario?')) {
-                users = users.filter(u => u.id !== userId);
+                users = users.filter(function(u) { return u.id !== userId; });
                 loadUsers();
                 showAlert('Usuario eliminado exitosamente', 'info');
             }
         }
 
-        // Filtrar usuarios (básico)
+        // Filtrar usuarios
         function filterUsers() {
             const filterText = prompt('Ingrese el nombre o email a buscar:');
             if (filterText) {
-                const filtered = users.filter(u => 
-                    u.name.toLowerCase().includes(filterText.toLowerCase()) ||
-                    u.email.toLowerCase().includes(filterText.toLowerCase())
-                );
+                const filtered = users.filter(function(u) {
+                    return u.name.toLowerCase().includes(filterText.toLowerCase()) ||
+                           u.email.toLowerCase().includes(filterText.toLowerCase());
+                });
                 
                 const tbody = document.getElementById('usersTableBody');
                 tbody.innerHTML = '';
@@ -667,24 +671,22 @@
                 if (filtered.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="7" class="text-center">No se encontraron resultados</td></tr>';
                 } else {
-                    filtered.forEach(user => {
+                    filtered.forEach(function(user) {
                         const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${user.name}</td>
-                            <td>${user.email}</td>
-                            <td>${user.module}</td>
-                            <td>${user.phone}</td>
-                            <td><span class="badge badge-${user.status.toLowerCase()}">${user.status}</span></td>
-                            <td>${user.role}</td>
-                            <td>
-                                <button class="action-btn btn-edit" onclick="editUser(${user.id})">
-                                    <i class="fas fa-edit"></i> Editar
-                                </button>
-                                <button class="action-btn btn-delete" onclick="deleteUser(${user.id})">
-                                    <i class="fas fa-trash"></i> Eliminar
-                                </button>
-                            </td>
-                        `;
+                        row.innerHTML = '<td>' + user.name + '</td>' +
+                            '<td>' + user.email + '</td>' +
+                            '<td>' + user.module + '</td>' +
+                            '<td>' + user.phone + '</td>' +
+                            '<td><span class="badge badge-' + user.status.toLowerCase() + '">' + user.status + '</span></td>' +
+                            '<td>' + user.role + '</td>' +
+                            '<td>' +
+                                '<button class="action-btn btn-edit" onclick="editUser(' + user.id + ')">' +
+                                    '<i class="fas fa-edit"></i> Editar' +
+                                '</button>' +
+                                '<button class="action-btn btn-delete" onclick="deleteUser(' + user.id + ')">' +
+                                    '<i class="fas fa-trash"></i> Eliminar' +
+                                '</button>' +
+                            '</td>';
                         tbody.appendChild(row);
                     });
                 }
@@ -696,7 +698,7 @@
             if (confirm('¿Está seguro de cerrar sesión?')) {
                 currentUser = null;
                 showAlert('Sesión cerrada correctamente', 'info');
-                setTimeout(() => {
+                setTimeout(function() {
                     showPage('loginPage');
                     document.getElementById('loginForm').reset();
                 }, 1000);
@@ -704,19 +706,24 @@
         }
 
         // Validación de solo números en teléfono
-        document.querySelectorAll('input[type="tel"]').forEach(input => {
+        document.querySelectorAll('input[type="tel"]').forEach(function(input) {
             input.addEventListener('input', function(e) {
                 this.value = this.value.replace(/[^0-9]/g, '');
             });
         });
 
         // Validación de solo letras en nombre
-        document.querySelectorAll('input[pattern*="A-Za-z"]').forEach(input => {
+        document.querySelectorAll('input[pattern*="A-Za-z"]').forEach(function(input) {
             input.addEventListener('input', function(e) {
                 this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '');
             });
         });
     </script>
 </body>
-</html>
+    <footer>
+        <center>
+        <p>Desarrollado por Hernandez Reyes Brisa, Ortiz Ceballos Jorge, Romero Corral Luis Carlos</p>
+        <p>&copy; 2025 Módulo de Usuarios. Todos los derechos reservados.</p>
+        </center>
+    </footer>
 </html>
