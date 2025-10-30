@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
+    <h:head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>Sistema de Usuarios - Login</title>
+        <h:outputStylesheet library="css" name="bootstrap.min.css"/>
+        <h:outputStylesheet library="css" name="all.min.css"/>
+        <h:outputStylesheet library="css" name="styles.css" />
+        <script>
+            function togglePassword(inputId, icon) {
+                var input = document.getElementById(inputId);
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            }
+        </script>
+    </h:head>
+    <h:body>
+        <div class="header">
+            <h1>Sistema de Gestión de Usuarios</h1>
+        </div>
+
+        <div class="auth-box">
+            <h2>Iniciar Sesión</h2>
+            <h:form id="loginForm">
+                <div class="mb-3">
+                    <h:outputLabel for="loginUsername" value="Nombre de usuario" styleClass="form-label"/>
+                    <h:inputText id="loginUsername" value="#{userManagerBean.loginUsername}" styleClass="form-control" required="true"/>
+                </div>
+                <div class="form-group-custom">
+                    <h:outputLabel for="loginPassword" value="Contraseña" styleClass="form-label"/>
+                    <h:inputSecret id="loginPassword" value="#{userManagerBean.loginPassword}" styleClass="form-control" required="true"/>
+                    <i class="fas fa-eye password-toggle" onclick="togglePassword('loginForm:loginPassword', this)"></i>
+                </div>
+                <h:commandButton value="Iniciar Sesión" action="#{userManagerBean.handleLogin}" styleClass="btn btn-primary-custom w-100 mt-3"/>
+                <h:messages globalOnly="false" style="color:red; margin-top: 10px;" infoStyle="color:green;" errorStyle="color:red;"/>
+            </h:form>
+            <div class="text-center mt-3">
+                <small>¿No tienes cuenta? <h:link value="Regístrate aquí" outcome="registerPage.xhtml"/></small>
+            </div>
+        </div>
+        <h:outputScript library="js" name="bootstrap.bundle.min.js"/>
+    </h:body>
+</html>
