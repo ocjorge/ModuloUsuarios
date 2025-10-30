@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"> <!-- Namespace HTML5 -->
+    <h:head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>Editar Usuario</title>
+        <h:outputStylesheet library="css" name="bootstrap.min.css"/>
+        <h:outputStylesheet library="css" name="all.min.css"/>
+        <h:outputStylesheet library="css" name="styles.css" />
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var editUserPhoneInput = document.getElementById('editUserForm:editUserPhone');
+                if (editUserPhoneInput) {
+                    editUserPhoneInput.addEventListener('input', function (e) {
+                        this.value = this.value.replace(/[^0-9]/g, '');
+                    });
+                }
+                var editUserNameInput = document.getElementById('editUserForm:editUserName');
+                if (editUserNameInput) {
+                    editUserNameInput.addEventListener('input', function (e) {
+                        this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '');
+                    });
+                }
+                var editZipInput = document.getElementById('editUserForm:editZip'); // Asumiendo que existirá
+                if (editZipInput) {
+                    editZipInput.addEventListener('input', function (e) {
+                        this.value = this.value.replace(/[^0-9]/g, '');
+                    });
+                }
+            });
+        </script>
+    </h:head>
+    <h:body>
+        <div class="header">
+            <div>Usuarios</div>
+            <div class="header-right">
+                <span>Bienvenido, <strong>#{userManagerBean.currentUserName}</strong></span>
+                <h:form>
+                    <h:commandLink value="Volver" action="mainPage.xhtml?faces-redirect=true" styleClass="btn-logout"/>
+                </h:form>
+            </div>
+        </div>
+
+        <div class="detail-container">
+            <div class="header-form">Editar Usuario</div>
+
+            <h:form id="editUserForm">
+                <h:inputHidden id="editUserId" value="#{userManagerBean.selectedUser.id}"/>
+
+                <!-- INFORMACIÓN PERSONAL -->
+                <div class="form-section">
+                    <h3>Información Personal</h3>
+                    <div class="form-group">
+                        <h:outputLabel value="Nombre completo *" for="editUserName" styleClass="form-label"/>
+                        <h:inputText id="editUserName" value="#{userManagerBean.selectedUser.name}" styleClass="form-control" required="true"
+                                     style="#{userManagerBean.selectedUser.highlightedFields['name'] ? 'background-color: rgba(128, 255, 128, 0.2);' : ''}"/>
+                        <h:message for="editUserName" style="color: red;"/>
+                    </div>
+                    <div class="form-group">
+                        <h:outputLabel value="Correo electrónico *" for="editUserEmail" styleClass="form-label"/>
+                        <h:inputText id="editUserEmail" value="#{userManagerBean.selectedUser.email}" styleClass="form-control" required="true" validatorMessage="Formato de correo electrónico inválido."
+                                     style="#{userManagerBean.selectedUser.highlightedFields['email'] ? 'background-color: rgba(128, 255, 128, 0.2);' : ''}">
+                            <f:validateRegex pattern="[\w\.-]*[a-zA-Z0-9_]@[w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]"/>
+                        </h:inputText>
+                        <h:message for="editUserEmail" style="color: red;"/>
+                    </div>
+                    <div class="form-group">
+                        <h:outputLabel value="Teléfono *" for="editUserPhone" styleClass="form-label"/>
+                        <h:inputText id="editUserPhone" value="#{userManagerBean.selectedUser.phone}" styleClass="form-control" maxlength="10" required="true" validatorMessage="El teléfono debe tener 10 dígitos."
+                                     style="#{userManagerBean.selectedUser.highlightedFields['phone'] ? 'background-color: rgba(128, 255, 128, 0.2);' : ''}">
+                            <f:validateLength minimum="10" maximum="10"/>
+                            <f:validateRegex pattern="^[0-9]{10}$"/>
+                        </h:inputText>
+                        <h:message for="editUserPhone" style="color: red;"/>
+                    </div>
+                    <div class="form-group">
+                        <h:outputLabel value="Fecha de registro" for="editUserRegDate" styleClass="form-label"/>
+                        <h:inputText id="editUserRegDate" value="#{userManagerBean.selectedUser.regDate}" styleClass="form-control" readonly="true"/>
+                    </div>
+                    <div class="form-group">
+                        <h:outputLabel value="Última sesión" for="editUserLastSession" styleClass="form-label"/>
+                        <h:inputText id="editUserLastSession" value="#{userManagerBean.selectedUser.lastSession}" styleClass="form-control" readonly="true"/>
+                    </div>
+                </div>
+
+                <!-- ESTADO Y ACCESO -->
+                <div class="form-section">
+                    <h3>Estado y Acceso</h3>
+                    <div class="form-group">
+                        <h:outputLabel value="Rol asignado *" for="editUserRole" styleClass="form-label"/>
+                        <h:selectOneMenu id="editUserRole" value="#{userManagerBean.selectedUser.role}" styleClass="form-control" required="true"
+                                         style="#{userManagerBean.selectedUser.highlightedFields['role'] ? 'background-color: rgba(128, 255, 128, 0.2);' : ''}">
+                            <f:selectItem itemLabel="Jefe" itemValue="Jefe"/>
+                            <f:selectItem itemLabel="Gerente" itemValue="Gerente"/>
+                            <f:selectItem itemLabel="Operador" itemValue="Operador"/>
+                        </h:selectOneMenu>
+                        <h:message for="editUserRole" style="color: red;"/>
+                    </div>
+                    <div class="form-group">
+                        <h:outputLabel value="Estado de cuenta" for="editUserStatus" styleClass="form-label"/>
+                        <h:selectOneMenu id="editUserStatus" value="#{userManagerBean.selectedUser.status}" styleClass="form-control"
+                                         style="#{userManagerBean.selectedUser.highlightedFields['status'] ? 'background-color: rgba(128, 255, 128, 0.2);' : ''}">
+                            <f:selectItem itemLabel="Activo" itemValue="Activo"/>
+                            <f:selectItem itemLabel="Inactivo" itemValue="Inactivo"/>
+                            <f:selectItem itemLabel="Bloqueado" itemValue="Bloqueado"/>
+                        </h:selectOneMenu>
+                    </div>
+                    <div class="form-group">
+                        <h:outputLabel value="Módulo" for="editUserModule" styleClass="form-label"/>
+                        <h:inputText id="editUserModule" value="#{userManagerBean.selectedUser.module}" styleClass="form-control"/>
+                    </div>
+                </div>
+
+                <!-- DIRECCIÓN (Opcional, no implementado en el bean de ejemplo) -->
+                <div class="form-section">
+                    <h3>Dirección (opcional)</h3>
+                    <div class="form-group"><h:outputLabel value="Calle" styleClass="form-label"/><h:inputText styleClass="form-control"/></div>
+                    <div class="form-group"><h:outputLabel value="Número" styleClass="form-label"/><h:inputText styleClass="form-control"/></div>
+                    <div class="form-group"><h:outputLabel value="Colonia" styleClass="form-label"/><h:inputText styleClass="form-control"/></div>
+                    <div class="form-group"><h:outputLabel value="Ciudad" styleClass="form-label"/><h:inputText styleClass="form-control"/></div>
+                    <div class="form-group"><h:outputLabel value="Estado" styleClass="form-label"/><h:inputText styleClass="form-control"/></div>
+                    <div class="form-group"><h:outputLabel value="Código Postal" styleClass="form-label"/><h:inputText id="editZip" styleClass="form-control" maxlength="5"/></div>
+                </div>
+
+                <!-- PRIVILEGIOS DEL SISTEMA -->
+                <div class="form-section">
+                    <h3>Privilegios del Sistema</h3>
+                    <p>[Lista de módulos y permisos específicos - En desarrollo]</p>
+                </div>
+
+                <!-- HISTORIAL DE ACTIVIDAD -->
+                <div class="form-section">
+                    <h3>Historial de Actividad Reciente</h3>
+                    <table class="detail-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Acción</th>
+                                <th>Módulo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activityTableBody">
+                            <tr>
+                                <td>2025-10-15</td>
+                                <td>Inicio de sesión</td>
+                                <td>Usuarios</td>
+                            </tr>
+                            <tr>
+                                <td>2025-10-14</td>
+                                <td>Actualizó datos</td>
+                                <td>Bancos</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- BOTONES -->
+                <div class="form-actions">
+                    <h:commandButton value="ACTUALIZAR USUARIO" action="#{userManagerBean.handleEditUser}" styleClass="btn-success-custom"/>
+                    <h:commandLink value="CANCELAR" action="mainPage.xhtml?faces-redirect=true" styleClass="btn-secondary-custom"/>
+                </div>
+                <h:messages globalOnly="false" style="color:red; margin-top: 10px;" infoStyle="color:green;" errorStyle="color:red;"/>
+            </h:form>
+        </div>
+        <h:outputScript library="js" name="bootstrap.bundle.min.js"/>
+    </h:body>
+</html>

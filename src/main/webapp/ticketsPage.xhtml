@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"> <!-- Namespace HTML5 -->
+    <h:head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>Tickets de Revisión</title>
+        <h:outputStylesheet library="css" name="bootstrap.min.css"/>
+        <h:outputStylesheet library="css" name="all.min.css"/>
+        <h:outputStylesheet library="css" name="styles.css" />
+    </h:head>
+    <h:body>
+        <div class="header">
+            <h1>Tickets de Revisión</h1>
+            <div class="header-right">
+                <span>Bienvenido, <strong>#{userManagerBean.currentUserName}</strong></span>
+                <h:form>
+                    <h:commandLink value="Volver a Usuarios" action="mainPage.xhtml?faces-redirect=true" styleClass="btn-logout"/>
+                </h:form>
+            </div>
+        </div>
+
+        <div class="container-custom">
+            <h2>Listado de Solicitudes Pendientes</h2>
+
+            <div class="buttons-nav">
+                <h:form id="filterTicketButtonsForm">
+                    <h:commandButton value="Todos" action="#{userManagerBean.filterTickets('Todos')}" styleClass="filter">
+                        <f:ajax render=":ticketsForm:ticketsTable :messages"/>
+                    </h:commandButton>
+                    <h:commandButton value="Pendientes" action="#{userManagerBean.filterTickets('Pendiente')}" styleClass="filter" style="background-color: var(--color-advertencia);">
+                        <f:ajax render=":ticketsForm:ticketsTable :messages"/>
+                    </h:commandButton>
+                    <h:commandButton value="En Revisión" action="#{userManagerBean.filterTickets('En Revisión')}" styleClass="filter" style="background-color: var(--color-acento);">
+                        <f:ajax render=":ticketsForm:ticketsTable :messages"/>
+                    </h:commandButton>
+                </h:form>
+            </div>
+
+            <h:messages id="messages" globalOnly="false" style="color:red; margin-top: 10px;" infoStyle="color:green;" errorStyle="color:red;"/>
+
+            <h:form id="ticketsForm">
+                <!-- Mensaje alternativo para lista vacía -->
+                <h:panelGroup layout="block" styleClass="alert alert-info" rendered="#{empty userManagerBean.filteredTickets}">
+                    No hay tickets para mostrar.
+                </h:panelGroup>
+
+                <!-- Tabla con rendered -->
+                <h:dataTable id="ticketsTable" value="#{userManagerBean.filteredTickets}" var="ticket" styleClass="table"
+                             headerClass="table-header" rowClasses="table-row"
+                             rendered="#{not empty userManagerBean.filteredTickets}">
+                    <h:column>
+                        <f:facet name="header">ID Ticket</f:facet>
+                        #{ticket.id}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Tipo de Cambio</f:facet>
+                        #{ticket.tipo}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Módulo</f:facet>
+                        #{ticket.modulo}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Fecha Solicitud</f:facet>
+                        #{ticket.fecha}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Estado</f:facet>
+                        <span class="badge #{ticket.estado eq 'Pendiente' ? 'pendiente' : (ticket.estado eq 'Aprobado' ? 'aprobado' : (ticket.estado eq 'Rechazado' ? 'rechazado' : 'revision'))}">#{ticket.estado}</span>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Usuario Solicitante</f:facet>
+                        #{ticket.usuarioSolicitante}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Acciones</f:facet>
+                        <div class="actions">
+                            <!-- Uso de pt: para los atributos de Bootstrap -->
+                            <h:commandButton value="#{ticket.estado eq 'Pendiente' or ticket.estado eq 'En Revisión' ? 'Revisar' : 'Ver'}"
+                                             action="#{userManagerBean.selectTicketForReview(ticket)}"
+                                             styleClass="review"
+                                             pt:data-bs-toggle="modal" pt:data-bs-target="#reviewTicketModal">
+                                <f:ajax render=":modalTicketForm:reviewTicketModalContent"/>
+                            </h:commandButton>
+                        </div>
+                    </h:column>
+                </h:dataTable>
+            </h:form>
+        </div>
+
+        <!-- Modal de Revisión de Tickets -->
+        <div class="modal fade" id="reviewTicketModal" tabindex="-1" aria-labelledby="reviewTicketModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <h:form id="modalTicketForm">
+                        <h:panelGroup id="reviewTicketModalContent">
+                            <div class="modal-header" style="background-color: var(--color-secundario); color: white;">
+                                <h5 class="modal-title" id="reviewTicketModalLabel">
+                                    <i class="fas fa-ticket-alt"></i> Revisar Ticket: 
+                                    <h:outputText value="#{userManagerBean.selectedTicket.id}" rendered="#{not empty userManagerBean.selectedTicket}"/>
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            
+                            <h:panelGroup layout="block" styleClass="modal-body" rendered="#{not empty userManagerBean.selectedTicket}">
+                                <p><strong>Tipo de Cambio:</strong> <h:outputText value="#{userManagerBean.selectedTicket.tipo}"/></p>
+                                <p><strong>Módulo:</strong> <h:outputText value="#{userManagerBean.selectedTicket.modulo}"/></p>
+                                <p><strong>Fecha Solicitud:</strong> <h:outputText value="#{userManagerBean.selectedTicket.fecha}"/></p>
+                                <p><strong>Estado:</strong> <h:outputText value="#{userManagerBean.selectedTicket.estado}"/></p>
+                                <p><strong>Usuario Solicitante:</strong> <h:outputText value="#{userManagerBean.selectedTicket.usuarioSolicitante}"/></p>
+
+                                <h6 class="mt-3" style="color: var(--color-acento);">Detalles de la Solicitud (Datos Propuestos)</h6>
+                                <div style="background-color: var(--luz-bg); padding: 10px; border-radius: 5px; border: 1px solid #ddd;">
+                                    <ui:repeat value="#{userManagerBean.selectedTicket.detalles.entrySet().toArray()}" var="entry">
+                                        <h:panelGroup rendered="#{!('motivo_rechazo'.equals(entry.key) or 'aprobado_por'.equals(entry.key) or 'rechazado_por'.equals(entry.key))}">
+                                            <p><strong>#{entry.key.toUpperCase().replace('_', ' ')}:</strong>
+                                                <h:outputText value="#{entry.value}" styleClass="#{userManagerBean.selectedTicket.estado eq 'Aprobado' ? 'text-success fw-bold' : ''}"/>
+                                            </p>
+                                        </h:panelGroup>
+                                    </ui:repeat>
+                                    <h:panelGroup rendered="#{userManagerBean.selectedTicket.estado eq 'Rechazado' and not empty userManagerBean.selectedTicket.detalles['motivo_rechazo']}">
+                                        <p style="color: var(--color-peligro); font-weight: bold;">MOTIVO DE RECHAZO: <h:outputText value="#{userManagerBean.selectedTicket.detalles['motivo_rechazo']}"/></p>
+                                    </h:panelGroup>
+                                </div>
+                                <h:panelGroup rendered="#{userManagerBean.selectedTicket.estado eq 'Pendiente' or userManagerBean.selectedTicket.estado eq 'En Revisión'}">
+                                    <h:outputLabel value="Motivo de Rechazo (opcional):" for="ticketRejectionReason" styleClass="form-label mt-2"/>
+                                    <h:inputTextarea id="ticketRejectionReason" value="#{userManagerBean.ticketRejectionReason}" styleClass="form-control"/>
+                                </h:panelGroup>
+                            </h:panelGroup>
+                            
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+
+                                <h:panelGroup rendered="#{not empty userManagerBean.selectedTicket}">
+                                    <h:commandButton value="Rechazar" action="#{userManagerBean.rejectTicket}" styleClass="btn btn-danger"
+                                                     rendered="#{userManagerBean.selectedTicket.estado eq 'Pendiente' or userManagerBean.selectedTicket.estado eq 'En Revisión'}"
+                                                     onclick="if (!confirm('¿Está seguro de rechazar este ticket?')) return false;">
+                                        <f:ajax execute="@form" render=":ticketsForm:ticketsTable :modalTicketForm:reviewTicketModalContent :messages"/>
+                                    </h:commandButton>
+
+                                    <h:commandButton value="Ir a Editar Usuario" action="#{userManagerBean.navigateToEditUserFromTicket}"
+                                                     styleClass="btn btn-primary-custom"
+                                                     rendered="#{userManagerBean.selectedTicket.tipo eq 'Edición Usuario' and (userManagerBean.selectedTicket.estado eq 'Pendiente' or userManagerBean.selectedTicket.estado eq 'En Revisión')}">
+                                    </h:commandButton>
+                                     <h:commandButton value="Aprobar y Cerrar" action="#{userManagerBean.approveTicket}"
+                                                     styleClass="btn btn-success-custom"
+                                                     rendered="#{userManagerBean.selectedTicket.tipo ne 'Edición Usuario' and (userManagerBean.selectedTicket.estado eq 'Pendiente' or userManagerBean.selectedTicket.estado eq 'En Revisión')}"
+                                                     onclick="if (!confirm('¿Confirma que desea APROBAR y cerrar el ticket?')) return false;">
+                                        <f:ajax execute="@form" render=":ticketsForm:ticketsTable :modalTicketForm:reviewTicketModalContent :messages"/>
+                                    </h:commandButton>
+                                </h:panelGroup>
+                            </div>
+                        </h:panelGroup>
+                    </h:form>
+                </div>
+            </div>
+        </div>
+        <h:outputScript library="js" name="bootstrap.bundle.min.js"/>
+    </h:body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"> <!-- Namespace para atributos HTML5 -->
+    <h:head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>Sistema de Usuarios</title>
+        <h:outputStylesheet library="css" name="bootstrap.min.css"/>
+        <h:outputStylesheet library="css" name="all.min.css"/>
+        <h:outputStylesheet library="css" name="styles.css" />
+    </h:head>
+    <h:body>
+        <div class="header">
+            <h1>Usuarios</h1>
+            <div class="header-right">
+                <span>Bienvenido, <strong>#{userManagerBean.currentUserName}</strong></span>
+                <h:form>
+                    <h:commandButton value="Cerrar Sesión" action="#{userManagerBean.logout}" styleClass="btn-logout"/>
+                </h:form>
+            </div>
+        </div>
+
+        <div class="container-custom">
+            <h2>Lista de Usuarios</h2>
+
+            <div class="buttons-nav">
+                <h:link value="+ Nuevo Usuario" outcome="newUserPage.xhtml" styleClass="new-user"/>
+                <h:link outcome="ticketsPage.xhtml" styleClass="tickets">
+                    <i class="fas fa-ticket-alt"></i> Tickets Pendientes
+                </h:link>
+                <h:form id="filterForm" style="display: inline-flex; gap: 10px;">
+                    <!-- Uso de pt:placeholder para el atributo HTML5 -->
+                    <h:inputText id="filterInput" value="#{userManagerBean.filterUsersInput}" styleClass="form-control"
+                                 style="width: 200px;" pt:placeholder="Buscar usuario/email"/>
+                    <h:commandButton value="&#128269; Filtrar" action="#{userManagerBean.filterUsers}" styleClass="filter">
+                         <f:ajax execute="@form" render=":usersForm @messages"/>
+                    </h:commandButton>
+                </h:form>
+            </div>
+
+            <h:messages id="messages" globalOnly="false" style="color:red; margin-top: 10px;" infoStyle="color:green;" errorStyle="color:red;"/>
+
+            <h:form id="usersForm">
+                <!-- Mensaje alternativo si la lista está vacía -->
+                <h:panelGroup layout="block" styleClass="alert alert-info" rendered="#{empty userManagerBean.filteredUsers}">
+                    No hay usuarios para mostrar.
+                </h:panelGroup>
+
+                <!-- La tabla solo se muestra si HAY usuarios -->
+                <h:dataTable id="usersTable" value="#{userManagerBean.filteredUsers}" var="user" styleClass="table"
+                             headerClass="table-header" rowClasses="table-row"
+                             rendered="#{not empty userManagerBean.filteredUsers}">
+                    <h:column>
+                        <f:facet name="header">Nombre</f:facet>
+                        #{user.name}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Correo</f:facet>
+                        #{user.email}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Módulo</f:facet>
+                        #{user.module}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Teléfono</f:facet>
+                        #{user.phone}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Estado</f:facet>
+                        <span class="badge #{user.status eq 'Activo' ? 'activo' : 'inactivo'}">#{user.status}</span>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Rol</f:facet>
+                        #{user.role}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Acciones</f:facet>
+                        <div class="actions">
+                            <h:commandButton value="Editar" action="#{userManagerBean.editUser(user)}" styleClass="edit">
+                                <f:setPropertyActionListener target="#{userManagerBean.selectedUser}" value="#{user}"/>
+                                <f:ajax execute="@this" render="@none" onevent="function(data){ if(data.status === 'success'){ window.location.href='detailsPage.xhtml'; } }"/>
+                            </h:commandButton>
+                            <h:commandButton value="Eliminar" action="#{userManagerBean.deleteUser(user)}" styleClass="delete"
+                                             onclick="return confirm('¿Está seguro de eliminar este usuario?');">
+                                <f:ajax render="@form :messages"/>
+                            </h:commandButton>
+                        </div>
+                    </h:column>
+                </h:dataTable>
+            </h:form>
+        </div>
+        <h:outputScript library="js" name="bootstrap.bundle.min.js"/>
+    </h:body>
+</html>

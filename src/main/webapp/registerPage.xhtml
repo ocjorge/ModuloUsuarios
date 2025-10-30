@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"> <!-- Namespace HTML5 -->
+    <h:head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>Registro de Empleados</title>
+        <h:outputStylesheet library="css" name="bootstrap.min.css"/>
+        <h:outputStylesheet library="css" name="all.min.css"/>
+        <h:outputStylesheet library="css" name="styles.css" />
+        <script>
+            function togglePassword(inputId, icon) {
+                var input = document.getElementById(inputId);
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            }
+            document.addEventListener('DOMContentLoaded', function() {
+                var registerPhoneInput = document.getElementById('registerForm:registerPhone');
+                if (registerPhoneInput) {
+                    registerPhoneInput.addEventListener('input', function (e) {
+                        this.value = this.value.replace(/[^0-9]/g, '');
+                    });
+                }
+                var registerNameInput = document.getElementById('registerForm:registerName');
+                if (registerNameInput) {
+                    registerNameInput.addEventListener('input', function (e) {
+                        this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '');
+                    });
+                }
+            });
+        </script>
+    </h:head>
+    <h:body>
+        <div class="header">
+            <h1>Registro de Empleados</h1>
+        </div>
+
+        <div class="auth-box">
+            <h2>Registrar Empleado</h2>
+            <h:form id="registerForm">
+                <div class="mb-3">
+                    <h:outputLabel for="registerEmail" value="Correo electrónico" styleClass="form-label"/>
+                    <h:inputText id="registerEmail" value="#{userManagerBean.registerEmail}" styleClass="form-control" required="true" validatorMessage="Formato de correo electrónico inválido.">
+                        <f:validateRegex pattern="[\w\.-]*[a-zA-Z0-9_]@[w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]"/>
+                    </h:inputText>
+                    <h:message for="registerEmail" style="color: red;"/>
+                </div>
+                <div class="mb-3">
+                    <h:outputLabel for="registerName" value="Nombre completo" styleClass="form-label"/>
+                    <h:inputText id="registerName" value="#{userManagerBean.registerName}" styleClass="form-control" required="true"/>
+                </div>
+                <div class="mb-3">
+                    <h:outputLabel for="registerPhone" value="Teléfono" styleClass="form-label"/>
+                    <h:inputText id="registerPhone" value="#{userManagerBean.registerPhone}" styleClass="form-control" maxlength="10" required="true" validatorMessage="El teléfono debe tener 10 dígitos.">
+                        <f:validateLength minimum="10" maximum="10"/>
+                        <f:validateRegex pattern="^[0-9]{10}$"/>
+                    </h:inputText>
+                    <h:message for="registerPhone" style="color: red;"/>
+                </div>
+                <div class="form-group-custom">
+                    <h:outputLabel for="registerPassword" value="Contraseña" styleClass="form-label"/>
+                    <!-- Uso de pt:minlength para HTML5 y f:validateLength para JSF -->
+                    <h:inputSecret id="registerPassword" value="#{userManagerBean.registerPassword}" styleClass="form-control" required="true" pt:minlength="6">
+                        <f:validateLength minimum="6"/>
+                    </h:inputSecret>
+                    <i class="fas fa-eye password-toggle" onclick="togglePassword('registerForm:registerPassword', this)"></i>
+                    <h:message for="registerPassword" style="color: red;"/>
+                </div>
+                <div class="form-group-custom">
+                    <h:outputLabel for="registerConfirmPassword" value="Confirmar Contraseña" styleClass="form-label"/>
+                    <!-- Uso de pt:minlength para HTML5 y f:validateLength para JSF -->
+                    <h:inputSecret id="registerConfirmPassword" value="#{userManagerBean.registerConfirmPassword}" styleClass="form-control" required="true" pt:minlength="6">
+                        <f:validateLength minimum="6"/>
+                    </h:inputSecret>
+                    <i class="fas fa-eye password-toggle" onclick="togglePassword('registerForm:registerConfirmPassword', this)"></i>
+                     <h:message for="registerConfirmPassword" style="color: red;"/>
+                </div>
+                <h:commandButton value="Registrar Empleado" action="#{userManagerBean.handleRegister}" styleClass="btn btn-primary-custom w-100 mt-3"/>
+                <h:messages globalOnly="true" style="color:red; margin-top: 10px;" infoStyle="color:green;" errorStyle="color:red;"/>
+            </h:form>
+            <div class="text-center mt-3">
+                <small>¿Ya tienes cuenta? <h:link value="Inicia sesión" outcome="loginPage.xhtml"/></small>
+            </div>
+        </div>
+        <h:outputScript library="js" name="bootstrap.bundle.min.js"/>
+    </h:body>
+</html>

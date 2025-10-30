@@ -1,0 +1,416 @@
+:root {
+    --color-primario: #2c5aa0;
+    --color-secundario: #34495e;
+    --color-acento: #3498db;
+    --color-exito: #27ae60;
+    --color-peligro: #e74c3c;
+    --color-advertencia: #f39c12;
+    --luz-bg: #f8f9fa;
+    --texto-oscuro: #2c3e50;
+}
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--luz-bg);
+    color: var(--texto-oscuro);
+}
+
+.page {
+    /* En JSF, esto ya no se usa para cambiar de "página" */
+    /* display: none; */
+}
+
+.page.active {
+    /* display: block; */
+}
+
+/* Barra superior */
+.header {
+    background-color: var(--color-primario);
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 1.5em;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.header-right span {
+    font-size: 0.95em;
+}
+
+.header-right .btn-logout {
+    background-color: var(--color-peligro);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease;
+}
+
+.header-right .btn-logout:hover {
+    background-color: #c0392b;
+}
+
+.container-custom {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    color: var(--color-secundario);
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Botones principales */
+.buttons-nav {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.buttons-nav button, .buttons-nav a { /* Incluir 'a' para h:link */
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: white;
+    text-decoration: none; /* Para h:link */
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.buttons-nav .new-user {
+    background-color: var(--color-exito);
+}
+.buttons-nav .new-user:hover {
+    background-color: #1e8449;
+    transform: translateY(-2px);
+}
+
+.buttons-nav .filter {
+    background-color: var(--color-acento);
+}
+.buttons-nav .filter:hover {
+    background-color: #2d80c4;
+    transform: translateY(-2px);
+}
+
+/* Tabla */
+.table { /* Modificado de `table` a `.table` para Bootstrap */
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table th, .table td { /* Modificado de `th, td` a `.table th, .table td` */
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.table th { /* Modificado de `th` a `.table th` */
+    background-color: var(--luz-bg);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9em;
+}
+
+.table tbody tr:hover { /* Modificado de `tbody tr:hover` a `.table tbody tr:hover` */
+    background-color: #f1f7fe;
+}
+
+/* Acciones */
+.actions {
+    display: flex;
+    gap: 8px;
+}
+
+.actions button {
+    padding: 6px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    color: white;
+    text-transform: uppercase;
+    transition: transform 0.2s;
+}
+
+.actions .edit {
+    background-color: var(--color-acento);
+}
+.actions .edit:hover {
+    background-color: #2d80c4;
+    transform: translateY(-2px);
+}
+
+.actions .delete {
+    background-color: var(--color-peligro);
+}
+.actions .delete:hover {
+    background-color: #c0392b;
+    transform: translateY(-2px);
+}
+
+/* Estado con badges */
+.badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    color: white;
+    font-size: 0.85em;
+    font-weight: bold;
+    text-align: center;
+    display: inline-block;
+}
+.activo {
+    background-color: var(--color-exito);
+}
+.inactivo {
+    background-color: var(--color-peligro);
+}
+
+/* Página de Login */
+.auth-box {
+    max-width: 450px;
+    margin: 100px auto;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    padding: 40px;
+}
+
+.auth-box h2 {
+    text-align: center;
+    color: var(--texto-oscuro);
+    margin-bottom: 30px;
+}
+
+.form-control:focus {
+    border-color: var(--color-acento);
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
+
+.btn-primary-custom {
+    background: var(--color-acento);
+    border: none;
+    padding: 12px;
+    font-weight: bold;
+    transition: all 0.3s;
+    color: white;
+}
+
+.btn-primary-custom:hover {
+    background: var(--color-primario);
+    transform: translateY(-2px);
+}
+
+.password-toggle {
+    cursor: pointer;
+    position: absolute;
+    right: 10px;
+    top: 38px;
+    color: var(--color-secundario);
+}
+
+.form-group-custom {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+/* Página de detalles */
+.detail-container {
+    max-width: 900px;
+    margin: 20px auto;
+    background: white;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    overflow: hidden;
+}
+
+.header-form {
+    background: var(--color-primario);
+    color: white;
+    padding: 10px 15px;
+    font-weight: bold;
+}
+
+.form-section {
+    padding: 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+.form-section h3 {
+    margin-top: 0;
+    color: var(--color-secundario);
+    border-bottom: 2px solid var(--color-acento);
+    padding-bottom: 10px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.form-group label {
+    flex: 1 0 200px;
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+.form-group input,
+.form-group select {
+    flex: 2 0 250px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+}
+
+.btn-success-custom {
+    background: var(--color-exito);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-success-custom:hover {
+    background: #1e8449;
+    transform: translateY(-2px);
+}
+
+.btn-secondary-custom {
+    background: var(--color-secundario);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-secondary-custom:hover {
+    background: #2c3e50;
+    transform: translateY(-2px);
+}
+
+.detail-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.detail-table, .detail-table th, .detail-table td {
+    border: 1px solid #ddd;
+}
+
+.detail-table th, .detail-table td {
+    text-align: left;
+    padding: 8px;
+}
+
+.detail-table th {
+    background: var(--color-acento);
+    color: white;
+}
+
+.alert-custom {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    min-width: 300px;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* --- Estilos Adicionales para Tickets --- */
+.buttons-nav .tickets {
+    background-color: var(--color-secundario); /* Color secundario para el botón de tickets */
+}
+.buttons-nav .tickets:hover {
+    background-color: #2c4056;
+    transform: translateY(-2px);
+}
+
+/* Badges de Estados de Ticket */
+.pendiente {
+    background-color: var(--color-advertencia); /* Amarillo para Pendiente */
+}
+.aprobado {
+    background-color: var(--color-exito); /* Verde para Aprobado */
+}
+.rechazado {
+    background-color: var(--color-peligro); /* Rojo para Rechazado */
+}
+.revision {
+    background-color: var(--color-acento); /* Azul para En Revisión */
+}
+.actions .review {
+    background-color: var(--color-secundario);
+}
+.actions .review:hover {
+    background-color: #2c4056;
+    transform: translateY(-2px);
+}
+
+.btn-close-white {
+    filter: invert(1);
+}
+/* Estilo para los detalles JSON */
+#modalDetalles p {
+    margin-bottom: 5px;
+    font-size: 0.9em;
+    font-family: monospace;
+}
+
+#modalAprobarBtn[disabled] {
+    background-color: #95a5a6 !important; /* Gris claro */
+    cursor: not-allowed;
+    transform: none;
+}
