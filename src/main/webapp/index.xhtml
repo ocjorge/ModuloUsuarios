@@ -234,13 +234,15 @@
                 cursor: pointer;
                 position: absolute;
                 right: 10px;
-                top: 38px;
+                top: 50%;
+                transform: translateY(-50%);
                 color: var(--color-secundario);
             }
 
             .form-group-custom {
                 position: relative;
-                margin-bottom: 20px;
+                margin-bottom: 0;
+                flex: 2 0 250px;
             }
 
             .detail-container {
@@ -398,17 +400,17 @@
                 background-color: #2c4056;
                 transform: translateY(-2px);
             }
-            
+
             .btn-close-white {
-                filter: invert(1); 
+                filter: invert(1);
             }
-            
+
             #modalDetalles p {
                 margin-bottom: 5px;
                 font-size: 0.9em;
                 font-family: monospace;
             }
-            
+
             #modalAprobarBtn[disabled] {
                 background-color: #95a5a6;
                 cursor: not-allowed;
@@ -432,16 +434,15 @@
                         <label for="loginUsername" class="form-label">Nombre de usuario</label>
                         <input type="text" class="form-control" id="loginUsername" required="required" />
                     </div>
-                    <div class="form-group-custom">
+                    <div class="mb-3">
                         <label for="loginPassword" class="form-label">Contraseña</label>
-                        <input type="password" class="form-control" id="loginPassword" required="required" />
-                        <i class="fas fa-eye password-toggle" onclick="togglePassword('loginPassword', this)"></i>
+                        <div class="form-group-custom">
+                            <input type="password" class="form-control" id="loginPassword" required="required" />
+                            <i class="fas fa-eye password-toggle" onclick="togglePassword('loginPassword', this)"></i>
+                        </div>
                     </div>
                     <button type="submit" class="btn btn-primary-custom w-100 mt-3">Iniciar Sesión</button>
                 </form>
-                <div class="text-center mt-3">
-                    <small>¿No tienes cuenta? <a href="#register" onclick="showPage('registerPage'); return false;">Regístrate aquí</a></small>
-                </div>
             </div>
         </div>
 
@@ -639,8 +640,7 @@
         <!-- PÁGINA DE NUEVO USUARIO -->
         <div id="newUserPage" class="page">
             <div class="header">
-                <div>Nuevo Usuario</div>
-                <div class="header-right">
+                <h1>Nuevo Usuario</h1> <div class="header-right">
                     <button class="btn-logout" onclick="showPage('mainPage')">Volver</button>
                 </div>
             </div>
@@ -651,41 +651,88 @@
                 <form id="newUserForm" onsubmit="return handleNewUser(event)">
                     <div class="form-section">
                         <h3>Información Personal</h3>
+
+                        <div class="form-group">
+                            <label>Tipo de Usuario *</label>
+                            <select id="newUserTipoUsuario" required="required" onchange="toggleInternalFields()">
+                                <option value="">Seleccione...</option>
+                                <option value="1">Interno</option> 
+                                <option value="2">Cliente</option>
+                                <option value="3">Proveedor</option>
+                            </select>
+                        </div>
+
                         <div class="form-group">
                             <label>Nombre completo *</label>
                             <input type="text" id="newUserName" required="required" />
                         </div>
+
                         <div class="form-group">
                             <label>Correo electrónico *</label>
                             <input type="email" id="newUserEmail" required="required" />
                         </div>
+
+                        <div class="form-group" style="margin-top: 15px; display: flex; align-items: flex-start;">
+                            <label style="flex: 1 0 200px; margin-right: 10px;">Contraseña *</label>
+                            <div class="form-group-custom" style="flex: 2 0 250px; margin-bottom: 0;">
+                                <input type="password" class="form-control" id="newUserPassword" minlength="6" required="required" style="width: 100%;" />
+                                <i class="fas fa-eye password-toggle" onclick="togglePassword('newUserPassword', this)"></i>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-top: 15px; display: flex; align-items: flex-start;">
+                            <label style="flex: 1 0 200px; margin-right: 10px;">Confirmar Contraseña *</label>
+                            <div class="form-group-custom" style="flex: 2 0 250px; margin-bottom: 0;">
+                                <input type="password" class="form-control" id="newUserConfirmPassword" minlength="6" required="required" style="width: 100%;" />
+                                <i class="fas fa-eye password-toggle" onclick="togglePassword('newUserConfirmPassword', this)"></i>
+                            </div>
+                        </div>
+
                         <div class="form-group">
-                            <label>Teléfono *</label>
-                            <input type="tel" id="newUserPhone" maxlength="10" required="required" />
+                            <label>Teléfono</label>
+                            <input type="tel" id="newUserPhone" maxlength="20" />
                         </div>
                     </div>
 
                     <div class="form-section">
                         <h3>Estado y Acceso</h3>
-                        <div class="form-group">
-                            <label>Rol asignado *</label>
-                            <select id="newUserRole" required="required">
-                                <option value="">Seleccione...</option>
-                                <option value="Jefe">Jefe</option>
-                                <option value="Gerente">Gerente</option>
-                                <option value="Operador">Operador</option>
-                            </select>
+
+                        <div id="internalUserFields" style="display: none;">
+                            <div class="form-group">
+                                <label>Rol asignado *</label>
+                                <select id="newUserRole">
+                                    <option value="">Seleccione Rol...</option>
+                                    <option value="1">Gerente</option>
+                                    <option value="2">Jefe</option>
+                                    <option value="3">Operador</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Módulo Asignado</label>
+                                <select id="newUserModule">
+                                    <option value="">Ninguno / Sin Módulo</option>
+                                    <option value="ERP">ERP Central</option>
+                                    <option value="CRM">CRM</option>
+                                    <option value="PRV">Proveedores</option>
+                                    <option value="BCO">Módulo de Bancos</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="form-group">
-                            <label>Estado de cuenta</label>
-                            <select id="newUserStatus">
-                                <option value="Activo">Activo</option>
-                                <option value="Inactivo">Inactivo</option>
+                            <label>Estado de cuenta *</label>
+                            <select id="newUserStatus" required="required">
+                                <option value="1">Activo</option>
+                                <option value="2">Inactivo</option>
+                                <option value="3">Bloqueado</option>
                             </select>
                         </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Dirección (opcional)</h3>
                         <div class="form-group">
-                            <label>Módulo</label>
-                            <input type="text" id="newUserModule" />
+                            <label>Dirección Completa</label>
+                            <textarea id="newUserAddress" rows="3" placeholder="Ej: Av. Reforma 123, Col. Centro, CDMX, CP 00000"></textarea>
                         </div>
                     </div>
 
@@ -733,7 +780,7 @@
                 </table>
             </div>
         </div>
-        
+
         <!-- MODAL DE REVISIÓN -->
         <div class="modal fade" id="reviewTicketModal" tabindex="-1" aria-labelledby="reviewTicketModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
@@ -762,598 +809,681 @@
                 </div>
             </div>
         </div>
-        
+
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js" type="text/javascript"></script>
         <script type="text/javascript">
-            //<![CDATA[
-            var users = [
-                {id: 1, name: 'María', email: 'user@gmail.com', module: 'ERP', phone: '9900258789', status: 'Activo', role: 'Gerente', regDate: '2024-01-15', lastSession: '2025-10-15T10:30'},
-                {id: 2, name: 'Emanuel', email: 'usuario@gmail.com.mx', module: 'Bancos', phone: '9911165670', status: 'Inactivo', role: 'Jefe', regDate: '2024-02-20', lastSession: '2025-10-10T14:20'},
-                {id: 3, name: 'José', email: 'jt615257@gmail.com', module: 'Proveedores', phone: '9981298737', status: 'Activo', role: 'Operador', regDate: '2024-03-10', lastSession: '2025-10-16T09:15'},
-                {id: 4, name: 'Shaggy', email: 'shaggy@buu.net', module: 'CRM', phone: '54948151', status: 'Inactivo', role: 'Gerente', regDate: '2024-04-05', lastSession: '2025-09-30T16:45'},
-                {id: 5, name: 'Scrapy', email: 'sam@gmail.com', module: 'Usuarios', phone: '9975201478', status: 'Activo', role: 'Jefe', regDate: '2024-05-12', lastSession: '2025-10-16T08:00'},
-                {id: 6, name: 'Ana', email: 'ana@empresa.com', module: 'ERP', phone: '5587412369', status: 'Activo', role: 'Operador', regDate: '2024-06-18', lastSession: '2025-10-14T11:30'},
-                {id: 7, name: 'Carlos', email: 'carlos@banco.com', module: 'Bancos', phone: '5578963214', status: 'Inactivo', role: 'Jefe', regDate: '2024-07-22', lastSession: '2025-10-01T15:00'},
-                {id: 8, name: 'Lucía', email: 'lucia@proveedor.com', module: 'Proveedores', phone: '5563214789', status: 'Activo', role: 'Gerente', regDate: '2024-08-30', lastSession: '2025-10-15T13:45'},
-                {id: 9, name: 'Diego', email: 'diego@crm.com', module: 'CRM', phone: '5512345678', status: 'Inactivo', role: 'Operador', regDate: '2024-09-10', lastSession: '2025-09-28T10:20'},
-                {id: 10, name: 'Fernanda', email: 'fer@usuarios.com', module: 'Usuarios', phone: '5598765432', status: 'Activo', role: 'Jefe', regDate: '2024-10-01', lastSession: '2025-10-16T07:30'}
-            ];
-            
-            var tickets = [
-                { id: 'TK-001', tipo: 'Asignación Rol', modulo: 'ERP Central', fecha: '2025-10-22', estado: 'Pendiente', usuarioSolicitante: 'María (user@gmail.com)', detalles: { email: 'user@gmail.com', rol_propuesto: 'Jefe', justificacion: 'Promoción por desempeño' } },
-                { id: 'TK-002', tipo: 'Edición Usuario', modulo: 'Portal de Proveedores', fecha: '2025-10-23', estado: 'En Revisión', usuarioSolicitante: 'Lucía (lucia@proveedor.com)', detalles: { email: 'lucia@proveedor.com', telefono: '5598765999', cambio: 'Actualización de contacto' } },
-                { id: 'TK-003', tipo: 'Creación Usuario', modulo: 'Gestión de Clientes', fecha: '2025-10-19', estado: 'Aprobado', usuarioSolicitante: 'Gerente CRM', detalles: { email: 'nuevo.operador@tienda.com', cambio: 'Creación de nuevo usuario' } },
-                { id: 'TK-004', tipo: 'Cambio Estado', modulo: 'ERP Central', fecha: '2025-10-14', estado: 'Rechazado', usuarioSolicitante: 'Ana (ana@empresa.com)', detalles: { email: 'usuario.inactivo@tienda.com', estado_propuesto: 'Activo', motivo_rechazo: 'Documentación incompleta' } },
-                { id: 'TK-005', tipo: 'Edición Usuario', modulo: 'Gestión de Clientes', fecha: '2025-10-24', estado: 'Pendiente', usuarioSolicitante: 'Cliente 2', detalles: { email: 'usuario@gmail.com.mx', telefono: '5511223344', cambio: 'Actualización de número de cliente' } }
-            ];
+                        //<![CDATA[
+                        var users = [
+                            {id: 1, name: 'María', email: 'user@gmail.com', module: 'ERP', phone: '9900258789', status: 'Activo', role: 'Gerente', regDate: '2024-01-15', lastSession: '2025-10-15T10:30'},
+                            {id: 2, name: 'Emanuel', email: 'usuario@gmail.com.mx', module: 'Bancos', phone: '9911165670', status: 'Inactivo', role: 'Jefe', regDate: '2024-02-20', lastSession: '2025-10-10T14:20'},
+                            {id: 3, name: 'José', email: 'jt615257@gmail.com', module: 'Proveedores', phone: '9981298737', status: 'Activo', role: 'Operador', regDate: '2024-03-10', lastSession: '2025-10-16T09:15'},
+                            {id: 4, name: 'Shaggy', email: 'shaggy@buu.net', module: 'CRM', phone: '54948151', status: 'Inactivo', role: 'Gerente', regDate: '2024-04-05', lastSession: '2025-09-30T16:45'},
+                            {id: 5, name: 'Scrapy', email: 'sam@gmail.com', module: 'Usuarios', phone: '9975201478', status: 'Activo', role: 'Jefe', regDate: '2024-05-12', lastSession: '2025-10-16T08:00'},
+                            {id: 6, name: 'Ana', email: 'ana@empresa.com', module: 'ERP', phone: '5587412369', status: 'Activo', role: 'Operador', regDate: '2024-06-18', lastSession: '2025-10-14T11:30'},
+                            {id: 7, name: 'Carlos', email: 'carlos@banco.com', module: 'Bancos', phone: '5578963214', status: 'Inactivo', role: 'Jefe', regDate: '2024-07-22', lastSession: '2025-10-01T15:00'},
+                            {id: 8, name: 'Lucía', email: 'lucia@proveedor.com', module: 'Proveedores', phone: '5563214789', status: 'Activo', role: 'Gerente', regDate: '2024-08-30', lastSession: '2025-10-15T13:45'},
+                            {id: 9, name: 'Diego', email: 'diego@crm.com', module: 'CRM', phone: '5512345678', status: 'Inactivo', role: 'Operador', regDate: '2024-09-10', lastSession: '2025-09-28T10:20'},
+                            {id: 10, name: 'Fernanda', email: 'fer@usuarios.com', module: 'Usuarios', phone: '5598765432', status: 'Activo', role: 'Jefe', regDate: '2024-10-01', lastSession: '2025-10-16T07:30'}
+                        ];
 
-            var currentUser = null;
+                        var tickets = [
+                            {id: 'TK-001', tipo: 'Asignación Rol', modulo: 'ERP Central', fecha: '2025-10-22', estado: 'Pendiente', usuarioSolicitante: 'María (user@gmail.com)', detalles: {email: 'user@gmail.com', rol_propuesto: 'Jefe', justificacion: 'Promoción por desempeño'}},
+                            {id: 'TK-002', tipo: 'Edición Usuario', modulo: 'Portal de Proveedores', fecha: '2025-10-23', estado: 'En Revisión', usuarioSolicitante: 'Lucía (lucia@proveedor.com)', detalles: {email: 'lucia@proveedor.com', telefono: '5598765999', cambio: 'Actualización de contacto'}},
+                            {id: 'TK-003', tipo: 'Creación Usuario', modulo: 'Gestión de Clientes', fecha: '2025-10-19', estado: 'Aprobado', usuarioSolicitante: 'Gerente CRM', detalles: {email: 'nuevo.operador@tienda.com', cambio: 'Creación de nuevo usuario'}},
+                            {id: 'TK-004', tipo: 'Cambio Estado', modulo: 'ERP Central', fecha: '2025-10-14', estado: 'Rechazado', usuarioSolicitante: 'Ana (ana@empresa.com)', detalles: {email: 'usuario.inactivo@tienda.com', estado_propuesto: 'Activo', motivo_rechazo: 'Documentación incompleta'}},
+                            {id: 'TK-005', tipo: 'Edición Usuario', modulo: 'Gestión de Clientes', fecha: '2025-10-24', estado: 'Pendiente', usuarioSolicitante: 'Cliente 2', detalles: {email: 'usuario@gmail.com.mx', telefono: '5511223344', cambio: 'Actualización de número de cliente'}}
+                        ];
 
-            var validCredentials = {
-                'admin': 'admin123',
-                'usuario': 'password',
-                'KC': '12345'
-            };
+                        var currentUser = null;
 
-            function showPage(pageId) {
-                var pages = document.querySelectorAll('.page');
-                for (var i = 0; i < pages.length; i++) {
-                    pages[i].classList.remove('active');
-                }
-                document.getElementById(pageId).classList.add('active');
+                        var validCredentials = {
+                            'admin': 'admin123',
+                            'usuario': 'password',
+                            'KC': '12345'
+                        };
 
-                if (pageId === 'mainPage') {
-                    loadUsers();
-                } else if (pageId === 'ticketsPage') {
-                    if (currentUser) {
-                        document.getElementById('currentUserNameTickets').textContent = currentUser.name;
-                    }
-                    loadTickets();
-                } else if (pageId === 'newTicketPage') {
-                    if (currentUser) {
-                        document.getElementById('currentUserName3').textContent = currentUser.name;
-                        document.getElementById('newTicketUserEmail').value = currentUser.email;
-                        populateNewTicketDropdowns(); 
-                    } else {
-                        showAlert('Error de sesión. Intente iniciar sesión de nuevo.', 'danger');
-                        showPage('loginPage');
-                    }
-                }
-            }
+                        function showPage(pageId) {
+                            var pages = document.querySelectorAll('.page');
+                            for (var i = 0; i < pages.length; i++) {
+                                pages[i].classList.remove('active');
+                            }
+                            document.getElementById(pageId).classList.add('active');
 
-            function showAlert(message, type) {
-                var alertDiv = document.createElement('div');
-                alertDiv.className = 'alert alert-' + type + ' alert-dismissible fade show alert-custom';
-                alertDiv.innerHTML = message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
-                document.body.appendChild(alertDiv);
-
-                setTimeout(function () {
-                    alertDiv.remove();
-                }, 4000);
-            }
-
-            function togglePassword(inputId, icon) {
-                var input = document.getElementById(inputId);
-                if (input.type === 'password') {
-                    input.type = 'text';
-                    icon.classList.remove('fa-eye');
-                    icon.classList.add('fa-eye-slash');
-                } else {
-                    input.type = 'password';
-                    icon.classList.remove('fa-eye-slash');
-                    icon.classList.add('fa-eye');
-                }
-            }
-
-            function handleLogin(e) {
-                e.preventDefault();
-                var username = document.getElementById('loginUsername').value;
-                var password = document.getElementById('loginPassword').value;
-
-                if (validCredentials[username] && validCredentials[username] === password) {
-                    currentUser = {name: username, email: username + '@sistema.com'};
-                    document.getElementById('currentUserName').textContent = currentUser.name;
-                    document.getElementById('currentUserName2').textContent = currentUser.name;
-                    showAlert('¡Inicio de sesión exitoso!', 'success');
-                    setTimeout(function () {
-                        showPage('mainPage');
-                    }, 1000);
-                } else {
-                    showAlert('Credenciales incorrectas. Intente nuevamente.', 'danger');
-                }
-                return false;
-            }
-
-            function handleRegister(e) {
-                e.preventDefault();
-                var email = document.getElementById('registerEmail').value;
-                var name = document.getElementById('registerName').value;
-                var phone = document.getElementById('registerPhone').value;
-                var password = document.getElementById('registerPassword').value;
-                var confirmPassword = document.getElementById('registerConfirmPassword').value;
-
-                if (password !== confirmPassword) {
-                    showAlert('Las contraseñas no coinciden', 'warning');
-                    return false;
-                }
-
-                if (!/^[0-9]{10}$/.test(phone)) {
-                    showAlert('El teléfono debe tener 10 dígitos', 'warning');
-                    return false;
-                }
-
-                showAlert('¡Registro exitoso! Ya puede iniciar sesión', 'success');
-                document.getElementById('registerForm').reset();
-                setTimeout(function () {
-                    showPage('loginPage');
-                }, 2000);
-
-                return false;
-            }
-
-            function loadUsers() {
-                var tbody = document.getElementById('usersTableBody');
-                tbody.innerHTML = '';
-
-                for (var i = 0; i < users.length; i++) {
-                    var user = users[i];
-                    var row = document.createElement('tr');
-                    row.innerHTML = '<td>' + user.name + '</td>' +
-                            '<td>' + user.email + '</td>' +
-                            '<td>' + user.module + '</td>' +
-                            '<td>' + user.phone + '</td>' +
-                            '<td><span class="badge ' + user.status.toLowerCase() + '">' + user.status + '</span></td>' +
-                            '<td>' + user.role + '</td>' +
-                            '<td class="actions">' +
-                            '<button class="edit" onclick="editUser(' + user.id + ')">Editar</button>' +
-                            '<button class="delete" onclick="deleteUser(' + user.id + ')">Eliminar</button>' +
-                            '</td>';
-                    tbody.appendChild(row);
-                }
-            }
-
-            function editUser(userId) {
-                var user = null;
-                for (var i = 0; i < users.length; i++) {
-                    if (users[i].id === userId) {
-                        user = users[i];
-                        break;
-                    }
-                }
-
-                if (user) {
-                    document.getElementById('editUserId').value = user.id;
-                    document.getElementById('editUserName').value = user.name;
-                    document.getElementById('editUserEmail').value = user.email;
-                    document.getElementById('editUserPhone').value = user.phone;
-                    document.getElementById('editUserModule').value = user.module || '';
-                    document.getElementById('editUserRole').value = user.role;
-                    document.getElementById('editUserStatus').value = user.status;
-                    document.getElementById('editUserRegDate').value = user.regDate || '';
-                    document.getElementById('editUserLastSession').value = user.lastSession || '';
-                    
-                    document.getElementById('editUserRole').style.backgroundColor = '';
-                    document.getElementById('editUserPhone').style.backgroundColor = '';
-                    document.getElementById('editUserStatus').style.backgroundColor = '';
-                    
-                    showPage('detailsPage');
-                }
-            }
-
-            function handleEditUser(e) {
-                e.preventDefault();
-
-                var userId = parseInt(document.getElementById('editUserId').value);
-                var userIndex = -1;
-
-                for (var i = 0; i < users.length; i++) {
-                    if (users[i].id === userId) {
-                        userIndex = i;
-                        break;
-                    }
-                }
-
-                if (userIndex !== -1) {
-                    users[userIndex].name = document.getElementById('editUserName').value;
-                    users[userIndex].email = document.getElementById('editUserEmail').value;
-                    users[userIndex].phone = document.getElementById('editUserPhone').value;
-                    users[userIndex].module = document.getElementById('editUserModule').value;
-                    users[userIndex].role = document.getElementById('editUserRole').value;
-                    users[userIndex].status = document.getElementById('editUserStatus').value;
-
-                    showAlert('Usuario actualizado exitosamente', 'success');
-                    setTimeout(function () {
-                        showPage('mainPage');
-                    }, 1000);
-                }
-
-                return false;
-            }
-
-            function handleNewUser(e) {
-                e.preventDefault();
-
-                var newUser = {
-                    id: users.length + 1,
-                    name: document.getElementById('newUserName').value,
-                    email: document.getElementById('newUserEmail').value,
-                    phone: document.getElementById('newUserPhone').value,
-                    module: document.getElementById('newUserModule').value,
-                    role: document.getElementById('newUserRole').value,
-                    status: document.getElementById('newUserStatus').value,
-                    regDate: new Date().toISOString().split('T')[0],
-                    lastSession: new Date().toISOString().slice(0, 16)
-                };
-
-                users.push(newUser);
-                showAlert('Usuario creado exitosamente', 'success');
-                document.getElementById('newUserForm').reset();
-                setTimeout(function () {
-                    showPage('mainPage');
-                }, 1000);
-
-                return false;
-            }
-
-            function deleteUser(userId) {
-                if (confirm('¿Está seguro de eliminar este usuario?')) {
-                    var newUsers = [];
-                    for (var i = 0; i < users.length; i++) {
-                        if (users[i].id !== userId) {
-                            newUsers.push(users[i]);
-                        }
-                    }
-                    users = newUsers;
-                    loadUsers();
-                    showAlert('Usuario eliminado exitosamente', 'info');
-                }
-            }
-
-            function filterUsers() {
-                var filterText = prompt('Ingrese el nombre o email a buscar:');
-                if (filterText) {
-                    var filtered = [];
-                    for (var i = 0; i < users.length; i++) {
-                        var user = users[i];
-                        if (user.name.toLowerCase().indexOf(filterText.toLowerCase()) !== -1 ||
-                                user.email.toLowerCase().indexOf(filterText.toLowerCase()) !== -1) {
-                            filtered.push(user);
-                        }
-                    }
-
-                    var tbody = document.getElementById('usersTableBody');
-                    tbody.innerHTML = '';
-
-                    if (filtered.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No se encontraron resultados</td></tr>';
-                    } else {
-                        for (var i = 0; i < filtered.length; i++) {
-                            var user = filtered[i];
-                            var row = document.createElement('tr');
-                            row.innerHTML = '<td>' + user.name + '</td>' +
-                                    '<td>' + user.email + '</td>' +
-                                    '<td>' + user.module + '</td>' +
-                                    '<td>' + user.phone + '</td>' +
-                                    '<td><span class="badge ' + user.status.toLowerCase() + '">' + user.status + '</span></td>' +
-                                    '<td>' + user.role + '</td>' +
-                                    '<td class="actions">' +
-                                    '<button class="edit" onclick="editUser(' + user.id + ')">Editar</button>' +
-                                    '<button class="delete" onclick="deleteUser(' + user.id + ')">Eliminar</button>' +
-                                    '</td>';
-                            tbody.appendChild(row);
-                        }
-                    }
-                }
-            }
-
-            function logout() {
-                if (confirm('¿Está seguro de cerrar sesión?')) {
-                    currentUser = null;
-                    showAlert('Sesión cerrada correctamente', 'info');
-                    setTimeout(function () {
-                        showPage('loginPage');
-                        document.getElementById('loginForm').reset();
-                    }, 1000);
-                }
-            }
-
-            var telInputs = document.querySelectorAll('input[type="tel"]');
-            for (var i = 0; i < telInputs.length; i++) {
-                telInputs[i].addEventListener('input', function (e) {
-                    this.value = this.value.replace(/[^0-9]/g, '');
-                });
-            }
-
-            var nameInputs = document.querySelectorAll('#registerName, #newUserName, #editUserName');
-            for (var i = 0; i < nameInputs.length; i++) {
-                nameInputs[i].addEventListener('input', function (e) {
-                    this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '');
-                });
-            }
-
-            var zipInput = document.getElementById('editZip');
-            if (zipInput) {
-                zipInput.addEventListener('input', function (e) {
-                    this.value = this.value.replace(/[^0-9]/g, '');
-                });
-            }
-            
-            function getTicketById(ticketId) {
-                return tickets.find(function(t) { return t.id === ticketId; });
-            }
-            
-            function handleNewTicket(e) {
-                e.preventDefault();
-                var module = document.getElementById('newTicketModule').value;
-                var tipo = document.getElementById('newTicketTipoCambio').value;
-                var detallesText = document.getElementById('newTicketDetalles').value;
-                var userEmail = document.getElementById('newTicketUserEmail').value;
-
-                var detalles;
-                try {
-                    detalles = JSON.parse(detallesText);
-                } catch (e) {
-                    detalles = { descripcion: detallesText };
-                }
-
-                detalles.email = userEmail; 
-
-                var newTicket = {
-                    id: 'TK-' + String(nextTicketId++).padStart(3, '0'),
-                    tipo: tipo,
-                    modulo: module,
-                    fecha: new Date().toISOString().split('T')[0],
-                    estado: 'Pendiente',
-                    usuarioSolicitante: currentUser.name + ' (' + currentUser.email + ')',
-                    userEmail: currentUser.email,
-                    detalles: detalles
-                };
-
-                tickets.push(newTicket);
-                showAlert('Solicitud de cambio **' + newTicket.id + '** enviada con éxito.', 'success');
-                document.getElementById('newTicketForm').reset();
-                setTimeout(function() { showPage('ticketsPage'); }, 1000);
-                return false;
-            }
-            
-            function loadTickets(ticketsData) {
-                var tbody = document.getElementById('ticketsTableBody');
-                tbody.innerHTML = '';
-
-                var list = ticketsData || tickets; 
-
-                if (list.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No hay tickets para mostrar.</td></tr>';
-                    return;
-                }
-
-                for (var i = 0; i < list.length; i++) {
-                    var ticket = list[i];
-
-                    var statusClass = '';
-                    switch (ticket.estado) {
-                        case 'Pendiente': statusClass = 'pendiente'; break;
-                        case 'Aprobado': statusClass = 'aprobado'; break;
-                        case 'Rechazado': statusClass = 'rechazado'; break;
-                        case 'En Revisión': statusClass = 'revision'; break;
-                        default: statusClass = 'inactivo';
-                    }
-
-                    var buttonText = (ticket.estado === 'Pendiente' || ticket.estado === 'En Revisión') ? 'Revisar' : 'Ver';
-                    var buttonClass = (buttonText === 'Revisar') ? 'review' : 'edit';
-
-                    var row = document.createElement('tr');
-                    row.innerHTML = '<td>' + ticket.id + '</td>' +
-                        '<td>' + ticket.tipo + '</td>' +
-                        '<td>' + ticket.modulo + '</td>' +
-                        '<td>' + ticket.fecha + '</td>' +
-                        '<td><span class="badge ' + statusClass + '">' + ticket.estado + '</span></td>' +
-                        '<td>' + ticket.usuarioSolicitante + '</td>' +
-                        '<td class="actions">' +
-                            '<button class="' + buttonClass + '" onclick="showReviewModal(\'' + ticket.id + '\')">' + buttonText + '</button>' +
-                        '</td>';
-                    tbody.appendChild(row);
-                }
-            }
-
-            function showReviewModal(ticketId) {
-                var ticket = getTicketById(ticketId);
-                if (!ticket) {
-                    showAlert('Error: Ticket no encontrado.', 'danger');
-                    return;
-                }
-
-                var modalElement = document.getElementById('reviewTicketModal');
-                var modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
-
-                var isClosed = (ticket.estado === 'Aprobado' || ticket.estado === 'Rechazado');
-                var isManualEdit = (ticket.tipo === 'Edición Usuario');
-
-                document.getElementById('modalTicketId').textContent = ticket.id;
-                document.getElementById('modalTipoCambio').textContent = ticket.tipo;
-                document.getElementById('modalUsuarioSolicitante').textContent = ticket.usuarioSolicitante;
-
-                var detallesDiv = document.getElementById('modalDetalles');
-                detallesDiv.innerHTML = '';
-
-                if (ticket.estado === 'Rechazado' && ticket.detalles.motivo_rechazo) {
-                    detallesDiv.innerHTML += '<p style="color: var(--color-peligro); font-weight: bold;">MOTIVO DE RECHAZO: ' + ticket.detalles.motivo_rechazo + '</p>';
-                }
-
-                for (var key in ticket.detalles) {
-                    if (!['email', 'id_usuario', 'motivo_rechazo', 'cambio', 'aprobado_por'].includes(key)) {
-                        var highlightStyle = (isClosed && ticket.estado === 'Aprobado') ? 'style="color: var(--color-exito); font-weight: bold;"' : 'style="color: var(--texto-oscuro);"';
-                        detallesDiv.innerHTML += '<p><strong>' + key.replace('_', ' ').toUpperCase() + ':</strong> <span ' + highlightStyle + '>' + ticket.detalles[key] + '</span></p>';
-                    }
-                }
-
-                var aprobarBtn = document.getElementById('modalAprobarBtn');
-                var rejectBtn = document.getElementById('modalRechazarBtn');
-
-                if (isClosed) {
-                    aprobarBtn.setAttribute('disabled', 'disabled');
-                    aprobarBtn.textContent = 'Ticket Cerrado (' + ticket.estado + ')';
-                    aprobarBtn.classList.remove('btn-success-custom');
-                    aprobarBtn.classList.add('btn-primary-custom');
-                    rejectBtn.style.display = 'none';
-                    aprobarBtn.onclick = function() { modal.hide(); };
-
-                } else if (isManualEdit) {
-                    aprobarBtn.removeAttribute('disabled');
-                    aprobarBtn.innerHTML = '<i class="fas fa-edit"></i> Ir a Editar Usuario';
-                    aprobarBtn.classList.remove('btn-success-custom');
-                    aprobarBtn.classList.add('btn-primary-custom');
-                    rejectBtn.style.display = 'inline-block';
-
-                    aprobarBtn.onclick = function() {
-                        modal.hide();
-                        reviewAndEditUser(ticket.detalles.email, ticket.detalles, ticket.id);
-                    };
-                    rejectBtn.onclick = function() {
-                        handleRejectTicket(ticketId, modal);
-                    };
-
-                } else {
-                    aprobarBtn.removeAttribute('disabled');
-                    aprobarBtn.innerHTML = '<i class="fas fa-check"></i> Aprobar y Cerrar';
-                    aprobarBtn.classList.remove('btn-primary-custom');
-                    aprobarBtn.classList.add('btn-success-custom');
-                    rejectBtn.style.display = 'inline-block';
-
-                    aprobarBtn.onclick = function() {
-                        handleApproveTicket(ticketId, modal);
-                    };
-                    rejectBtn.onclick = function() {
-                        handleRejectTicket(ticketId, modal);
-                    };
-                }
-
-                modal.show();
-            }
-
-            function handleApproveTicket(ticketId, modalInstance) {
-                if (!confirm('¿Confirma que desea APROBAR y cerrar el ticket ' + ticketId + '? Se aplicarán los cambios propuestos al usuario.')) {
-                    return;
-                }
-
-                var ticketIndex = tickets.findIndex(function(t) { return t.id === ticketId; });
-                if (ticketIndex !== -1) {
-                    var ticket = tickets[ticketIndex];
-                    var userIndex = users.findIndex(function(u) { return u.email === ticket.detalles.email; });
-
-                    if (userIndex !== -1) {
-                        if (ticket.detalles.estado_propuesto) {
-                            users[userIndex].status = ticket.detalles.estado_propuesto;
-                        }
-                        if (ticket.detalles.rol_propuesto) {
-                            users[userIndex].role = ticket.detalles.rol_propuesto;
-                        }
-                        if (ticket.detalles.nombre_propuesto) {
-                            users[userIndex].name = ticket.detalles.nombre_propuesto;
+                            if (pageId === 'mainPage') {
+                                loadUsers();
+                            } else if (pageId === 'ticketsPage') {
+                                if (currentUser) {
+                                    document.getElementById('currentUserNameTickets').textContent = currentUser.name;
+                                }
+                                loadTickets();
+                            } else if (pageId === 'newTicketPage') {
+                                if (currentUser) {
+                                    document.getElementById('currentUserName3').textContent = currentUser.name;
+                                    document.getElementById('newTicketUserEmail').value = currentUser.email;
+                                    populateNewTicketDropdowns();
+                                } else {
+                                    showAlert('Error de sesión. Intente iniciar sesión de nuevo.', 'danger');
+                                    showPage('loginPage');
+                                }
+                            }
                         }
 
-                        tickets[ticketIndex].estado = 'Aprobado';
-                        tickets[ticketIndex].detalles.aprobado_por = currentUser.name;
+                        function showAlert(message, type) {
+                            var alertDiv = document.createElement('div');
+                            alertDiv.className = 'alert alert-' + type + ' alert-dismissible fade show alert-custom';
+                            alertDiv.innerHTML = message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+                            document.body.appendChild(alertDiv);
 
-                        showAlert('Ticket **' + ticketId + '** APROBADO y cambios aplicados al usuario **' + users[userIndex].name + '**.', 'success');
-                    } else {
-                        showAlert('Ticket **' + ticketId + '** APROBADO, pero el usuario no se encontró para aplicar los cambios.', 'warning');
-                        tickets[ticketIndex].estado = 'Aprobado';
-                    }
-
-                    modalInstance.hide();
-                    loadTickets();
-                }
-            }
-
-            function handleRejectTicket(ticketId, modalInstance) {
-                var rejectionReason = prompt('Ingrese el motivo del rechazo para el ticket ' + ticketId + ':');
-                if (rejectionReason === null || rejectionReason.trim() === '') {
-                    showAlert('Rechazo cancelado o motivo no especificado.', 'info');
-                    return;
-                }
-
-                var ticketIndex = tickets.findIndex(function(t) { return t.id === ticketId; });
-                if (ticketIndex !== -1) {
-                    tickets[ticketIndex].estado = 'Rechazado';
-                    tickets[ticketIndex].detalles.motivo_rechazo = rejectionReason.trim();
-
-                    showAlert('Ticket **' + ticketId + '** ha sido RECHAZADO. Motivo: ' + rejectionReason, 'danger');
-                    modalInstance.hide();
-                    loadTickets();
-                } else {
-                    showAlert('Error al rechazar: Ticket no encontrado en la lista.', 'danger');
-                }
-            }
-
-            function reviewAndEditUser(userEmail, proposedChanges, ticketId) {
-                var userToEdit = users.find(function(u) { return u.email === userEmail; });
-
-                if (userToEdit) {
-                    editUser(userToEdit.id); 
-
-                    var highlightStyle = 'rgba(128, 255, 128, 0.2)';
-
-                    if (proposedChanges.rol_propuesto) {
-                        document.getElementById('editUserRole').value = proposedChanges.rol_propuesto;
-                        document.getElementById('editUserRole').style.backgroundColor = highlightStyle;
-                    }
-                    if (proposedChanges.telefono) {
-                        document.getElementById('editUserPhone').value = proposedChanges.telefono;
-                        document.getElementById('editUserPhone').style.backgroundColor = highlightStyle;
-                    }
-                    if (proposedChanges.estado_propuesto) {
-                        document.getElementById('editUserStatus').value = proposedChanges.estado_propuesto;
-                        document.getElementById('editUserStatus').style.backgroundColor = highlightStyle;
-                    }
-                    if (proposedChanges.nombre_propuesto) {
-                        document.getElementById('editUserName').value = proposedChanges.nombre_propuesto;
-                        document.getElementById('editUserName').style.backgroundColor = highlightStyle;
-                    }
-
-                    showAlert('Revise los campos resaltados y presione "ACTUALIZAR USUARIO" para aplicar el cambio del ticket: **' + ticketId + '**', 'warning');
-                } else {
-                    showAlert('No se encontró el usuario: ' + userEmail + ' para el ticket: ' + ticketId, 'danger');
-                }
-            }
-
-            function filterTickets(filterValue) {
-                if (typeof filterValue !== 'string') {
-                    filterValue = prompt('Ingrese el ID, Módulo o Solicitante a buscar:');
-                }
-
-                if (filterValue) {
-                    var lowerFilter = filterValue.toLowerCase().trim();
-                    var filtered;
-
-                    if (['todos', 'pendiente', 'en revisión', 'aprobado', 'rechazado'].includes(lowerFilter.replace(/\s/g, ''))) {
-                        var statusToFilter = lowerFilter.replace(/\s/g, '');
-                        if (statusToFilter === 'todos') {
-                            filtered = tickets;
-                        } else {
-                            filtered = tickets.filter(function(t) { return t.estado.toLowerCase().replace(/\s/g, '') === statusToFilter; });
+                            setTimeout(function () {
+                                alertDiv.remove();
+                            }, 4000);
                         }
-                    } else {
-                        filtered = tickets.filter(function(ticket) {
-                            return ticket.id.toLowerCase().indexOf(lowerFilter) !== -1 ||
-                                ticket.modulo.toLowerCase().indexOf(lowerFilter) !== -1 ||
-                                ticket.usuarioSolicitante.toLowerCase().indexOf(lowerFilter) !== -1 ||
-                                ticket.tipo.toLowerCase().indexOf(lowerFilter) !== -1;
-                        });
-                    }
 
-                    loadTickets(filtered);
-                    if (filtered.length === 0) {
-                        showAlert('No se encontraron tickets con el criterio "' + filterValue + '".', 'warning');
-                    } else {
-                        showAlert('Filtrando tickets por: ' + filterValue, 'info');
-                    }
+                        function togglePassword(inputId, icon) {
+                            var input = document.getElementById(inputId);
+                            if (input.type === 'password') {
+                                input.type = 'text';
+                                icon.classList.remove('fa-eye');
+                                icon.classList.add('fa-eye-slash');
+                            } else {
+                                input.type = 'password';
+                                icon.classList.remove('fa-eye-slash');
+                                icon.classList.add('fa-eye');
+                            }
+                        }
 
-                } else {
-                    loadTickets();
-                }
-            }
-            //]]>
+                        function handleLogin(e) {
+                            e.preventDefault();
+                            var username = document.getElementById('loginUsername').value;
+                            var password = document.getElementById('loginPassword').value;
+
+                            if (validCredentials[username] && validCredentials[username] === password) {
+                                currentUser = {name: username, email: username + '@sistema.com'};
+                                document.getElementById('currentUserName').textContent = currentUser.name;
+                                document.getElementById('currentUserName2').textContent = currentUser.name;
+                                showAlert('¡Inicio de sesión exitoso!', 'success');
+                                setTimeout(function () {
+                                    showPage('mainPage');
+                                }, 1000);
+                            } else {
+                                showAlert('Credenciales incorrectas. Intente nuevamente.', 'danger');
+                            }
+                            return false;
+                        }
+
+                        function handleRegister(e) {
+                            e.preventDefault();
+                            var email = document.getElementById('registerEmail').value;
+                            var name = document.getElementById('registerName').value;
+                            var phone = document.getElementById('registerPhone').value;
+                            var password = document.getElementById('registerPassword').value;
+                            var confirmPassword = document.getElementById('registerConfirmPassword').value;
+
+                            if (password !== confirmPassword) {
+                                showAlert('Las contraseñas no coinciden', 'warning');
+                                return false;
+                            }
+
+                            if (!/^[0-9]{10}$/.test(phone)) {
+                                showAlert('El teléfono debe tener 10 dígitos', 'warning');
+                                return false;
+                            }
+
+                            showAlert('¡Registro exitoso! Ya puede iniciar sesión', 'success');
+                            document.getElementById('registerForm').reset();
+                            setTimeout(function () {
+                                showPage('loginPage');
+                            }, 2000);
+
+                            return false;
+                        }
+
+                        function loadUsers() {
+                            var tbody = document.getElementById('usersTableBody');
+                            tbody.innerHTML = '';
+
+                            for (var i = 0; i < users.length; i++) {
+                                var user = users[i];
+                                var row = document.createElement('tr');
+                                row.innerHTML = '<td>' + user.name + '</td>' +
+                                        '<td>' + user.email + '</td>' +
+                                        '<td>' + user.module + '</td>' +
+                                        '<td>' + user.phone + '</td>' +
+                                        '<td><span class="badge ' + user.status.toLowerCase() + '">' + user.status + '</span></td>' +
+                                        '<td>' + user.role + '</td>' +
+                                        '<td class="actions">' +
+                                        '<button class="edit" onclick="editUser(' + user.id + ')">Editar</button>' +
+                                        '<button class="delete" onclick="deleteUser(' + user.id + ')">Eliminar</button>' +
+                                        '</td>';
+                                tbody.appendChild(row);
+                            }
+                        }
+
+                        function editUser(userId) {
+                            var user = null;
+                            for (var i = 0; i < users.length; i++) {
+                                if (users[i].id === userId) {
+                                    user = users[i];
+                                    break;
+                                }
+                            }
+
+                            if (user) {
+                                document.getElementById('editUserId').value = user.id;
+                                document.getElementById('editUserName').value = user.name;
+                                document.getElementById('editUserEmail').value = user.email;
+                                document.getElementById('editUserPhone').value = user.phone;
+                                document.getElementById('editUserModule').value = user.module || '';
+                                document.getElementById('editUserRole').value = user.role;
+                                document.getElementById('editUserStatus').value = user.status;
+                                document.getElementById('editUserRegDate').value = user.regDate || '';
+                                document.getElementById('editUserLastSession').value = user.lastSession || '';
+
+                                document.getElementById('editUserRole').style.backgroundColor = '';
+                                document.getElementById('editUserPhone').style.backgroundColor = '';
+                                document.getElementById('editUserStatus').style.backgroundColor = '';
+
+                                showPage('detailsPage');
+                            }
+                        }
+
+                        function handleEditUser(e) {
+                            e.preventDefault();
+
+                            var userId = parseInt(document.getElementById('editUserId').value);
+                            var userIndex = -1;
+
+                            for (var i = 0; i < users.length; i++) {
+                                if (users[i].id === userId) {
+                                    userIndex = i;
+                                    break;
+                                }
+                            }
+
+                            if (userIndex !== -1) {
+                                users[userIndex].name = document.getElementById('editUserName').value;
+                                users[userIndex].email = document.getElementById('editUserEmail').value;
+                                users[userIndex].phone = document.getElementById('editUserPhone').value;
+                                users[userIndex].module = document.getElementById('editUserModule').value;
+                                users[userIndex].role = document.getElementById('editUserRole').value;
+                                users[userIndex].status = document.getElementById('editUserStatus').value;
+
+                                showAlert('Usuario actualizado exitosamente', 'success');
+                                setTimeout(function () {
+                                    showPage('mainPage');
+                                }, 1000);
+                            }
+
+                            return false;
+                        }
+
+                        function handleNewUser(e) {
+                            e.preventDefault();
+
+                            var userType = document.getElementById('newUserTipoUsuario').value;
+                            var userRole = document.getElementById('newUserRole').value;
+                            var password = document.getElementById('newUserPassword').value;
+                            var confirmPassword = document.getElementById('newUserConfirmPassword').value;
+                            var isInternal = userType === '1';
+
+                            // 1. Validar coincidencia de contraseñas
+                            if (password !== confirmPassword) {
+                                showAlert('Error: La contraseña y la confirmación no coinciden.', 'danger');
+                                return false;
+                            }
+
+                            // 2. Validación de Rol para usuarios Internos
+                            if (isInternal && !userRole) {
+                                showAlert('El Rol es obligatorio para un Usuario Interno.', 'warning');
+                                return false;
+                            }
+
+                            // 3. Crear el objeto de nuevo usuario (simulación)
+                            var newUser = {
+                                // Campos generados automáticamente por la BD (UUID, SERIAL, TIMESTAMPZ DEFAULT NOW())
+                                id: users.length + 1, // Simulación de UUID/ID
+                                regDate: new Date().toISOString().split('T')[0],
+                                lastSession: null,
+
+                                // Campos OBLIGATORIOS de entrada
+                                name: document.getElementById('newUserName').value, // nombre_completo 
+                                email: document.getElementById('newUserEmail').value, // correo_electronico 
+                                password: password, // contrasena [cite: 17]
+                                id_tipo_usuario: parseInt(userType), // id_tipo_usuario [cite: 17]
+                                id_estado_cuenta: parseInt(document.getElementById('newUserStatus').value), // id_estado_cuenta [cite: 17]
+
+                                // Campos opcionales de entrada
+                                phone: document.getElementById('newUserPhone').value || null, // telefono 
+                                address: document.getElementById('newUserAddress').value || null, // direccion 
+
+                                // Campos condicionales
+                                id_rol: isInternal ? parseInt(userRole) : null, // id_rol 
+                                id_modulo: document.getElementById('newUserModule').value || null, // id_modulo 
+
+                                // Propiedades de la lista de usuarios para la tabla de visualización (simulación)
+                                role: isInternal ? document.getElementById('newUserRole').options[document.getElementById('newUserRole').selectedIndex].text : 'N/A',
+                                status: document.getElementById('newUserStatus').options[document.getElementById('newUserStatus').selectedIndex].text,
+                                module: document.getElementById('newUserModule').value || 'N/A'
+                            };
+                            // La lógica real aquí sería enviar los datos a tu backend/API
+                            console.log('Datos a enviar al backend:', newUser);
+
+                            // Simulación de éxito
+                            users.push(newUser);
+                            showAlert('Usuario **' + newUser.name + '** creado exitosamente', 'success');
+                            document.getElementById('newUserForm').reset();
+                            setTimeout(function () {
+                                showPage('mainPage');
+                                toggleInternalFields(); // Restaurar el estado inicial
+                            }, 1000);
+
+                            return false;
+                        }
+
+                        function toggleInternalFields() {
+                            var tipoUsuarioSelect = document.getElementById('newUserTipoUsuario');
+                            var internalFieldsDiv = document.getElementById('internalUserFields');
+                            var rolSelect = document.getElementById('newUserRole');
+
+                            // El tipo de usuario 'Interno' tiene id_tipo_usuario = 1 [cite: 10]
+                            var isInternal = tipoUsuarioSelect.value === '1';
+
+                            if (isInternal) {
+                                internalFieldsDiv.style.display = 'block';
+                                // Rol es OBLIGATORIO para Internos según el CONSTRAINT de la BD [cite: 18]
+                                rolSelect.setAttribute('required', 'required');
+                            } else {
+                                internalFieldsDiv.style.display = 'none';
+                                rolSelect.removeAttribute('required');
+                                rolSelect.value = ""; // Limpiar valor
+                                document.getElementById('newUserModule').value = ""; // Limpiar módulo
+                            }
+                        }
+
+                        function deleteUser(userId) {
+                            if (confirm('¿Está seguro de eliminar este usuario?')) {
+                                var newUsers = [];
+                                for (var i = 0; i < users.length; i++) {
+                                    if (users[i].id !== userId) {
+                                        newUsers.push(users[i]);
+                                    }
+                                }
+                                users = newUsers;
+                                loadUsers();
+                                showAlert('Usuario eliminado exitosamente', 'info');
+                            }
+                        }
+
+                        function filterUsers() {
+                            var filterText = prompt('Ingrese el nombre o email a buscar:');
+                            if (filterText) {
+                                var filtered = [];
+                                for (var i = 0; i < users.length; i++) {
+                                    var user = users[i];
+                                    if (user.name.toLowerCase().indexOf(filterText.toLowerCase()) !== -1 ||
+                                            user.email.toLowerCase().indexOf(filterText.toLowerCase()) !== -1) {
+                                        filtered.push(user);
+                                    }
+                                }
+
+                                var tbody = document.getElementById('usersTableBody');
+                                tbody.innerHTML = '';
+
+                                if (filtered.length === 0) {
+                                    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No se encontraron resultados</td></tr>';
+                                } else {
+                                    for (var i = 0; i < filtered.length; i++) {
+                                        var user = filtered[i];
+                                        var row = document.createElement('tr');
+                                        row.innerHTML = '<td>' + user.name + '</td>' +
+                                                '<td>' + user.email + '</td>' +
+                                                '<td>' + user.module + '</td>' +
+                                                '<td>' + user.phone + '</td>' +
+                                                '<td><span class="badge ' + user.status.toLowerCase() + '">' + user.status + '</span></td>' +
+                                                '<td>' + user.role + '</td>' +
+                                                '<td class="actions">' +
+                                                '<button class="edit" onclick="editUser(' + user.id + ')">Editar</button>' +
+                                                '<button class="delete" onclick="deleteUser(' + user.id + ')">Eliminar</button>' +
+                                                '</td>';
+                                        tbody.appendChild(row);
+                                    }
+                                }
+                            }
+                        }
+
+                        function logout() {
+                            if (confirm('¿Está seguro de cerrar sesión?')) {
+                                currentUser = null;
+                                showAlert('Sesión cerrada correctamente', 'info');
+                                setTimeout(function () {
+                                    showPage('loginPage');
+                                    document.getElementById('loginForm').reset();
+                                }, 1000);
+                            }
+                        }
+
+                        var telInputs = document.querySelectorAll('input[type="tel"]');
+                        for (var i = 0; i < telInputs.length; i++) {
+                            telInputs[i].addEventListener('input', function (e) {
+                                this.value = this.value.replace(/[^0-9]/g, '');
+                            });
+                        }
+
+                        var nameInputs = document.querySelectorAll('#registerName, #newUserName, #editUserName');
+                        for (var i = 0; i < nameInputs.length; i++) {
+                            nameInputs[i].addEventListener('input', function (e) {
+                                this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '');
+                            });
+                        }
+
+                        var zipInput = document.getElementById('editZip');
+                        if (zipInput) {
+                            zipInput.addEventListener('input', function (e) {
+                                this.value = this.value.replace(/[^0-9]/g, '');
+                            });
+                        }
+
+                        function getTicketById(ticketId) {
+                            return tickets.find(function (t) {
+                                return t.id === ticketId;
+                            });
+                        }
+
+                        function handleNewTicket(e) {
+                            e.preventDefault();
+                            var module = document.getElementById('newTicketModule').value;
+                            var tipo = document.getElementById('newTicketTipoCambio').value;
+                            var detallesText = document.getElementById('newTicketDetalles').value;
+                            var userEmail = document.getElementById('newTicketUserEmail').value;
+
+                            var detalles;
+                            try {
+                                detalles = JSON.parse(detallesText);
+                            } catch (e) {
+                                detalles = {descripcion: detallesText};
+                            }
+
+                            detalles.email = userEmail;
+
+                            var newTicket = {
+                                id: 'TK-' + String(nextTicketId++).padStart(3, '0'),
+                                tipo: tipo,
+                                modulo: module,
+                                fecha: new Date().toISOString().split('T')[0],
+                                estado: 'Pendiente',
+                                usuarioSolicitante: currentUser.name + ' (' + currentUser.email + ')',
+                                userEmail: currentUser.email,
+                                detalles: detalles
+                            };
+
+                            tickets.push(newTicket);
+                            showAlert('Solicitud de cambio **' + newTicket.id + '** enviada con éxito.', 'success');
+                            document.getElementById('newTicketForm').reset();
+                            setTimeout(function () {
+                                showPage('ticketsPage');
+                            }, 1000);
+                            return false;
+                        }
+
+                        function loadTickets(ticketsData) {
+                            var tbody = document.getElementById('ticketsTableBody');
+                            tbody.innerHTML = '';
+
+                            var list = ticketsData || tickets;
+
+                            if (list.length === 0) {
+                                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No hay tickets para mostrar.</td></tr>';
+                                return;
+                            }
+
+                            for (var i = 0; i < list.length; i++) {
+                                var ticket = list[i];
+
+                                var statusClass = '';
+                                switch (ticket.estado) {
+                                    case 'Pendiente':
+                                        statusClass = 'pendiente';
+                                        break;
+                                    case 'Aprobado':
+                                        statusClass = 'aprobado';
+                                        break;
+                                    case 'Rechazado':
+                                        statusClass = 'rechazado';
+                                        break;
+                                    case 'En Revisión':
+                                        statusClass = 'revision';
+                                        break;
+                                    default:
+                                        statusClass = 'inactivo';
+                                }
+
+                                var buttonText = (ticket.estado === 'Pendiente' || ticket.estado === 'En Revisión') ? 'Revisar' : 'Ver';
+                                var buttonClass = (buttonText === 'Revisar') ? 'review' : 'edit';
+
+                                var row = document.createElement('tr');
+                                row.innerHTML = '<td>' + ticket.id + '</td>' +
+                                        '<td>' + ticket.tipo + '</td>' +
+                                        '<td>' + ticket.modulo + '</td>' +
+                                        '<td>' + ticket.fecha + '</td>' +
+                                        '<td><span class="badge ' + statusClass + '">' + ticket.estado + '</span></td>' +
+                                        '<td>' + ticket.usuarioSolicitante + '</td>' +
+                                        '<td class="actions">' +
+                                        '<button class="' + buttonClass + '" onclick="showReviewModal(\'' + ticket.id + '\')">' + buttonText + '</button>' +
+                                        '</td>';
+                                tbody.appendChild(row);
+                            }
+                        }
+
+                        function showReviewModal(ticketId) {
+                            var ticket = getTicketById(ticketId);
+                            if (!ticket) {
+                                showAlert('Error: Ticket no encontrado.', 'danger');
+                                return;
+                            }
+
+                            var modalElement = document.getElementById('reviewTicketModal');
+                            var modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+
+                            var isClosed = (ticket.estado === 'Aprobado' || ticket.estado === 'Rechazado');
+                            var isManualEdit = (ticket.tipo === 'Edición Usuario');
+
+                            document.getElementById('modalTicketId').textContent = ticket.id;
+                            document.getElementById('modalTipoCambio').textContent = ticket.tipo;
+                            document.getElementById('modalUsuarioSolicitante').textContent = ticket.usuarioSolicitante;
+
+                            var detallesDiv = document.getElementById('modalDetalles');
+                            detallesDiv.innerHTML = '';
+
+                            if (ticket.estado === 'Rechazado' && ticket.detalles.motivo_rechazo) {
+                                detallesDiv.innerHTML += '<p style="color: var(--color-peligro); font-weight: bold;">MOTIVO DE RECHAZO: ' + ticket.detalles.motivo_rechazo + '</p>';
+                            }
+
+                            for (var key in ticket.detalles) {
+                                if (!['email', 'id_usuario', 'motivo_rechazo', 'cambio', 'aprobado_por'].includes(key)) {
+                                    var highlightStyle = (isClosed && ticket.estado === 'Aprobado') ? 'style="color: var(--color-exito); font-weight: bold;"' : 'style="color: var(--texto-oscuro);"';
+                                    detallesDiv.innerHTML += '<p><strong>' + key.replace('_', ' ').toUpperCase() + ':</strong> <span ' + highlightStyle + '>' + ticket.detalles[key] + '</span></p>';
+                                }
+                            }
+
+                            var aprobarBtn = document.getElementById('modalAprobarBtn');
+                            var rejectBtn = document.getElementById('modalRechazarBtn');
+
+                            if (isClosed) {
+                                aprobarBtn.setAttribute('disabled', 'disabled');
+                                aprobarBtn.textContent = 'Ticket Cerrado (' + ticket.estado + ')';
+                                aprobarBtn.classList.remove('btn-success-custom');
+                                aprobarBtn.classList.add('btn-primary-custom');
+                                rejectBtn.style.display = 'none';
+                                aprobarBtn.onclick = function () {
+                                    modal.hide();
+                                };
+
+                            } else if (isManualEdit) {
+                                aprobarBtn.removeAttribute('disabled');
+                                aprobarBtn.innerHTML = '<i class="fas fa-edit"></i> Ir a Editar Usuario';
+                                aprobarBtn.classList.remove('btn-success-custom');
+                                aprobarBtn.classList.add('btn-primary-custom');
+                                rejectBtn.style.display = 'inline-block';
+
+                                aprobarBtn.onclick = function () {
+                                    modal.hide();
+                                    reviewAndEditUser(ticket.detalles.email, ticket.detalles, ticket.id);
+                                };
+                                rejectBtn.onclick = function () {
+                                    handleRejectTicket(ticketId, modal);
+                                };
+
+                            } else {
+                                aprobarBtn.removeAttribute('disabled');
+                                aprobarBtn.innerHTML = '<i class="fas fa-check"></i> Aprobar y Cerrar';
+                                aprobarBtn.classList.remove('btn-primary-custom');
+                                aprobarBtn.classList.add('btn-success-custom');
+                                rejectBtn.style.display = 'inline-block';
+
+                                aprobarBtn.onclick = function () {
+                                    handleApproveTicket(ticketId, modal);
+                                };
+                                rejectBtn.onclick = function () {
+                                    handleRejectTicket(ticketId, modal);
+                                };
+                            }
+
+                            modal.show();
+                        }
+
+                        function handleApproveTicket(ticketId, modalInstance) {
+                            if (!confirm('¿Confirma que desea APROBAR y cerrar el ticket ' + ticketId + '? Se aplicarán los cambios propuestos al usuario.')) {
+                                return;
+                            }
+
+                            var ticketIndex = tickets.findIndex(function (t) {
+                                return t.id === ticketId;
+                            });
+                            if (ticketIndex !== -1) {
+                                var ticket = tickets[ticketIndex];
+                                var userIndex = users.findIndex(function (u) {
+                                    return u.email === ticket.detalles.email;
+                                });
+
+                                if (userIndex !== -1) {
+                                    if (ticket.detalles.estado_propuesto) {
+                                        users[userIndex].status = ticket.detalles.estado_propuesto;
+                                    }
+                                    if (ticket.detalles.rol_propuesto) {
+                                        users[userIndex].role = ticket.detalles.rol_propuesto;
+                                    }
+                                    if (ticket.detalles.nombre_propuesto) {
+                                        users[userIndex].name = ticket.detalles.nombre_propuesto;
+                                    }
+
+                                    tickets[ticketIndex].estado = 'Aprobado';
+                                    tickets[ticketIndex].detalles.aprobado_por = currentUser.name;
+
+                                    showAlert('Ticket **' + ticketId + '** APROBADO y cambios aplicados al usuario **' + users[userIndex].name + '**.', 'success');
+                                } else {
+                                    showAlert('Ticket **' + ticketId + '** APROBADO, pero el usuario no se encontró para aplicar los cambios.', 'warning');
+                                    tickets[ticketIndex].estado = 'Aprobado';
+                                }
+
+                                modalInstance.hide();
+                                loadTickets();
+                            }
+                        }
+
+                        function handleRejectTicket(ticketId, modalInstance) {
+                            var rejectionReason = prompt('Ingrese el motivo del rechazo para el ticket ' + ticketId + ':');
+                            if (rejectionReason === null || rejectionReason.trim() === '') {
+                                showAlert('Rechazo cancelado o motivo no especificado.', 'info');
+                                return;
+                            }
+
+                            var ticketIndex = tickets.findIndex(function (t) {
+                                return t.id === ticketId;
+                            });
+                            if (ticketIndex !== -1) {
+                                tickets[ticketIndex].estado = 'Rechazado';
+                                tickets[ticketIndex].detalles.motivo_rechazo = rejectionReason.trim();
+
+                                showAlert('Ticket **' + ticketId + '** ha sido RECHAZADO. Motivo: ' + rejectionReason, 'danger');
+                                modalInstance.hide();
+                                loadTickets();
+                            } else {
+                                showAlert('Error al rechazar: Ticket no encontrado en la lista.', 'danger');
+                            }
+                        }
+
+                        function reviewAndEditUser(userEmail, proposedChanges, ticketId) {
+                            var userToEdit = users.find(function (u) {
+                                return u.email === userEmail;
+                            });
+
+                            if (userToEdit) {
+                                editUser(userToEdit.id);
+
+                                var highlightStyle = 'rgba(128, 255, 128, 0.2)';
+
+                                if (proposedChanges.rol_propuesto) {
+                                    document.getElementById('editUserRole').value = proposedChanges.rol_propuesto;
+                                    document.getElementById('editUserRole').style.backgroundColor = highlightStyle;
+                                }
+                                if (proposedChanges.telefono) {
+                                    document.getElementById('editUserPhone').value = proposedChanges.telefono;
+                                    document.getElementById('editUserPhone').style.backgroundColor = highlightStyle;
+                                }
+                                if (proposedChanges.estado_propuesto) {
+                                    document.getElementById('editUserStatus').value = proposedChanges.estado_propuesto;
+                                    document.getElementById('editUserStatus').style.backgroundColor = highlightStyle;
+                                }
+                                if (proposedChanges.nombre_propuesto) {
+                                    document.getElementById('editUserName').value = proposedChanges.nombre_propuesto;
+                                    document.getElementById('editUserName').style.backgroundColor = highlightStyle;
+                                }
+
+                                showAlert('Revise los campos resaltados y presione "ACTUALIZAR USUARIO" para aplicar el cambio del ticket: **' + ticketId + '**', 'warning');
+                            } else {
+                                showAlert('No se encontró el usuario: ' + userEmail + ' para el ticket: ' + ticketId, 'danger');
+                            }
+                        }
+
+                        function filterTickets(filterValue) {
+                            if (typeof filterValue !== 'string') {
+                                filterValue = prompt('Ingrese el ID, Módulo o Solicitante a buscar:');
+                            }
+
+                            if (filterValue) {
+                                var lowerFilter = filterValue.toLowerCase().trim();
+                                var filtered;
+
+                                if (['todos', 'pendiente', 'en revisión', 'aprobado', 'rechazado'].includes(lowerFilter.replace(/\s/g, ''))) {
+                                    var statusToFilter = lowerFilter.replace(/\s/g, '');
+                                    if (statusToFilter === 'todos') {
+                                        filtered = tickets;
+                                    } else {
+                                        filtered = tickets.filter(function (t) {
+                                            return t.estado.toLowerCase().replace(/\s/g, '') === statusToFilter;
+                                        });
+                                    }
+                                } else {
+                                    filtered = tickets.filter(function (ticket) {
+                                        return ticket.id.toLowerCase().indexOf(lowerFilter) !== -1 ||
+                                                ticket.modulo.toLowerCase().indexOf(lowerFilter) !== -1 ||
+                                                ticket.usuarioSolicitante.toLowerCase().indexOf(lowerFilter) !== -1 ||
+                                                ticket.tipo.toLowerCase().indexOf(lowerFilter) !== -1;
+                                    });
+                                }
+
+                                loadTickets(filtered);
+                                if (filtered.length === 0) {
+                                    showAlert('No se encontraron tickets con el criterio "' + filterValue + '".', 'warning');
+                                } else {
+                                    showAlert('Filtrando tickets por: ' + filterValue, 'info');
+                                }
+
+                            } else {
+                                loadTickets();
+                            }
+                        }
+                        //]]>
         </script>
     </body>
 </html>
