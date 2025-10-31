@@ -715,6 +715,7 @@
                                     <option value="CRM">CRM</option>
                                     <option value="PRV">Proveedores</option>
                                     <option value="BCO">Módulo de Bancos</option>
+                                    <option value="Usuarios">Módulo de Usuarios</option>
                                 </select>
                             </div>
                         </div>
@@ -1453,14 +1454,14 @@
                             if (filterValue) {
                                 var lowerFilter = filterValue.toLowerCase().trim();
                                 var filtered;
+                                var predefinedStates = ['Todos', 'Pendiente', 'En Revisión', 'Aprobado', 'Rechazado'];
+                                if (predefinedStates.includes(filterValue)) {
 
-                                if (['todos', 'pendiente', 'en revisión', 'aprobado', 'rechazado'].includes(lowerFilter.replace(/\s/g, ''))) {
-                                    var statusToFilter = lowerFilter.replace(/\s/g, '');
-                                    if (statusToFilter === 'todos') {
+                                    if (filterValue === 'Todos') {
                                         filtered = tickets;
                                     } else {
                                         filtered = tickets.filter(function (t) {
-                                            return t.estado.toLowerCase().replace(/\s/g, '') === statusToFilter;
+                                            return t.estado === filterValue;
                                         });
                                     }
                                 } else {
