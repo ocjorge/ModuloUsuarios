@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
+    <h:head>
+        <title>Nuevo Usuario - Sistema de Usuarios</title>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" type="text/css" />
+        <style type="text/css">
+            :root {
+                --color-primario: #2c5aa0;
+                --color-secundario: #34495e;
+                --color-acento: #3498db;
+                --color-exito: #27ae60;
+                --luz-bg: #f8f9fa;
+                --texto-oscuro: #2c3e50;
+            }
+            body {
+                margin: 0;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background-color: var(--luz-bg);
+                color: var(--texto-oscuro);
+            }
+            .header {
+                background-color: var(--color-primario);
+                color: white;
+                padding: 15px 30px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+            .detail-container {
+                max-width: 800px;
+                margin: 20px auto;
+                background: white;
+                border-radius: 6px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                overflow: hidden;
+            }
+            .header-form {
+                background: var(--color-primario);
+                color: white;
+                padding: 10px 15px;
+                font-weight: bold;
+            }
+            .form-section {
+                padding: 20px;
+                border-bottom: 1px solid #ddd;
+            }
+            .form-section h3 {
+                margin-top: 0;
+                color: var(--color-secundario);
+                border-bottom: 2px solid var(--color-acento);
+                padding-bottom: 10px;
+            }
+            .form-actions {
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+                padding: 20px;
+            }
+            .btn-success-custom {
+                background: var(--color-exito);
+                color: white;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 4px;
+                font-weight: bold;
+                cursor: pointer;
+            }
+            .btn-secondary-custom {
+                background: var(--color-secundario);
+                color: white;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 4px;
+                font-weight: bold;
+                cursor: pointer;
+                text-decoration: none;
+            }
+            .password-toggle {
+                cursor: pointer;
+                position: absolute;
+                right: 10px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--color-secundario);
+            }
+            .form-group-custom {
+                position: relative;
+            }
+        </style>
+    </h:head>
+    <h:body>
+        <div class="header">
+            <h1>Nuevo Usuario</h1>
+            <div class="header-right">
+                <h:button value="← Volver" outcome="usuarios" styleClass="btn-secondary-custom" />
+            </div>
+        </div>
+
+        <div class="messages-container" style="max-width: 800px; margin: 20px auto;">
+            <h:messages globalOnly="false" layout="list" showDetail="true" showSummary="true" 
+                       infoClass="alert alert-info" warnClass="alert alert-warning" 
+                       errorClass="alert alert-danger" fatalClass="alert alert-danger"/>
+        </div>
+
+        <div class="detail-container">
+            <div class="header-form">Crear Nuevo Usuario</div>
+
+            <h:form id="newUserForm">
+                <div class="form-section">
+                    <h3>Información Personal</h3>
+
+                    <div class="mb-3">
+                        <h:outputLabel for="newUserTipoUsuario" value="Tipo de Usuario *" styleClass="form-label" />
+                        <h:selectOneMenu id="newUserTipoUsuario"
+                                         value="#{usuarioBean.newUserTipoUsuario}"
+                                         styleClass="form-control"
+                                         required="true"
+                                         requiredMessage="El tipo de usuario es obligatorio.">
+                            <f:selectItem itemLabel="Seleccione..." itemValue="" />
+                            <f:selectItems value="#{usuarioBean.tiposUsuarios}"
+                                           var="tipo"
+                                           itemLabel="#{tipo.nombreTipo}"
+                                           itemValue="#{tipo.idTipoUsuario}" />
+                            <f:ajax event="change" render="internalUserFields" />
+                        </h:selectOneMenu>
+                        <h:message for="newUserTipoUsuario" styleClass="text-danger" />
+                    </div>
+
+                    <div class="mb-3">
+                        <h:outputLabel for="newUserName" value="Nombre completo *" styleClass="form-label" />
+                        <h:inputText id="newUserName"
+                                     value="#{usuarioBean.newUserName}"
+                                     styleClass="form-control"
+                                     required="true"
+                                     requiredMessage="El nombre completo es obligatorio."/>
+                        <h:message for="newUserName" styleClass="text-danger" />
+                    </div>
+
+                    <div class="mb-3">
+                        <h:outputLabel for="newUserEmail" value="Correo electrónico *" styleClass="form-label" />
+                        <h:inputText id="newUserEmail"
+                                     value="#{usuarioBean.newUserEmail}"
+                                     styleClass="form-control"
+                                     required="true"
+                                     requiredMessage="El correo electrónico es obligatorio."
+                                     validatorMessage="Formato de correo electrónico inválido.">
+                            <f:validateRegex pattern="[\w\.-]*[a-zA-Z0-9_]@[\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]" />
+                        </h:inputText>
+                        <h:message for="newUserEmail" styleClass="text-danger" />
+                    </div>
+
+                    <div class="mb-3">
+                        <h:outputLabel for="newUserPhone" value="Teléfono" styleClass="form-label" />
+                        <h:inputText id="newUserPhone"
+                                     value="#{usuarioBean.newUserPhone}"
+                                     styleClass="form-control"
+                                     pt:maxlength="10"
+                                     validatorMessage="El teléfono debe tener 10 dígitos numéricos.">
+                            <f:validateRegex pattern="^[0-9]{10}$" />
+                        </h:inputText>
+                        <h:message for="newUserPhone" styleClass="text-danger" />
+                    </div>
+
+                    <div class="mb-3">
+                        <h:outputLabel for="newUserPassword" value="Contraseña *" styleClass="form-label" />
+                        <div class="form-group-custom">
+                            <h:inputSecret id="newUserPassword"
+                                           value="#{usuarioBean.newUserPassword}"
+                                           styleClass="form-control"
+                                           required="true"
+                                           pt:minlength="6"
+                                           requiredMessage="La contraseña es obligatoria." />
+                            <i class="fas fa-eye password-toggle" onclick="togglePassword('newUserForm:newUserPassword', this)"></i>
+                        </div>
+                        <h:message for="newUserPassword" styleClass="text-danger" />
+                    </div>
+
+                    <div class="mb-3">
+                        <h:outputLabel for="newUserConfirmPassword" value="Confirmar Contraseña *" styleClass="form-label" />
+                        <div class="form-group-custom">
+                            <h:inputSecret id="newUserConfirmPassword"
+                                           value="#{usuarioBean.newUserConfirmPassword}"
+                                           styleClass="form-control"
+                                           required="true"
+                                           pt:minlength="6"
+                                           requiredMessage="La confirmación de contraseña es obligatoria." />
+                            <i class="fas fa-eye password-toggle" onclick="togglePassword('newUserForm:newUserConfirmPassword', this)"></i>
+                        </div>
+                        <h:message for="newUserConfirmPassword" styleClass="text-danger" />
+                    </div>
+                </div>
+
+                <h:panelGroup id="internalUserFields">
+                    <div class="form-section" style="display: #{usuarioBean.newUserTipoUsuario == 1 ? 'block' : 'none'};">
+                        <h3>Estado y Acceso (Usuario Interno)</h3>
+
+                        <div class="mb-3">
+                            <h:outputLabel for="newUserRole" value="Rol asignado *" styleClass="form-label" />
+                            <h:selectOneMenu id="newUserRole"
+                                             value="#{usuarioBean.newUserRole}"
+                                             styleClass="form-control"
+                                             required="#{usuarioBean.newUserTipoUsuario == 1}"
+                                             requiredMessage="El rol es obligatorio para usuarios internos.">
+                                <f:selectItem itemLabel="Seleccione Rol..." itemValue="" />
+                                <f:selectItems value="#{usuarioBean.rolesInternos}"
+                                               var="rol"
+                                               itemLabel="#{rol.nombreRol}"
+                                               itemValue="#{rol.idRol}" />
+                            </h:selectOneMenu>
+                            <h:message for="newUserRole" styleClass="text-danger" />
+                        </div>
+                        <div class="mb-3">
+                            <h:outputLabel for="newUserModule" value="Módulo Asignado" styleClass="form-label" />
+                            <h:selectOneMenu id="newUserModule"
+                                             value="#{usuarioBean.newUserModule}"
+                                             styleClass="form-control">
+                                <f:selectItem itemLabel="Ninguno / Sin Módulo" itemValue="" />
+                                <f:selectItems value="#{usuarioBean.modulos}"
+                                               var="modulo"
+                                               itemLabel="#{modulo.nombreModulo}"
+                                               itemValue="#{modulo.idModulo}" />
+                            </h:selectOneMenu>
+                            <h:message for="newUserModule" styleClass="text-danger" />
+                        </div>
+                    </div>
+                </h:panelGroup>
+
+                <div class="form-section">
+                    <h3>Estado de Cuenta</h3>
+                    <div class="mb-3">
+                        <h:outputLabel for="newUserStatus" value="Estado de cuenta *" styleClass="form-label" />
+                        <h:selectOneMenu id="newUserStatus"
+                                         value="#{usuarioBean.newUserStatus}"
+                                         styleClass="form-control"
+                                         required="true"
+                                         requiredMessage="El estado de cuenta es obligatorio.">
+                            <f:selectItems value="#{usuarioBean.estadosCuenta}"
+                                           var="estado"
+                                           itemLabel="#{estado.nombreEstado}"
+                                           itemValue="#{estado.idEstadoCuenta}" />
+                        </h:selectOneMenu>
+                        <h:message for="newUserStatus" styleClass="text-danger" />
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Dirección (opcional)</h3>
+                    <div class="mb-3">
+                        <h:outputLabel for="newUserAddress" value="Dirección Completa" styleClass="form-label" />
+                        <h:inputTextarea id="newUserAddress"
+                                         value="#{usuarioBean.newUserAddress}"
+                                         rows="3"
+                                         styleClass="form-control"
+                                         pt:placeholder="Ej: Av. Reforma 123, Col. Centro, CDMX, CP 00000" />
+                        <h:message for="newUserAddress" styleClass="text-danger" />
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <h:commandButton value="GUARDAR USUARIO"
+                                     styleClass="btn-success-custom"
+                                     action="#{usuarioBean.createUsuario}">
+                        <f:ajax execute="@form" render="@messages" />
+                    </h:commandButton>
+                    <h:button value="CANCELAR" outcome="usuarios" styleClass="btn-secondary-custom" />
+                </div>
+            </h:form>
+        </div>
+
+        <script>
+            function togglePassword(inputId, icon) {
+                const input = document.getElementById(inputId);
+                if (!input) return;
+
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            }
+
+            // Mostrar/ocultar campos de usuario interno basado en tipo de usuario
+            document.addEventListener('DOMContentLoaded', function() {
+                const tipoSelect = document.getElementById('newUserForm:newUserTipoUsuario');
+                const internalSection = document.querySelector('#internalUserFields .form-section');
+                
+                if (tipoSelect && internalSection) {
+                    tipoSelect.addEventListener('change', function() {
+                        internalSection.style.display = this.value === '1' ? 'block' : 'none';
+                    });
+                }
+            });
+        </script>
+    </h:body>
+</html>

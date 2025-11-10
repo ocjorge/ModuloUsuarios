@@ -53,7 +53,10 @@ public class UsuarioBean implements Serializable {
     private List<RolInterno> rolesInternos;
     private List<EstadoCuenta> estadosCuenta;
     private List<Modulo> modulos;
-
+    
+    private UUID selectedUserId;
+    private String selectedUserIdStr; // Para manejar parámetros URL     
+    
     @PostConstruct
     public void init() {
         loadUsuarios();
@@ -391,4 +394,63 @@ public class UsuarioBean implements Serializable {
         return selectedUser != null && selectedUser.getFechaCreacion() != null ?
                selectedUser.getFechaCreacion().format(DateTimeFormatter.ISO_LOCAL_DATE) : "";
     }
+    
+// Getters y Setters
+public UUID getSelectedUserId() {
+    return selectedUserId;
+}
+
+public void setSelectedUserId(UUID selectedUserId) {
+    this.selectedUserId = selectedUserId;
+}
+
+public String getSelectedUserIdStr() {
+    return selectedUserIdStr;
+}
+
+public void setSelectedUserIdStr(String selectedUserIdStr) {
+    this.selectedUserIdStr = selectedUserIdStr;
+    if (selectedUserIdStr != null && !selectedUserIdStr.isEmpty()) {
+        try {
+            this.selectedUserId = UUID.fromString(selectedUserIdStr);
+            loadUserForEdit();
+        } catch (IllegalArgumentException e) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "ID de usuario inválido"));
+        }
+    }
+}
+
+// Método para cargar usuario cuando se accede por URL
+public void loadUserForEdit() {
+    if (selectedUserId != null) {
+        try {
+            this.selectedUser = em.find(Usuario.class, selectedUserId);
+            if (selectedUser != null) {
+                // Cargar los IDs de las entidades relacionadas
+                newUserRole = (selectedUser.getIdRol() != null) ? selectedUser.getIdRol().getIdRol() : null;
+                newUserModule = (selectedUser.getIdModulo() != null) ? selectedUser.getIdModulo().getIdModulo() : null;
+                newUserStatus = selectedUser.getIdEstadoCuenta().getIdEstadoCuenta();
+                newUserAddress = selectedUser.getDireccion();
+                
+                FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Usuario cargado", 
+                    "Editando usuario: " + selectedUser.getNombreCompleto()));
+            } else {
+                FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Usuario no encontrado"));
+            }
+        } catch (Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", 
+                "No se pudo cargar el usuario: " + e.getMessage()));
+            e.printStackTrace();
+        }
+    }
+}
+
+// Método alternativo para compatibilidad con f:viewParam
+/*    public void loadUserForEdit(ComponentSystemEvent event) {
+        loadUserForEdit();
+    } */
 }
