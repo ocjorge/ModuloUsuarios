@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" 
+<html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="jakarta.faces.html"
       xmlns:f="jakarta.faces.core"
-      xml:lang="es" 
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+      xml:lang="es"
       lang="es">
-    <head>
+    <h:head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Sistema de Usuarios</title>
@@ -127,6 +129,14 @@
                 transform: translateY(-2px);
             }
 
+            .buttons-nav .tickets {
+                background-color: var(--color-secundario);
+            }
+            .buttons-nav .tickets:hover {
+                background-color: #2c4056;
+                transform: translateY(-2px);
+            }
+
             table {
                 width: 100%;
                 border-collapse: collapse;
@@ -157,7 +167,7 @@
                 gap: 8px;
             }
 
-            .actions button {
+            .actions button, .actions a {
                 padding: 6px 10px;
                 border: none;
                 border-radius: 5px;
@@ -165,6 +175,7 @@
                 font-size: 0.9em;
                 color: white;
                 text-transform: uppercase;
+                text-decoration: none;
                 transition: transform 0.2s;
             }
 
@@ -184,6 +195,14 @@
                 transform: translateY(-2px);
             }
 
+            .actions .review {
+                background-color: var(--color-secundario);
+            }
+            .actions .review:hover {
+                background-color: #2c4056;
+                transform: translateY(-2px);
+            }
+
             .badge {
                 padding: 4px 10px;
                 border-radius: 12px;
@@ -198,6 +217,21 @@
             }
             .inactivo {
                 background-color: var(--color-peligro);
+            }
+            .bloqueado {
+                background-color: var(--color-secundario);
+            }
+            .pendiente {
+                background-color: var(--color-advertencia);
+            }
+            .aprobado {
+                background-color: var(--color-exito);
+            }
+            .rechazado {
+                background-color: var(--color-peligro);
+            }
+            .revision {
+                background-color: var(--color-acento);
             }
 
             .auth-box {
@@ -246,7 +280,10 @@
             .form-group-custom {
                 position: relative;
                 margin-bottom: 0;
-                flex: 2 0 250px;
+            }
+
+            .form-group-custom input.form-control {
+                padding-right: 35px;
             }
 
             .detail-container {
@@ -291,7 +328,8 @@
             }
 
             .form-group input,
-            .form-group select {
+            .form-group select,
+            .form-group textarea {
                 flex: 2 0 250px;
                 padding: 8px;
                 border: 1px solid #ccc;
@@ -357,1138 +395,769 @@
                 color: white;
             }
 
-            .alert-custom {
+            .messages-container {
                 position: fixed;
-                top: 20px;
+                top: 70px;
                 right: 20px;
-                z-index: 9999;
-                min-width: 300px;
-                animation: slideIn 0.3s ease-out;
+                z-index: 10000;
+                width: 300px;
             }
 
-            @keyframes slideIn {
-                from {
-                    transform: translateX(400px);
-                    opacity: 0;
-                }
-                to {
-                    transform: translateX(0);
-                    opacity: 1;
-                }
+            .messages-container .ui-messages-info,
+            .messages-container .ui-messages-warn,
+            .messages-container .ui-messages-error,
+            .messages-container .ui-messages-fatal {
+                padding: 10px;
+                margin-bottom: 10px;
+                border-radius: 5px;
+                font-weight: bold;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             }
 
-            .buttons-nav .tickets {
-                background-color: var(--color-secundario);
-            }
-            .buttons-nav .tickets:hover {
-                background-color: #2c4056;
-                transform: translateY(-2px);
+            .messages-container .ui-messages-info {
+                background-color: #e0f2f7;
+                border: 1px solid #b2ebf2;
+                color: var(--color-acento);
             }
 
-            .pendiente {
-                background-color: var(--color-advertencia);
+            .messages-container .ui-messages-warn {
+                background-color: #fff8e1;
+                border: 1px solid #ffe082;
+                color: var(--color-advertencia);
             }
-            .aprobado {
-                background-color: var(--color-exito);
-            }
-            .rechazado {
-                background-color: var(--color-peligro);
-            }
-            .revision {
-                background-color: var(--color-acento);
-            }
-            .actions .review {
-                background-color: var(--color-secundario);
-            }
-            .actions .review:hover {
-                background-color: #2c4056;
-                transform: translateY(-2px);
+
+            .messages-container .ui-messages-error {
+                background-color: #ffebee;
+                border: 1px solid #ef9a9a;
+                color: var(--color-peligro);
             }
 
             .btn-close-white {
                 filter: invert(1);
             }
-
-            #modalDetalles p {
-                margin-bottom: 5px;
-                font-size: 0.9em;
-                font-family: monospace;
-            }
-
-            #modalAprobarBtn[disabled] {
-                background-color: #95a5a6;
-                cursor: not-allowed;
-                transform: none;
-            }
             /*]]>*/
         </style>
-    </head>
-    <body>
+    </h:head>
 
-        <!-- PÁGINA DE LOGIN -->
-        <div id="loginPage" class="page active">
-            <div class="header">
-                <h1>Sistema de Gestión de Usuarios</h1>
-            </div>
-
-            <div class="auth-box">
-                <h2>Iniciar Sesión</h2>
-                <form id="loginForm" onsubmit="return handleLogin(event)">
-                    <div class="mb-3">
-                        <label for="loginUsername" class="form-label">Nombre de usuario</label>
-                        <input type="text" class="form-control" id="loginUsername" required="required" />
-                    </div>
-                    <div class="mb-3">
-                        <label for="loginPassword" class="form-label">Contraseña</label>
-                        <div class="form-group-custom">
-                            <input type="password" class="form-control" id="loginPassword" required="required" />
-                            <i class="fas fa-eye password-toggle" onclick="togglePassword('loginPassword', this)"></i>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary-custom w-100 mt-3">Iniciar Sesión</button>
-                </form>
-            </div>
+    <h:body>
+        <!-- Contenedor de mensajes -->
+        <div class="messages-container">
+            <h:messages globalOnly="false" layout="list" showDetail="true" showSummary="true" styleClass="ui-messages"/>
         </div>
 
-        <!-- PÁGINA DE REGISTRO -->
-        <div id="registerPage" class="page">
-            <div class="header">
-                <h1>Registro de Empleados</h1>
-            </div>
+        <h:panelGroup id="mainContent" layout="block">
 
-            <div class="auth-box">
-                <h2>Registrar Empleado</h2>
-                <form id="registerForm" onsubmit="return handleRegister(event)">
-                    <div class="mb-3">
-                        <label for="registerEmail" class="form-label">Correo electrónico</label>
-                        <input type="email" class="form-control" id="registerEmail" required="required" />
-                    </div>
-                    <div class="mb-3">
-                        <label for="registerName" class="form-label">Nombre completo</label>
-                        <input type="text" class="form-control" id="registerName" required="required" />
-                    </div>
-                    <div class="mb-3">
-                        <label for="registerPhone" class="form-label">Teléfono</label>
-                        <input type="tel" class="form-control" id="registerPhone" maxlength="10" required="required" />
-                    </div>
-                    <div class="form-group-custom">
-                        <label for="registerPassword" class="form-label">Contraseña</label>
-                        <input type="password" class="form-control" id="registerPassword" minlength="6" required="required" />
-                        <i class="fas fa-eye password-toggle" onclick="togglePassword('registerPassword', this)"></i>
-                    </div>
-                    <div class="form-group-custom">
-                        <label for="registerConfirmPassword" class="form-label">Confirmar Contraseña</label>
-                        <input type="password" class="form-control" id="registerConfirmPassword" minlength="6" required="required" />
-                        <i class="fas fa-eye password-toggle" onclick="togglePassword('registerConfirmPassword', this)"></i>
-                    </div>
-                    <button type="submit" class="btn btn-primary-custom w-100 mt-3">Registrar Empleado</button>
-                </form>
-                <div class="text-center mt-3">
-                    <small>¿Ya tienes cuenta? <a href="#login" onclick="showPage('loginPage'); return false;">Inicia sesión</a></small>
-                </div>
-            </div>
-        </div>
-
-        <!-- PÁGINA PRINCIPAL -->
-        <div id="mainPage" class="page">
-            <div class="header">
-                <h1>Usuarios</h1>
-                <div class="header-right">
-                    <span>Bienvenido, <strong id="currentUserName"></strong></span>
-                    <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
-                </div>
-            </div>
-
-            <div class="container-custom">
-                <h2>Lista de Usuarios</h2>
-
-                <div class="buttons-nav">
-                    <button class="new-user" onclick="showPage('newUserPage')">+ Nuevo Usuario</button>
-                    <button class="tickets" onclick="showPage('ticketsPage')">
-                        <i class="fas fa-ticket-alt"></i> Tickets Pendientes
-                    </button>
-                    <button class="filter" onclick="filterUsers()">&#128269; Filtrar</button>
+            <!-- ========================================== -->
+            <!-- PÁGINA DE LOGIN -->
+            <!-- ========================================== -->
+            <div id="loginPage" class="page #{loginBean.loggedIn ? '' : 'active'}" data-page="loginPage">
+                <div class="header">
+                    <h1>Sistema de Gestión de Usuarios</h1>
                 </div>
 
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Correo</th>
-                            <th>Módulo</th>
-                            <th>Teléfono</th>
-                            <th>Estado</th>
-                            <th>Rol</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="usersTableBody">
-                        <!-- Los usuarios se cargarán dinámicamente -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- PÁGINA DE DETALLES/EDITAR USUARIO -->
-        <div id="detailsPage" class="page">
-            <div class="header">
-                <div>Usuarios</div>
-                <div class="header-right">
-                    <span>Bienvenido, <strong id="currentUserName2"></strong></span>
-                    <button class="btn-logout" onclick="showPage('mainPage')">Volver</button>
-                </div>
-            </div>
-
-            <div class="detail-container">
-                <div class="header-form">Editar Usuario</div>
-
-                <form id="editUserForm" onsubmit="return handleEditUser(event)">
-                    <input type="hidden" id="editUserId" />
-
-                    <div class="form-section">
-                        <h3>Información Personal</h3>
-                        <div class="form-group">
-                            <label>Nombre completo *</label>
-                            <input type="text" id="editUserName" required="required" />
+                <div class="auth-box">
+                    <h2>Iniciar Sesión</h2>
+                    <h:form id="loginForm">
+                        <div class="mb-3">
+                            <h:outputLabel for="loginUsername" value="Correo Electrónico" styleClass="form-label" />
+                            <h:inputText id="loginUsername"
+                                         value="#{loginBean.username}"
+                                         styleClass="form-control"
+                                         required="true"
+                                         requiredMessage="El correo electrónico es obligatorio." />
+                            <h:message for="loginUsername" errorClass="text-danger" />
                         </div>
-                        <div class="form-group">
-                            <label>Correo electrónico *</label>
-                            <input type="email" id="editUserEmail" required="required" />
-                        </div>
-                        <div class="form-group">
-                            <label>Teléfono *</label>
-                            <input type="tel" id="editUserPhone" maxlength="10" required="required" />
-                        </div>
-                        <div class="form-group">
-                            <label>Fecha de registro</label>
-                            <input type="date" id="editUserRegDate" readonly="readonly" />
-                        </div>
-                        <div class="form-group">
-                            <label>Última sesión</label>
-                            <input type="datetime-local" id="editUserLastSession" readonly="readonly" />
-                        </div>
-                    </div>
-
-                    <div class="form-section">
-                        <h3>Estado y Acceso</h3>
-                        <div class="form-group">
-                            <label>Rol asignado *</label>
-                            <select id="editUserRole" required="required">
-                                <option value="Jefe">Jefe</option>
-                                <option value="Gerente">Gerente</option>
-                                <option value="Operador">Operador</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Estado de cuenta</label>
-                            <select id="editUserStatus">
-                                <option value="Activo">Activo</option>
-                                <option value="Inactivo">Inactivo</option>
-                                <option value="Bloqueado">Bloqueado</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Módulo</label>
-                            <input type="text" id="editUserModule" />
-                        </div>
-                    </div>
-
-                    <div class="form-section">
-                        <h3>Dirección (opcional)</h3>
-                        <div class="form-group"><label>Calle</label><input type="text" id="editStreet" /></div>
-                        <div class="form-group"><label>Número</label><input type="text" id="editNumber" /></div>
-                        <div class="form-group"><label>Colonia</label><input type="text" id="editColony" /></div>
-                        <div class="form-group"><label>Ciudad</label><input type="text" id="editCity" /></div>
-                        <div class="form-group"><label>Estado</label><input type="text" id="editState" /></div>
-                        <div class="form-group"><label>Código Postal</label><input type="text" id="editZip" maxlength="5" /></div>
-                    </div>
-
-                    <div class="form-section">
-                        <h3>Privilegios del Sistema</h3>
-                        <p>[Lista de módulos y permisos específicos - En desarrollo]</p>
-                    </div>
-
-                    <div class="form-section">
-                        <h3>Historial de Actividad Reciente</h3>
-                        <table class="detail-table">
-                            <thead>
-                                <tr>
-                                    <th>Fecha</th>
-                                    <th>Acción</th>
-                                    <th>Módulo</th>
-                                </tr>
-                            </thead>
-                            <tbody id="activityTableBody">
-                                <tr>
-                                    <td>2025-10-15</td>
-                                    <td>Inicio de sesión</td>
-                                    <td>Usuarios</td>
-                                </tr>
-                                <tr>
-                                    <td>2025-10-14</td>
-                                    <td>Actualizó datos</td>
-                                    <td>Bancos</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="submit" class="btn-success-custom">ACTUALIZAR USUARIO</button>
-                        <button type="button" class="btn-secondary-custom" onclick="showPage('mainPage')">CANCELAR</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- PÁGINA DE NUEVO USUARIO -->
-        <div id="newUserPage" class="page">
-            <div class="header">
-                <h1>Nuevo Usuario</h1> <div class="header-right">
-                    <button class="btn-logout" onclick="showPage('mainPage')">Volver</button>
-                </div>
-            </div>
-
-            <div class="detail-container">
-                <div class="header-form">Crear Nuevo Usuario</div>
-
-                <form id="newUserForm" onsubmit="return handleNewUser(event)">
-                    <div class="form-section">
-                        <h3>Información Personal</h3>
-
-                        <div class="form-group">
-                            <label>Tipo de Usuario *</label>
-                            <select id="newUserTipoUsuario" required="required" onchange="toggleInternalFields()">
-                                <option value="">Seleccione...</option>
-                                <option value="1">Interno</option> 
-                                <option value="2">Cliente</option>
-                                <option value="3">Proveedor</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Nombre completo *</label>
-                            <input type="text" id="newUserName" required="required" />
-                        </div>
-
-                        <div class="form-group">
-                            <label>Correo electrónico *</label>
-                            <input type="email" id="newUserEmail" required="required" />
-                        </div>
-
-                        <div class="form-group" style="margin-top: 15px; display: flex; align-items: flex-start;">
-                            <label style="flex: 1 0 200px; margin-right: 10px;">Contraseña *</label>
-                            <div class="form-group-custom" style="flex: 2 0 250px; margin-bottom: 0;">
-                                <input type="password" class="form-control" id="newUserPassword" minlength="6" required="required" style="width: 100%;" />
-                                <i class="fas fa-eye password-toggle" onclick="togglePassword('newUserPassword', this)"></i>
+                        <div class="mb-3">
+                            <h:outputLabel for="loginPassword" value="Contraseña" styleClass="form-label" />
+                            <div class="form-group-custom">
+                                <h:inputSecret id="loginPassword"
+                                               value="#{loginBean.password}"
+                                               styleClass="form-control"
+                                               required="true"
+                                               pt:minlength="6"
+                                               requiredMessage="La contraseña es obligatoria." />
+                                <i class="fas fa-eye password-toggle" onclick="togglePassword('loginForm:loginPassword', this)"></i>
                             </div>
+                            <h:message for="loginPassword" errorClass="text-danger" />
                         </div>
+                        <h:commandButton value="Iniciar Sesión"
+                                         styleClass="btn btn-primary-custom w-100 mt-3"
+                                         action="#{loginBean.login}">
+                            <f:ajax execute="@form" render="@messages mainContent" />
+                        </h:commandButton>
+                        <div class="text-center mt-3">
+                            <small>¿No tienes cuenta? <a href="javascript:void(0);" onclick="showPage('registerPage');">Regístrate</a></small>
+                        </div>
+                    </h:form>
+                </div>
+            </div>
 
-                        <div class="form-group" style="margin-top: 15px; display: flex; align-items: flex-start;">
-                            <label style="flex: 1 0 200px; margin-right: 10px;">Confirmar Contraseña *</label>
-                            <div class="form-group-custom" style="flex: 2 0 250px; margin-bottom: 0;">
-                                <input type="password" class="form-control" id="newUserConfirmPassword" minlength="6" required="required" style="width: 100%;" />
-                                <i class="fas fa-eye password-toggle" onclick="togglePassword('newUserConfirmPassword', this)"></i>
+            <!-- ========================================== -->
+            <!-- PÁGINA DE REGISTRO -->
+            <!-- ========================================== -->
+            <div id="registerPage" class="page" data-page="registerPage">
+                <div class="header">
+                    <h1>Registro de Empleados</h1>
+                </div>
+
+                <div class="auth-box">
+                    <h2>Registrar Empleado</h2>
+                    <h:form id="registerForm">
+                        <div class="mb-3">
+                            <h:outputLabel for="registerEmail" value="Correo electrónico" styleClass="form-label" />
+                            <h:inputText id="registerEmail"
+                                         value="#{loginBean.registerEmail}"
+                                         styleClass="form-control"
+                                         required="true"
+                                         requiredMessage="El correo electrónico es obligatorio."
+                                         validatorMessage="Formato de correo electrónico inválido.">
+                                <f:validateRegex pattern="[\w\.-]*[a-zA-Z0-9_]@[\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]" />
+                            </h:inputText>
+                            <h:message for="registerEmail" errorClass="text-danger" />
+                        </div>
+                        <div class="mb-3">
+                            <h:outputLabel for="registerName" value="Nombre completo" styleClass="form-label" />
+                            <h:inputText id="registerName"
+                                         value="#{loginBean.registerName}"
+                                         styleClass="form-control"
+                                         required="true"
+                                         requiredMessage="El nombre completo es obligatorio." />
+                            <h:message for="registerName" errorClass="text-danger" />
+                        </div>
+                        <div class="mb-3">
+                            <h:outputLabel for="registerPhone" value="Teléfono" styleClass="form-label" />
+                            <h:inputText id="registerPhone"
+                                         value="#{loginBean.registerPhone}"
+                                         styleClass="form-control"
+                                         pt:maxlength="10"
+                                         required="true"
+                                         requiredMessage="El teléfono es obligatorio."
+                                         validatorMessage="El teléfono debe tener 10 dígitos numéricos.">
+                                <f:validateRegex pattern="^[0-9]{10}$" />
+                            </h:inputText>
+                            <h:message for="registerPhone" errorClass="text-danger" />
+                        </div>
+                        <div class="mb-3">
+                            <h:outputLabel for="registerPassword" value="Contraseña" styleClass="form-label" />
+                            <div class="form-group-custom">
+                                <h:inputSecret id="registerPassword"
+                                               value="#{loginBean.registerPassword}"
+                                               styleClass="form-control"
+                                               required="true"
+                                               pt:minlength="6"
+                                               requiredMessage="La contraseña es obligatoria." />
+                                <i class="fas fa-eye password-toggle" onclick="togglePassword('registerForm:registerPassword', this)"></i>
                             </div>
+                            <h:message for="registerPassword" errorClass="text-danger" />
                         </div>
+                        <div class="mb-3">
+                            <h:outputLabel for="registerConfirmPassword" value="Confirmar Contraseña" styleClass="form-label" />
+                            <div class="form-group-custom">
+                                <h:inputSecret id="registerConfirmPassword"
+                                               value="#{loginBean.registerConfirmPassword}"
+                                               styleClass="form-control"
+                                               required="true"
+                                               pt:minlength="6"
+                                               requiredMessage="La confirmación de contraseña es obligatoria." />
+                                <i class="fas fa-eye password-toggle" onclick="togglePassword('registerForm:registerConfirmPassword', this)"></i>
+                            </div>
+                            <h:message for="registerConfirmPassword" errorClass="text-danger" />
+                        </div>
+                        <h:commandButton value="Registrar Empleado"
+                                         styleClass="btn btn-primary-custom w-100 mt-3"
+                                         action="#{loginBean.register}">
+                            <f:ajax execute="@form" render="@messages mainContent" />
+                        </h:commandButton>
+                        <div class="text-center mt-3">
+                            <small>¿Ya tienes cuenta? <a href="javascript:void(0);" onclick="showPage('loginPage');">Inicia sesión</a></small>
+                        </div>
+                    </h:form>
+                </div>
+            </div>
 
-                        <div class="form-group">
-                            <label>Teléfono</label>
-                            <input type="tel" id="newUserPhone" maxlength="20" />
+            <!-- ========================================== -->
+            <!-- PÁGINA PRINCIPAL - LISTA DE USUARIOS -->
+            <!-- ========================================== -->
+            <div id="mainPage" class="page #{loginBean.loggedIn ? 'active' : ''}" data-page="mainPage">
+                <h:form id="mainPageForm">
+                    <div class="header">
+                        <h1>Usuarios</h1>
+                        <div class="header-right">
+                            <span>Bienvenido, <strong>#{loginBean.currentUser.nombreCompleto}</strong></span>
+                            <h:commandButton value="Cerrar Sesión"
+                                             styleClass="btn-logout"
+                                             action="#{loginBean.logout}">
+                                <f:ajax execute="@this" render="@messages mainContent" />
+                            </h:commandButton>
                         </div>
                     </div>
 
-                    <div class="form-section">
-                        <h3>Estado y Acceso</h3>
+                    <div class="container-custom">
+                        <h2>Lista de Usuarios</h2>
 
-                        <div id="internalUserFields" style="display: none;">
+                        <div class="buttons-nav">
+                            <button type="button" class="new-user" onclick="showPage('newUserPage'); return false;">
+                                + Nuevo Usuario
+                            </button>
+                            <button type="button" class="tickets" onclick="showPage('ticketsPage'); return false;">
+                                <i class="fas fa-ticket-alt"></i> Tickets Pendientes
+                            </button>
+                            <h:commandButton value="🔍 Refrescar"
+                                             styleClass="filter"
+                                             action="#{usuarioBean.loadUsuarios}">
+                                <f:ajax execute="@this" render="usersTableBody @messages" />
+                            </h:commandButton>
+                        </div>
+
+                        <h:dataTable value="#{usuarioBean.usuarios}" var="user" styleClass="table" id="usersTableBody">
+                            <h:column>
+                                <f:facet name="header">Nombre</f:facet>
+                                #{user.nombreCompleto}
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Correo</f:facet>
+                                #{user.correoElectronico}
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Módulo</f:facet>
+                                #{user.idModulo != null ? user.idModulo.nombreModulo : 'N/A'}
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Teléfono</f:facet>
+                                #{user.telefono}
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Estado</f:facet>
+                                <span class="badge #{user.idEstadoCuenta.nombreEstado.toLowerCase()}">
+                                    #{user.idEstadoCuenta.nombreEstado}
+                                </span>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Rol</f:facet>
+                                #{user.idRol != null ? user.idRol.nombreRol : 'N/A'}
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Acciones</f:facet>
+                                <div class="actions">
+                                    <h:commandLink styleClass="edit"
+                                                   value="Editar"
+                                                   action="#{usuarioBean.selectUserForEdit(user.idUsuario)}">
+                                        <f:ajax execute="@this" render="@none" onevent="function(data){if(data.status=='success')showPage('detailsPage');}" />
+                                    </h:commandLink>
+                                    <h:commandLink styleClass="delete"
+                                                   value="Eliminar"
+                                                   onclick="return confirm('¿Está seguro de eliminar a #{user.nombreCompleto}?');"
+                                                   action="#{usuarioBean.deleteUsuario(user.idUsuario)}">
+                                        <f:ajax execute="@this" render="usersTableBody @messages" />
+                                    </h:commandLink>
+                                </div>
+                            </h:column>
+                        </h:dataTable>
+                    </div>
+                </h:form>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- PÁGINA DE EDITAR USUARIO -->
+            <!-- ========================================== -->
+            <div id="detailsPage" class="page" data-page="detailsPage">
+                <h:form id="detailsPageForm">
+                    <div class="header">
+                        <div>Usuarios</div>
+                        <div class="header-right">
+                            <span>Bienvenido, <strong>#{loginBean.currentUser.nombreCompleto}</strong></span>
+                            <button type="button" class="btn-logout" onclick="showPage('mainPage'); return false;">Volver</button>
+                        </div>
+                    </div>
+                </h:form>
+
+                <div class="detail-container">
+                    <div class="header-form">Editar Usuario</div>
+
+                    <h:form id="editUserForm">
+                        <h:inputHidden id="editUserId" value="#{usuarioBean.selectedUser.idUsuario}" />
+
+                        <div class="form-section">
+                            <h3>Información Personal</h3>
                             <div class="form-group">
-                                <label>Rol asignado *</label>
-                                <select id="newUserRole">
-                                    <option value="">Seleccione Rol...</option>
-                                    <option value="1">Gerente</option>
-                                    <option value="2">Jefe</option>
-                                    <option value="3">Operador</option>
-                                </select>
+                                <h:outputLabel for="editUserName" value="Nombre completo *" />
+                                <h:inputText id="editUserName"
+                                             value="#{usuarioBean.selectedUser.nombreCompleto}"
+                                             required="true"
+                                             styleClass="form-control" />
+                                <h:message for="editUserName" errorClass="text-danger" />
                             </div>
                             <div class="form-group">
-                                <label>Módulo Asignado</label>
-                                <select id="newUserModule">
-                                    <option value="">Ninguno / Sin Módulo</option>
-                                    <option value="ERP">ERP Central</option>
-                                    <option value="CRM">CRM</option>
-                                    <option value="PRV">Proveedores</option>
-                                    <option value="BCO">Módulo de Bancos</option>
-                                    <option value="Usuarios">Módulo de Usuarios</option>
-                                </select>
+                                <h:outputLabel for="editUserEmail" value="Correo electrónico *" />
+                                <h:inputText id="editUserEmail"
+                                             value="#{usuarioBean.selectedUser.correoElectronico}"
+                                             required="true"
+                                             styleClass="form-control"
+                                             validatorMessage="Formato de correo electrónico inválido.">
+                                    <f:validateRegex pattern="[\w\.-]*[a-zA-Z0-9_]@[\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]" />
+                                </h:inputText>
+                                <h:message for="editUserEmail" errorClass="text-danger" />
+                            </div>
+                            <div class="form-group">
+                                <h:outputLabel for="editUserPhone" value="Teléfono *" />
+                                <h:inputText id="editUserPhone"
+                                             value="#{usuarioBean.selectedUser.telefono}"
+                                             pt:maxlength="10"
+                                             required="true"
+                                             styleClass="form-control"
+                                             validatorMessage="El teléfono debe tener 10 dígitos numéricos.">
+                                    <f:validateRegex pattern="^[0-9]{10}$" />
+                                </h:inputText>
+                                <h:message for="editUserPhone" errorClass="text-danger" />
+                            </div>
+                            <div class="form-group">
+                                <h:outputLabel for="editUserRegDate" value="Fecha de registro" />
+                                <h:inputText id="editUserRegDate"
+                                             value="#{usuarioBean.formattedRegDate}"
+                                             readonly="true"
+                                             styleClass="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <h:outputLabel for="editUserLastSession" value="Última sesión" />
+                                <h:inputText id="editUserLastSession"
+                                             value="#{usuarioBean.formattedLastSession}"
+                                             readonly="true"
+                                             styleClass="form-control" />
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label>Estado de cuenta *</label>
-                            <select id="newUserStatus" required="required">
-                                <option value="1">Activo</option>
-                                <option value="2">Inactivo</option>
-                                <option value="3">Bloqueado</option>
-                            </select>
+
+                        <div class="form-section">
+                            <h3>Estado y Acceso</h3>
+                            <div class="form-group">
+                                <h:outputLabel for="editUserRole" value="Rol asignado *" />
+                                <h:selectOneMenu id="editUserRole"
+                                                 value="#{usuarioBean.newUserRole}"
+                                                 required="true"
+                                                 styleClass="form-control">
+                                    <f:selectItem itemLabel="Seleccione Rol..." itemValue="" noSelectionOption="true" />
+                                    <f:selectItems value="#{usuarioBean.rolesInternos}"
+                                                   var="rol"
+                                                   itemLabel="#{rol.nombreRol}"
+                                                   itemValue="#{rol.idRol}" />
+                                </h:selectOneMenu>
+                                <h:message for="editUserRole" errorClass="text-danger" />
+                            </div>
+                            <div class="form-group">
+                                <h:outputLabel for="editUserStatus" value="Estado de cuenta" />
+                                <h:selectOneMenu id="editUserStatus"
+                                                 value="#{usuarioBean.newUserStatus}"
+                                                 styleClass="form-control">
+                                    <f:selectItems value="#{usuarioBean.estadosCuenta}"
+                                                   var="estado"
+                                                   itemLabel="#{estado.nombreEstado}"
+                                                   itemValue="#{estado.idEstadoCuenta}" />
+                                </h:selectOneMenu>
+                                <h:message for="editUserStatus" errorClass="text-danger" />
+                            </div>
+                            <div class="form-group">
+                                <h:outputLabel for="editUserModule" value="Módulo" />
+                                <h:selectOneMenu id="editUserModule"
+                                                 value="#{usuarioBean.newUserModule}"
+                                                 styleClass="form-control">
+                                    <f:selectItem itemLabel="Ninguno / Sin Módulo" itemValue="" />
+                                    <f:selectItems value="#{usuarioBean.modulos}"
+                                                   var="modulo"
+                                                   itemLabel="#{modulo.nombreModulo}"
+                                                   itemValue="#{modulo.idModulo}" />
+                                </h:selectOneMenu>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="form-section">
-                        <h3>Dirección (opcional)</h3>
-                        <div class="form-group">
-                            <label>Dirección Completa</label>
-                            <textarea id="newUserAddress" rows="3" placeholder="Ej: Av. Reforma 123, Col. Centro, CDMX, CP 00000"></textarea>
+                        <div class="form-section">
+                            <h3>Dirección (opcional)</h3>
+                            <div class="form-group">
+                                <h:outputLabel for="editUserAddress" value="Dirección Completa" />
+                                <h:inputTextarea id="editUserAddress"
+                                                 value="#{usuarioBean.newUserAddress}"
+                                                 rows="3"
+                                                 styleClass="form-control"
+                                                 pt:placeholder="Ej: Av. Reforma 123, Col. Centro, CDMX, CP 00000" />
+                                <h:message for="editUserAddress" errorClass="text-danger" />
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="form-actions">
-                        <button type="submit" class="btn-success-custom">GUARDAR USUARIO</button>
-                        <button type="button" class="btn-secondary-custom" onclick="showPage('mainPage')">CANCELAR</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- PÁGINA DE TICKETS -->
-        <div id="ticketsPage" class="page">
-            <div class="header">
-                <h1>Tickets de Revisión</h1>
-                <div class="header-right">
-                    <span>Bienvenido, <strong id="currentUserNameTickets"></strong></span>
-                    <button class="btn-logout" onclick="showPage('mainPage')">Volver a Usuarios</button>
+                        <div class="form-actions">
+                            <h:commandButton value="ACTUALIZAR USUARIO"
+                                             styleClass="btn-success-custom"
+                                             action="#{usuarioBean.updateUsuario}">
+                                <f:ajax execute="@form" render="@messages" onevent="function(data){if(data.status=='success')showPage('mainPage');}" />
+                            </h:commandButton>
+                            <button type="button" class="btn-secondary-custom" onclick="showPage('mainPage'); return false;">
+                                CANCELAR
+                            </button>
+                        </div>
+                    </h:form>
                 </div>
             </div>
 
-            <div class="container-custom">
-                <h2>Listado de Solicitudes Pendientes</h2>
-
-                <div class="buttons-nav">
-                    <button class="filter" onclick="filterTickets('Todos')">Todos</button>
-                    <button class="filter" style="background-color: var(--color-advertencia);" onclick="filterTickets('Pendiente')">Pendientes</button>
-                    <button class="filter" style="background-color: var(--color-acento);" onclick="filterTickets('En Revisión')">En Revisión</button>
-                </div>
-
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID Ticket</th>
-                            <th>Tipo de Cambio</th>
-                            <th>Módulo</th>
-                            <th>Fecha Solicitud</th>
-                            <th>Estado</th>
-                            <th>Usuario Solicitante</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="ticketsTableBody">
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- MODAL DE REVISIÓN -->
-        <div class="modal fade" id="reviewTicketModal" tabindex="-1" aria-labelledby="reviewTicketModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header" style="background-color: var(--color-secundario); color: white;">
-                        <h5 class="modal-title" id="reviewTicketModalLabel"><i class="fas fa-ticket-alt"></i> Revisar Ticket: <span id="modalTicketId"></span></h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p><strong>Tipo de Cambio:</strong> <span id="modalTipoCambio"></span></p>
-                        <p><strong>Usuario Solicitante:</strong> <span id="modalUsuarioSolicitante"></span></p>
-
-                        <h6 class="mt-3" style="color: var(--color-acento);">Detalles de la Solicitud (Datos Propuestos)</h6>
-                        <div id="modalDetalles" style="background-color: var(--luz-bg); padding: 10px; border-radius: 5px; border: 1px solid #ddd;">
+            <!-- ========================================== -->
+            <!-- PÁGINA DE NUEVO USUARIO -->
+            <!-- ========================================== -->
+            <div id="newUserPage" class="page" data-page="newUserPage">
+                <h:form id="newUserPageForm">
+                    <div class="header">
+                        <h1>Nuevo Usuario</h1>
+                        <div class="header-right">
+                            <button type="button" class="btn-logout" onclick="showPage('mainPage'); return false;">Volver</button>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                        <button type="button" class="btn btn-danger" id="modalRechazarBtn">
-                            <i class="fas fa-times"></i> Rechazar
-                        </button>
-                        <button type="button" class="btn btn-primary-custom" id="modalAprobarBtn">
-                            <i class="fas fa-edit"></i> Ir a Editar Usuario
-                        </button>
-                    </div>
+                </h:form>
+
+                <div class="detail-container">
+                    <div class="header-form">Crear Nuevo Usuario</div>
+
+                    <h:form id="newUserForm">
+                        <div class="form-section">
+                            <h3>Información Personal</h3>
+
+                            <div class="form-group">
+                                <h:outputLabel for="newUserTipoUsuario" value="Tipo de Usuario *" />
+                                <h:selectOneMenu id="newUserTipoUsuario"
+                                                 value="#{usuarioBean.newUserTipoUsuario}"
+                                                 required="true"
+                                                 styleClass="form-control"
+                                                 requiredMessage="El tipo de usuario es obligatorio.">
+                                    <f:selectItem itemLabel="Seleccione..." itemValue="" noSelectionOption="true" />
+                                    <f:selectItems value="#{usuarioBean.tiposUsuarios}"
+                                                   var="tipo"
+                                                   itemLabel="#{tipo.nombreTipo}"
+                                                   itemValue="#{tipo.idTipoUsuario}" />
+                                    <f:ajax event="change" render="internalUserFields" />
+                                </h:selectOneMenu>
+                                <h:message for="newUserTipoUsuario" errorClass="text-danger" />
+                            </div>
+
+                            <div class="form-group">
+                                <h:outputLabel for="newUserName" value="Nombre completo *" />
+                                <h:inputText id="newUserName"
+                                             value="#{usuarioBean.newUserName}"
+                                             required="true"
+                                             styleClass="form-control"
+                                             requiredMessage="El nombre completo es obligatorio."/>
+                                <h:message for="newUserName" errorClass="text-danger" />
+                            </div>
+
+                            <div class="form-group">
+                                <h:outputLabel for="newUserEmail" value="Correo electrónico *" />
+                                <h:inputText id="newUserEmail"
+                                             value="#{usuarioBean.newUserEmail}"
+                                             required="true"
+                                             styleClass="form-control"
+                                             requiredMessage="El correo electrónico es obligatorio."
+                                             validatorMessage="Formato de correo electrónico inválido.">
+                                    <f:validateRegex pattern="[\w\.-]*[a-zA-Z0-9_]@[\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]" />
+                                </h:inputText>
+                                <h:message for="newUserEmail" errorClass="text-danger" />
+                            </div>
+
+                            <div class="form-group" style="margin-top: 15px; display: flex; align-items: flex-start;">
+                                <h:outputLabel for="newUserPassword" value="Contraseña *" style="flex: 1 0 200px; margin-right: 10px;" />
+                                <div class="form-group-custom" style="flex: 2 0 250px; margin-bottom: 0;">
+                                    <h:inputSecret id="newUserPassword"
+                                                   value="#{usuarioBean.newUserPassword}"
+                                                   styleClass="form-control"
+                                                   required="true"
+                                                   pt:minlength="6"
+                                                   requiredMessage="La contraseña es obligatoria."
+                                                   style="width: 100%;" />
+                                    <i class="fas fa-eye password-toggle" onclick="togglePassword('newUserForm:newUserPassword', this)"></i>
+                                </div>
+                                <h:message for="newUserPassword" errorClass="text-danger" />
+                            </div>
+
+                            <div class="form-group" style="margin-top: 15px; display: flex; align-items: flex-start;">
+                                <h:outputLabel for="newUserConfirmPassword" value="Confirmar Contraseña *" style="flex: 1 0 200px; margin-right: 10px;" />
+                                <div class="form-group-custom" style="flex: 2 0 250px; margin-bottom: 0;">
+                                    <h:inputSecret id="newUserConfirmPassword"
+                                                   value="#{usuarioBean.newUserConfirmPassword}"
+                                                   styleClass="form-control"
+                                                   required="true"
+                                                   pt:minlength="6"
+                                                   requiredMessage="La confirmación de contraseña es obligatoria."
+                                                   style="width: 100%;" />
+                                    <i class="fas fa-eye password-toggle" onclick="togglePassword('newUserForm:newUserConfirmPassword', this)"></i>
+                                </div>
+                                <h:message for="newUserConfirmPassword" errorClass="text-danger" />
+                            </div>
+
+                            <div class="form-group">
+                                <h:outputLabel for="newUserPhone" value="Teléfono" />
+                                <h:inputText id="newUserPhone"
+                                             value="#{usuarioBean.newUserPhone}"
+                                             pt:maxlength="10"
+                                             styleClass="form-control"
+                                             validatorMessage="El teléfono debe tener 10 dígitos numéricos.">
+                                    <f:validateRegex pattern="^[0-9]{10}$" />
+                                </h:inputText>
+                                <h:message for="newUserPhone" errorClass="text-danger" />
+                            </div>
+                        </div>
+
+                        <h:panelGroup id="internalUserFields"
+                                      layout="block"
+                                      style="display: #{usuarioBean.newUserTipoUsuario == 1 ? 'block' : 'none'};">
+                            <div class="form-section">
+                                <h3>Estado y Acceso</h3>
+
+                                <div class="form-group">
+                                    <h:outputLabel for="newUserRole" value="Rol asignado *" />
+                                    <h:selectOneMenu id="newUserRole"
+                                                     value="#{usuarioBean.newUserRole}"
+                                                     styleClass="form-control"
+                                                     required="#{usuarioBean.newUserTipoUsuario == 1}"
+                                                     requiredMessage="El rol es obligatorio para usuarios internos.">
+                                        <f:selectItem itemLabel="Seleccione Rol..." itemValue="" noSelectionOption="true" />
+                                        <f:selectItems value="#{usuarioBean.rolesInternos}"
+                                                       var="rol"
+                                                       itemLabel="#{rol.nombreRol}"
+                                                       itemValue="#{rol.idRol}" />
+                                    </h:selectOneMenu>
+                                    <h:message for="newUserRole" errorClass="text-danger" />
+                                </div>
+                                <div class="form-group">
+                                    <h:outputLabel for="newUserModule" value="Módulo Asignado" />
+                                    <h:selectOneMenu id="newUserModule"
+                                                     value="#{usuarioBean.newUserModule}"
+                                                     styleClass="form-control">
+                                        <f:selectItem itemLabel="Ninguno / Sin Módulo" itemValue="" />
+                                        <f:selectItems value="#{usuarioBean.modulos}"
+                                                       var="modulo"
+                                                       itemLabel="#{modulo.nombreModulo}"
+                                                       itemValue="#{modulo.idModulo}" />
+                                    </h:selectOneMenu>
+                                    <h:message for="newUserModule" errorClass="text-danger" />
+                                </div>
+                            </div>
+                        </h:panelGroup>
+
+                        <div class="form-section">
+                            <div class="form-group">
+                                <h:outputLabel for="newUserStatus" value="Estado de cuenta *" />
+                                <h:selectOneMenu id="newUserStatus"
+                                                 value="#{usuarioBean.newUserStatus}"
+                                                 required="true"
+                                                 styleClass="form-control"
+                                                 requiredMessage="El estado de cuenta es obligatorio.">
+                                    <f:selectItems value="#{usuarioBean.estadosCuenta}"
+                                                   var="estado"
+                                                   itemLabel="#{estado.nombreEstado}"
+                                                   itemValue="#{estado.idEstadoCuenta}" />
+                                </h:selectOneMenu>
+                                <h:message for="newUserStatus" errorClass="text-danger" />
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h3>Dirección (opcional)</h3>
+                            <div class="form-group">
+                                <h:outputLabel for="newUserAddress" value="Dirección Completa" />
+                                <h:inputTextarea id="newUserAddress"
+                                                 value="#{usuarioBean.newUserAddress}"
+                                                 rows="3"
+                                                 styleClass="form-control"
+                                                 pt:placeholder="Ej: Av. Reforma 123, Col. Centro, CDMX, CP 00000" />
+                                <h:message for="newUserAddress" errorClass="text-danger" />
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <h:commandButton value="GUARDAR USUARIO"
+                                             styleClass="btn-success-custom"
+                                             action="#{usuarioBean.createUsuario}">
+                                <f:ajax execute="@form" render="@messages" onevent="function(data){if(data.status=='success'){showPage('mainPage');}}" />
+                            </h:commandButton>
+                            <button type="button" class="btn-secondary-custom" onclick="showPage('mainPage'); return false;">
+                                CANCELAR
+                            </button>
+                        </div>
+                    </h:form>
                 </div>
             </div>
-        </div>
 
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js" type="text/javascript"></script>
-        <script type="text/javascript">
-                        //<![CDATA[
-                        var users = [
-                            {id: 1, name: 'María', email: 'user@gmail.com', module: 'ERP', phone: '9900258789', status: 'Activo', role: 'Gerente', regDate: '2024-01-15', lastSession: '2025-10-15T10:30'},
-                            {id: 2, name: 'Emanuel', email: 'usuario@gmail.com.mx', module: 'Bancos', phone: '9911165670', status: 'Inactivo', role: 'Jefe', regDate: '2024-02-20', lastSession: '2025-10-10T14:20'},
-                            {id: 3, name: 'José', email: 'jt615257@gmail.com', module: 'Proveedores', phone: '9981298737', status: 'Activo', role: 'Operador', regDate: '2024-03-10', lastSession: '2025-10-16T09:15'},
-                            {id: 4, name: 'Shaggy', email: 'shaggy@buu.net', module: 'CRM', phone: '54948151', status: 'Inactivo', role: 'Gerente', regDate: '2024-04-05', lastSession: '2025-09-30T16:45'},
-                            {id: 5, name: 'Scrapy', email: 'sam@gmail.com', module: 'Usuarios', phone: '9975201478', status: 'Activo', role: 'Jefe', regDate: '2024-05-12', lastSession: '2025-10-16T08:00'},
-                            {id: 6, name: 'Ana', email: 'ana@empresa.com', module: 'ERP', phone: '5587412369', status: 'Activo', role: 'Operador', regDate: '2024-06-18', lastSession: '2025-10-14T11:30'},
-                            {id: 7, name: 'Carlos', email: 'carlos@banco.com', module: 'Bancos', phone: '5578963214', status: 'Inactivo', role: 'Jefe', regDate: '2024-07-22', lastSession: '2025-10-01T15:00'},
-                            {id: 8, name: 'Lucía', email: 'lucia@proveedor.com', module: 'Proveedores', phone: '5563214789', status: 'Activo', role: 'Gerente', regDate: '2024-08-30', lastSession: '2025-10-15T13:45'},
-                            {id: 9, name: 'Diego', email: 'diego@crm.com', module: 'CRM', phone: '5512345678', status: 'Inactivo', role: 'Operador', regDate: '2024-09-10', lastSession: '2025-09-28T10:20'},
-                            {id: 10, name: 'Fernanda', email: 'fer@usuarios.com', module: 'Usuarios', phone: '5598765432', status: 'Activo', role: 'Jefe', regDate: '2024-10-01', lastSession: '2025-10-16T07:30'}
-                        ];
-
-                        var tickets = [
-                            {id: 'TK-001', tipo: 'Asignación Rol', modulo: 'ERP Central', fecha: '2025-10-22', estado: 'Pendiente', usuarioSolicitante: 'María (user@gmail.com)', detalles: {email: 'user@gmail.com', rol_propuesto: 'Jefe', justificacion: 'Promoción por desempeño'}},
-                            {id: 'TK-002', tipo: 'Edición Usuario', modulo: 'Portal de Proveedores', fecha: '2025-10-23', estado: 'En Revisión', usuarioSolicitante: 'Lucía (lucia@proveedor.com)', detalles: {email: 'lucia@proveedor.com', telefono: '5598765999', cambio: 'Actualización de contacto'}},
-                            {id: 'TK-003', tipo: 'Creación Usuario', modulo: 'Gestión de Clientes', fecha: '2025-10-19', estado: 'Aprobado', usuarioSolicitante: 'Gerente CRM', detalles: {email: 'nuevo.operador@tienda.com', cambio: 'Creación de nuevo usuario'}},
-                            {id: 'TK-004', tipo: 'Cambio Estado', modulo: 'ERP Central', fecha: '2025-10-14', estado: 'Rechazado', usuarioSolicitante: 'Ana (ana@empresa.com)', detalles: {email: 'usuario.inactivo@tienda.com', estado_propuesto: 'Activo', motivo_rechazo: 'Documentación incompleta'}},
-                            {id: 'TK-005', tipo: 'Edición Usuario', modulo: 'Gestión de Clientes', fecha: '2025-10-24', estado: 'Pendiente', usuarioSolicitante: 'Cliente 2', detalles: {email: 'usuario@gmail.com.mx', telefono: '5511223344', cambio: 'Actualización de número de cliente'}}
-                        ];
-
-                        var currentUser = null;
-
-                        var validCredentials = {
-                            'admin': 'admin123',
-                            'usuario': 'password',
-                            'KC': '12345'
-                        };
-
-                        function showPage(pageId) {
-                            var pages = document.querySelectorAll('.page');
-                            for (var i = 0; i < pages.length; i++) {
-                                pages[i].classList.remove('active');
-                            }
-                            document.getElementById(pageId).classList.add('active');
-
-                            if (pageId === 'mainPage') {
-                                loadUsers();
-                            } else if (pageId === 'ticketsPage') {
-                                if (currentUser) {
-                                    document.getElementById('currentUserNameTickets').textContent = currentUser.name;
-                                }
-                                loadTickets();
-                            } else if (pageId === 'newTicketPage') {
-                                if (currentUser) {
-                                    document.getElementById('currentUserName3').textContent = currentUser.name;
-                                    document.getElementById('newTicketUserEmail').value = currentUser.email;
-                                    populateNewTicketDropdowns();
-                                } else {
-                                    showAlert('Error de sesión. Intente iniciar sesión de nuevo.', 'danger');
-                                    showPage('loginPage');
-                                }
-                            }
-                        }
-
-                        function showAlert(message, type) {
-                            var alertDiv = document.createElement('div');
-                            alertDiv.className = 'alert alert-' + type + ' alert-dismissible fade show alert-custom';
-                            alertDiv.innerHTML = message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
-                            document.body.appendChild(alertDiv);
-
-                            setTimeout(function () {
-                                alertDiv.remove();
-                            }, 4000);
-                        }
-
-                        function togglePassword(inputId, icon) {
-                            var input = document.getElementById(inputId);
-                            if (input.type === 'password') {
-                                input.type = 'text';
-                                icon.classList.remove('fa-eye');
-                                icon.classList.add('fa-eye-slash');
-                            } else {
-                                input.type = 'password';
-                                icon.classList.remove('fa-eye-slash');
-                                icon.classList.add('fa-eye');
-                            }
-                        }
-
-                        function handleLogin(e) {
-                            e.preventDefault();
-                            var username = document.getElementById('loginUsername').value;
-                            var password = document.getElementById('loginPassword').value;
-
-                            if (validCredentials[username] && validCredentials[username] === password) {
-                                currentUser = {name: username, email: username + '@sistema.com'};
-                                document.getElementById('currentUserName').textContent = currentUser.name;
-                                document.getElementById('currentUserName2').textContent = currentUser.name;
-                                showAlert('¡Inicio de sesión exitoso!', 'success');
-                                setTimeout(function () {
-                                    showPage('mainPage');
-                                }, 1000);
-                            } else {
-                                showAlert('Credenciales incorrectas. Intente nuevamente.', 'danger');
-                            }
-                            return false;
-                        }
-
-                        function handleRegister(e) {
-                            e.preventDefault();
-                            var email = document.getElementById('registerEmail').value;
-                            var name = document.getElementById('registerName').value;
-                            var phone = document.getElementById('registerPhone').value;
-                            var password = document.getElementById('registerPassword').value;
-                            var confirmPassword = document.getElementById('registerConfirmPassword').value;
-
-                            if (password !== confirmPassword) {
-                                showAlert('Las contraseñas no coinciden', 'warning');
-                                return false;
-                            }
-
-                            if (!/^[0-9]{10}$/.test(phone)) {
-                                showAlert('El teléfono debe tener 10 dígitos', 'warning');
-                                return false;
-                            }
-
-                            showAlert('¡Registro exitoso! Ya puede iniciar sesión', 'success');
-                            document.getElementById('registerForm').reset();
-                            setTimeout(function () {
-                                showPage('loginPage');
-                            }, 2000);
-
-                            return false;
-                        }
-
-                        function loadUsers() {
-                            var tbody = document.getElementById('usersTableBody');
-                            tbody.innerHTML = '';
-
-                            for (var i = 0; i < users.length; i++) {
-                                var user = users[i];
-                                var row = document.createElement('tr');
-                                row.innerHTML = '<td>' + user.name + '</td>' +
-                                        '<td>' + user.email + '</td>' +
-                                        '<td>' + user.module + '</td>' +
-                                        '<td>' + user.phone + '</td>' +
-                                        '<td><span class="badge ' + user.status.toLowerCase() + '">' + user.status + '</span></td>' +
-                                        '<td>' + user.role + '</td>' +
-                                        '<td class="actions">' +
-                                        '<button class="edit" onclick="editUser(' + user.id + ')">Editar</button>' +
-                                        '<button class="delete" onclick="deleteUser(' + user.id + ')">Eliminar</button>' +
-                                        '</td>';
-                                tbody.appendChild(row);
-                            }
-                        }
-
-                        function editUser(userId) {
-                            var user = null;
-                            for (var i = 0; i < users.length; i++) {
-                                if (users[i].id === userId) {
-                                    user = users[i];
-                                    break;
-                                }
-                            }
-
-                            if (user) {
-                                document.getElementById('editUserId').value = user.id;
-                                document.getElementById('editUserName').value = user.name;
-                                document.getElementById('editUserEmail').value = user.email;
-                                document.getElementById('editUserPhone').value = user.phone;
-                                document.getElementById('editUserModule').value = user.module || '';
-                                document.getElementById('editUserRole').value = user.role;
-                                document.getElementById('editUserStatus').value = user.status;
-                                document.getElementById('editUserRegDate').value = user.regDate || '';
-                                document.getElementById('editUserLastSession').value = user.lastSession || '';
-
-                                document.getElementById('editUserRole').style.backgroundColor = '';
-                                document.getElementById('editUserPhone').style.backgroundColor = '';
-                                document.getElementById('editUserStatus').style.backgroundColor = '';
-
-                                showPage('detailsPage');
-                            }
-                        }
-
-                        function handleEditUser(e) {
-                            e.preventDefault();
-
-                            var userId = parseInt(document.getElementById('editUserId').value);
-                            var userIndex = -1;
-
-                            for (var i = 0; i < users.length; i++) {
-                                if (users[i].id === userId) {
-                                    userIndex = i;
-                                    break;
-                                }
-                            }
-
-                            if (userIndex !== -1) {
-                                users[userIndex].name = document.getElementById('editUserName').value;
-                                users[userIndex].email = document.getElementById('editUserEmail').value;
-                                users[userIndex].phone = document.getElementById('editUserPhone').value;
-                                users[userIndex].module = document.getElementById('editUserModule').value;
-                                users[userIndex].role = document.getElementById('editUserRole').value;
-                                users[userIndex].status = document.getElementById('editUserStatus').value;
-
-                                showAlert('Usuario actualizado exitosamente', 'success');
-                                setTimeout(function () {
-                                    showPage('mainPage');
-                                }, 1000);
-                            }
-
-                            return false;
-                        }
-
-                        function handleNewUser(e) {
-                            e.preventDefault();
-
-                            var userType = document.getElementById('newUserTipoUsuario').value;
-                            var userRole = document.getElementById('newUserRole').value;
-                            var password = document.getElementById('newUserPassword').value;
-                            var confirmPassword = document.getElementById('newUserConfirmPassword').value;
-                            var isInternal = userType === '1';
-
-                            // 1. Validar coincidencia de contraseñas
-                            if (password !== confirmPassword) {
-                                showAlert('Error: La contraseña y la confirmación no coinciden.', 'danger');
-                                return false;
-                            }
-
-                            // 2. Validación de Rol para usuarios Internos
-                            if (isInternal && !userRole) {
-                                showAlert('El Rol es obligatorio para un Usuario Interno.', 'warning');
-                                return false;
-                            }
-
-                            // 3. Crear el objeto de nuevo usuario (simulación)
-                            var newUser = {
-                                // Campos generados automáticamente por la BD (UUID, SERIAL, TIMESTAMPZ DEFAULT NOW())
-                                id: users.length + 1, // Simulación de UUID/ID
-                                regDate: new Date().toISOString().split('T')[0],
-                                lastSession: null,
-
-                                // Campos OBLIGATORIOS de entrada
-                                name: document.getElementById('newUserName').value, // nombre_completo 
-                                email: document.getElementById('newUserEmail').value, // correo_electronico 
-                                password: password, // contrasena [cite: 17]
-                                id_tipo_usuario: parseInt(userType), // id_tipo_usuario [cite: 17]
-                                id_estado_cuenta: parseInt(document.getElementById('newUserStatus').value), // id_estado_cuenta [cite: 17]
-
-                                // Campos opcionales de entrada
-                                phone: document.getElementById('newUserPhone').value || null, // telefono 
-                                address: document.getElementById('newUserAddress').value || null, // direccion 
-
-                                // Campos condicionales
-                                id_rol: isInternal ? parseInt(userRole) : null, // id_rol 
-                                id_modulo: document.getElementById('newUserModule').value || null, // id_modulo 
-
-                                // Propiedades de la lista de usuarios para la tabla de visualización (simulación)
-                                role: isInternal ? document.getElementById('newUserRole').options[document.getElementById('newUserRole').selectedIndex].text : 'N/A',
-                                status: document.getElementById('newUserStatus').options[document.getElementById('newUserStatus').selectedIndex].text,
-                                module: document.getElementById('newUserModule').value || 'N/A'
-                            };
-                            // La lógica real aquí sería enviar los datos a tu backend/API
-                            console.log('Datos a enviar al backend:', newUser);
-
-                            // Simulación de éxito
-                            users.push(newUser);
-                            showAlert('Usuario **' + newUser.name + '** creado exitosamente', 'success');
-                            document.getElementById('newUserForm').reset();
-                            setTimeout(function () {
-                                showPage('mainPage');
-                                toggleInternalFields(); // Restaurar el estado inicial
-                            }, 1000);
-
-                            return false;
-                        }
-
-                        function toggleInternalFields() {
-                            var tipoUsuarioSelect = document.getElementById('newUserTipoUsuario');
-                            var internalFieldsDiv = document.getElementById('internalUserFields');
-                            var rolSelect = document.getElementById('newUserRole');
-
-                            // El tipo de usuario 'Interno' tiene id_tipo_usuario = 1 [cite: 10]
-                            var isInternal = tipoUsuarioSelect.value === '1';
-
-                            if (isInternal) {
-                                internalFieldsDiv.style.display = 'block';
-                                // Rol es OBLIGATORIO para Internos según el CONSTRAINT de la BD [cite: 18]
-                                rolSelect.setAttribute('required', 'required');
-                            } else {
-                                internalFieldsDiv.style.display = 'none';
-                                rolSelect.removeAttribute('required');
-                                rolSelect.value = ""; // Limpiar valor
-                                document.getElementById('newUserModule').value = ""; // Limpiar módulo
-                            }
-                        }
-
-                        function deleteUser(userId) {
-                            if (confirm('¿Está seguro de eliminar este usuario?')) {
-                                var newUsers = [];
-                                for (var i = 0; i < users.length; i++) {
-                                    if (users[i].id !== userId) {
-                                        newUsers.push(users[i]);
-                                    }
-                                }
-                                users = newUsers;
-                                loadUsers();
-                                showAlert('Usuario eliminado exitosamente', 'info');
-                            }
-                        }
-
-                        function filterUsers() {
-                            var filterText = prompt('Ingrese el nombre o email a buscar:');
-                            if (filterText) {
-                                var filtered = [];
-                                for (var i = 0; i < users.length; i++) {
-                                    var user = users[i];
-                                    if (user.name.toLowerCase().indexOf(filterText.toLowerCase()) !== -1 ||
-                                            user.email.toLowerCase().indexOf(filterText.toLowerCase()) !== -1) {
-                                        filtered.push(user);
-                                    }
-                                }
-
-                                var tbody = document.getElementById('usersTableBody');
-                                tbody.innerHTML = '';
-
-                                if (filtered.length === 0) {
-                                    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No se encontraron resultados</td></tr>';
-                                } else {
-                                    for (var i = 0; i < filtered.length; i++) {
-                                        var user = filtered[i];
-                                        var row = document.createElement('tr');
-                                        row.innerHTML = '<td>' + user.name + '</td>' +
-                                                '<td>' + user.email + '</td>' +
-                                                '<td>' + user.module + '</td>' +
-                                                '<td>' + user.phone + '</td>' +
-                                                '<td><span class="badge ' + user.status.toLowerCase() + '">' + user.status + '</span></td>' +
-                                                '<td>' + user.role + '</td>' +
-                                                '<td class="actions">' +
-                                                '<button class="edit" onclick="editUser(' + user.id + ')">Editar</button>' +
-                                                '<button class="delete" onclick="deleteUser(' + user.id + ')">Eliminar</button>' +
-                                                '</td>';
-                                        tbody.appendChild(row);
-                                    }
-                                }
-                            }
-                        }
-
-                        function logout() {
-                            if (confirm('¿Está seguro de cerrar sesión?')) {
-                                currentUser = null;
-                                showAlert('Sesión cerrada correctamente', 'info');
-                                setTimeout(function () {
-                                    showPage('loginPage');
-                                    document.getElementById('loginForm').reset();
-                                }, 1000);
-                            }
-                        }
-
-                        var telInputs = document.querySelectorAll('input[type="tel"]');
-                        for (var i = 0; i < telInputs.length; i++) {
-                            telInputs[i].addEventListener('input', function (e) {
-                                this.value = this.value.replace(/[^0-9]/g, '');
-                            });
-                        }
-
-                        var nameInputs = document.querySelectorAll('#registerName, #newUserName, #editUserName');
-                        for (var i = 0; i < nameInputs.length; i++) {
-                            nameInputs[i].addEventListener('input', function (e) {
-                                this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '');
-                            });
-                        }
-
-                        var zipInput = document.getElementById('editZip');
-                        if (zipInput) {
-                            zipInput.addEventListener('input', function (e) {
-                                this.value = this.value.replace(/[^0-9]/g, '');
-                            });
-                        }
-
-                        function getTicketById(ticketId) {
-                            return tickets.find(function (t) {
-                                return t.id === ticketId;
-                            });
-                        }
-
-                        function handleNewTicket(e) {
-                            e.preventDefault();
-                            var module = document.getElementById('newTicketModule').value;
-                            var tipo = document.getElementById('newTicketTipoCambio').value;
-                            var detallesText = document.getElementById('newTicketDetalles').value;
-                            var userEmail = document.getElementById('newTicketUserEmail').value;
-
-                            var detalles;
-                            try {
-                                detalles = JSON.parse(detallesText);
-                            } catch (e) {
-                                detalles = {descripcion: detallesText};
-                            }
-
-                            detalles.email = userEmail;
-
-                            var newTicket = {
-                                id: 'TK-' + String(nextTicketId++).padStart(3, '0'),
-                                tipo: tipo,
-                                modulo: module,
-                                fecha: new Date().toISOString().split('T')[0],
-                                estado: 'Pendiente',
-                                usuarioSolicitante: currentUser.name + ' (' + currentUser.email + ')',
-                                userEmail: currentUser.email,
-                                detalles: detalles
-                            };
-
-                            tickets.push(newTicket);
-                            showAlert('Solicitud de cambio **' + newTicket.id + '** enviada con éxito.', 'success');
-                            document.getElementById('newTicketForm').reset();
-                            setTimeout(function () {
-                                showPage('ticketsPage');
-                            }, 1000);
-                            return false;
-                        }
-
-                        function loadTickets(ticketsData) {
-                            var tbody = document.getElementById('ticketsTableBody');
-                            tbody.innerHTML = '';
-
-                            var list = ticketsData || tickets;
-
-                            if (list.length === 0) {
-                                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No hay tickets para mostrar.</td></tr>';
-                                return;
-                            }
-
-                            for (var i = 0; i < list.length; i++) {
-                                var ticket = list[i];
-
-                                var statusClass = '';
-                                switch (ticket.estado) {
-                                    case 'Pendiente':
-                                        statusClass = 'pendiente';
-                                        break;
-                                    case 'Aprobado':
-                                        statusClass = 'aprobado';
-                                        break;
-                                    case 'Rechazado':
-                                        statusClass = 'rechazado';
-                                        break;
-                                    case 'En Revisión':
-                                        statusClass = 'revision';
-                                        break;
-                                    default:
-                                        statusClass = 'inactivo';
-                                }
-
-                                var buttonText = (ticket.estado === 'Pendiente' || ticket.estado === 'En Revisión') ? 'Revisar' : 'Ver';
-                                var buttonClass = (buttonText === 'Revisar') ? 'review' : 'edit';
-
-                                var row = document.createElement('tr');
-                                row.innerHTML = '<td>' + ticket.id + '</td>' +
-                                        '<td>' + ticket.tipo + '</td>' +
-                                        '<td>' + ticket.modulo + '</td>' +
-                                        '<td>' + ticket.fecha + '</td>' +
-                                        '<td><span class="badge ' + statusClass + '">' + ticket.estado + '</span></td>' +
-                                        '<td>' + ticket.usuarioSolicitante + '</td>' +
-                                        '<td class="actions">' +
-                                        '<button class="' + buttonClass + '" onclick="showReviewModal(\'' + ticket.id + '\')">' + buttonText + '</button>' +
-                                        '</td>';
-                                tbody.appendChild(row);
-                            }
-                        }
-
-                        function showReviewModal(ticketId) {
-                            var ticket = getTicketById(ticketId);
-                            if (!ticket) {
-                                showAlert('Error: Ticket no encontrado.', 'danger');
-                                return;
-                            }
-
-                            var modalElement = document.getElementById('reviewTicketModal');
-                            var modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
-
-                            var isClosed = (ticket.estado === 'Aprobado' || ticket.estado === 'Rechazado');
-                            var isManualEdit = (ticket.tipo === 'Edición Usuario');
-
-                            document.getElementById('modalTicketId').textContent = ticket.id;
-                            document.getElementById('modalTipoCambio').textContent = ticket.tipo;
-                            document.getElementById('modalUsuarioSolicitante').textContent = ticket.usuarioSolicitante;
-
-                            var detallesDiv = document.getElementById('modalDetalles');
-                            detallesDiv.innerHTML = '';
-
-                            if (ticket.estado === 'Rechazado' && ticket.detalles.motivo_rechazo) {
-                                detallesDiv.innerHTML += '<p style="color: var(--color-peligro); font-weight: bold;">MOTIVO DE RECHAZO: ' + ticket.detalles.motivo_rechazo + '</p>';
-                            }
-
-                            for (var key in ticket.detalles) {
-                                if (!['email', 'id_usuario', 'motivo_rechazo', 'cambio', 'aprobado_por'].includes(key)) {
-                                    var highlightStyle = (isClosed && ticket.estado === 'Aprobado') ? 'style="color: var(--color-exito); font-weight: bold;"' : 'style="color: var(--texto-oscuro);"';
-                                    detallesDiv.innerHTML += '<p><strong>' + key.replace('_', ' ').toUpperCase() + ':</strong> <span ' + highlightStyle + '>' + ticket.detalles[key] + '</span></p>';
-                                }
-                            }
-
-                            var aprobarBtn = document.getElementById('modalAprobarBtn');
-                            var rejectBtn = document.getElementById('modalRechazarBtn');
-
-                            if (isClosed) {
-                                aprobarBtn.setAttribute('disabled', 'disabled');
-                                aprobarBtn.textContent = 'Ticket Cerrado (' + ticket.estado + ')';
-                                aprobarBtn.classList.remove('btn-success-custom');
-                                aprobarBtn.classList.add('btn-primary-custom');
-                                rejectBtn.style.display = 'none';
-                                aprobarBtn.onclick = function () {
-                                    modal.hide();
-                                };
-
-                            } else if (isManualEdit) {
-                                aprobarBtn.removeAttribute('disabled');
-                                aprobarBtn.innerHTML = '<i class="fas fa-edit"></i> Ir a Editar Usuario';
-                                aprobarBtn.classList.remove('btn-success-custom');
-                                aprobarBtn.classList.add('btn-primary-custom');
-                                rejectBtn.style.display = 'inline-block';
-
-                                aprobarBtn.onclick = function () {
-                                    modal.hide();
-                                    reviewAndEditUser(ticket.detalles.email, ticket.detalles, ticket.id);
-                                };
-                                rejectBtn.onclick = function () {
-                                    handleRejectTicket(ticketId, modal);
-                                };
-
-                            } else {
-                                aprobarBtn.removeAttribute('disabled');
-                                aprobarBtn.innerHTML = '<i class="fas fa-check"></i> Aprobar y Cerrar';
-                                aprobarBtn.classList.remove('btn-primary-custom');
-                                aprobarBtn.classList.add('btn-success-custom');
-                                rejectBtn.style.display = 'inline-block';
-
-                                aprobarBtn.onclick = function () {
-                                    handleApproveTicket(ticketId, modal);
-                                };
-                                rejectBtn.onclick = function () {
-                                    handleRejectTicket(ticketId, modal);
-                                };
-                            }
-
-                            modal.show();
-                        }
-
-                        function handleApproveTicket(ticketId, modalInstance) {
-                            if (!confirm('¿Confirma que desea APROBAR y cerrar el ticket ' + ticketId + '? Se aplicarán los cambios propuestos al usuario.')) {
-                                return;
-                            }
-
-                            var ticketIndex = tickets.findIndex(function (t) {
-                                return t.id === ticketId;
-                            });
-                            if (ticketIndex !== -1) {
-                                var ticket = tickets[ticketIndex];
-                                var userIndex = users.findIndex(function (u) {
-                                    return u.email === ticket.detalles.email;
-                                });
-
-                                if (userIndex !== -1) {
-                                    if (ticket.detalles.estado_propuesto) {
-                                        users[userIndex].status = ticket.detalles.estado_propuesto;
-                                    }
-                                    if (ticket.detalles.rol_propuesto) {
-                                        users[userIndex].role = ticket.detalles.rol_propuesto;
-                                    }
-                                    if (ticket.detalles.nombre_propuesto) {
-                                        users[userIndex].name = ticket.detalles.nombre_propuesto;
-                                    }
-
-                                    tickets[ticketIndex].estado = 'Aprobado';
-                                    tickets[ticketIndex].detalles.aprobado_por = currentUser.name;
-
-                                    showAlert('Ticket **' + ticketId + '** APROBADO y cambios aplicados al usuario **' + users[userIndex].name + '**.', 'success');
-                                } else {
-                                    showAlert('Ticket **' + ticketId + '** APROBADO, pero el usuario no se encontró para aplicar los cambios.', 'warning');
-                                    tickets[ticketIndex].estado = 'Aprobado';
-                                }
-
-                                modalInstance.hide();
-                                loadTickets();
-                            }
-                        }
-
-                        function handleRejectTicket(ticketId, modalInstance) {
-                            var rejectionReason = prompt('Ingrese el motivo del rechazo para el ticket ' + ticketId + ':');
-                            if (rejectionReason === null || rejectionReason.trim() === '') {
-                                showAlert('Rechazo cancelado o motivo no especificado.', 'info');
-                                return;
-                            }
-
-                            var ticketIndex = tickets.findIndex(function (t) {
-                                return t.id === ticketId;
-                            });
-                            if (ticketIndex !== -1) {
-                                tickets[ticketIndex].estado = 'Rechazado';
-                                tickets[ticketIndex].detalles.motivo_rechazo = rejectionReason.trim();
-
-                                showAlert('Ticket **' + ticketId + '** ha sido RECHAZADO. Motivo: ' + rejectionReason, 'danger');
-                                modalInstance.hide();
-                                loadTickets();
-                            } else {
-                                showAlert('Error al rechazar: Ticket no encontrado en la lista.', 'danger');
-                            }
-                        }
-
-                        function reviewAndEditUser(userEmail, proposedChanges, ticketId) {
-                            var userToEdit = users.find(function (u) {
-                                return u.email === userEmail;
-                            });
-
-                            if (userToEdit) {
-                                editUser(userToEdit.id);
-
-                                var highlightStyle = 'rgba(128, 255, 128, 0.2)';
-
-                                if (proposedChanges.rol_propuesto) {
-                                    document.getElementById('editUserRole').value = proposedChanges.rol_propuesto;
-                                    document.getElementById('editUserRole').style.backgroundColor = highlightStyle;
-                                }
-                                if (proposedChanges.telefono) {
-                                    document.getElementById('editUserPhone').value = proposedChanges.telefono;
-                                    document.getElementById('editUserPhone').style.backgroundColor = highlightStyle;
-                                }
-                                if (proposedChanges.estado_propuesto) {
-                                    document.getElementById('editUserStatus').value = proposedChanges.estado_propuesto;
-                                    document.getElementById('editUserStatus').style.backgroundColor = highlightStyle;
-                                }
-                                if (proposedChanges.nombre_propuesto) {
-                                    document.getElementById('editUserName').value = proposedChanges.nombre_propuesto;
-                                    document.getElementById('editUserName').style.backgroundColor = highlightStyle;
-                                }
-
-                                showAlert('Revise los campos resaltados y presione "ACTUALIZAR USUARIO" para aplicar el cambio del ticket: **' + ticketId + '**', 'warning');
-                            } else {
-                                showAlert('No se encontró el usuario: ' + userEmail + ' para el ticket: ' + ticketId, 'danger');
-                            }
-                        }
-
-                        function filterTickets(filterValue) {
-                            if (typeof filterValue !== 'string') {
-                                filterValue = prompt('Ingrese el ID, Módulo o Solicitante a buscar:');
-                            }
-
-                            if (filterValue) {
-                                var lowerFilter = filterValue.toLowerCase().trim();
-                                var filtered;
-                                var predefinedStates = ['Todos', 'Pendiente', 'En Revisión', 'Aprobado', 'Rechazado'];
-                                if (predefinedStates.includes(filterValue)) {
-
-                                    if (filterValue === 'Todos') {
-                                        filtered = tickets;
-                                    } else {
-                                        filtered = tickets.filter(function (t) {
-                                            return t.estado === filterValue;
-                                        });
-                                    }
-                                } else {
-                                    filtered = tickets.filter(function (ticket) {
-                                        return ticket.id.toLowerCase().indexOf(lowerFilter) !== -1 ||
-                                                ticket.modulo.toLowerCase().indexOf(lowerFilter) !== -1 ||
-                                                ticket.usuarioSolicitante.toLowerCase().indexOf(lowerFilter) !== -1 ||
-                                                ticket.tipo.toLowerCase().indexOf(lowerFilter) !== -1;
-                                    });
-                                }
-
-                                loadTickets(filtered);
-                                if (filtered.length === 0) {
-                                    showAlert('No se encontraron tickets con el criterio "' + filterValue + '".', 'warning');
-                                } else {
-                                    showAlert('Filtrando tickets por: ' + filterValue, 'info');
-                                }
-
-                            } else {
-                                loadTickets();
-                            }
-                        }
-                        //]]>
-        </script>
-    </body>
+            <!-- ========================================== -->
+            <!-- PÁGINA DE TICKETS -->
+            <!-- ========================================== -->
+            <div id="ticketsPage" class="page" data-page="ticketsPage">
+                <h:form id="ticketsPageForm">
+                    <div class="header">
+                        <h1>Tickets de Revisión</h1>
+                        <div class="header-right">
+                            <span>Bienvenido, <strong>#{loginBean.currentUser.nombreCompleto}</strong></span>
+                            <button type="button" class="btn-logout" onclick="showPage('mainPage'); return false;">
+                                Volver a Usuarios
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="container-custom">
+                        <h2>Listado de Solicitudes Pendientes</h2>
+
+                        <div class="buttons-nav">
+                            <h:commandButton value="Todos"
+                                             styleClass="filter"
+                                             action="#{ticketBean.filterTicketsByState('Todos')}">
+                                <f:ajax execute="@this" render="ticketsTableBody @messages" />
+                            </h:commandButton>
+                            <h:commandButton value="Pendientes"
+                                             styleClass="filter pendiente"
+                                             action="#{ticketBean.filterTicketsByState('Pendiente')}">
+                                <f:ajax execute="@this" render="ticketsTableBody @messages" />
+                            </h:commandButton>
+                            <h:commandButton value="En Revisión"
+                                             styleClass="filter revision"
+                                             action="#{ticketBean.filterTicketsByState('En Revisión')}">
+                                <f:ajax execute="@this" render="ticketsTableBody @messages" />
+                            </h:commandButton>
+                        </div>
+
+                        <h:dataTable value="#{ticketBean.tickets}" var="ticket" styleClass="table" id="ticketsTableBody">
+                            <h:column>
+                                <f:facet name="header">ID Ticket</f:facet>
+                                #{ticket.idTicket}
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Tipo de Cambio</f:facet>
+                                #{ticket.idTipoCambio.nombreCambio}
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Módulo</f:facet>
+                                #{ticket.idModulo.nombreModulo}
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Fecha Solicitud</f:facet>
+                                <h:outputText value="#{ticket.fechaSolicitud}">
+                                    <f:convertDateTime pattern="yyyy-MM-dd" />
+                                </h:outputText>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Estado</f:facet>
+                                <span class="badge #{ticket.idEstado.nombreEstado.toLowerCase().replace(' ', '-')}">
+                                    #{ticket.idEstado.nombreEstado}
+                                </span>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Usuario Solicitante</f:facet>
+                                #{ticket.idUsuario.nombreCompleto} (#{ticket.idUsuario.correoElectronico})
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Acciones</f:facet>
+                                <div class="actions">
+                                    <h:commandButton styleClass="review"
+                                                     value="Revisar"
+                                                     action="#{ticketBean.selectTicketForReview}">
+                                        <f:param name="ticketId" value="#{ticket.idTicket}" />
+                                        <f:ajax execute="@this" render="@none" onevent="function(data){if(data.status=='success')showPage('reviewTicketPage');}" />
+                                    </h:commandButton>
+                                </div>
+                            </h:column>
+                        </h:dataTable>
+                    </div>
+                </h:form>
+            </div>
+        </h:panelGroup>
+
+        <!-- ========================================== -->
+        <!-- SCRIPTS -->
+        <!-- ========================================== -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+        <h:outputScript>
+        //<![CDATA[
+
+        // ===== Navegación entre páginas =====
+        function showPage(pageId) {
+            console.log('=== showPage llamado con:', pageId);
+            
+            // Ocultar todas las páginas
+            const allPages = document.querySelectorAll('.page');
+            console.log('Total de páginas encontradas:', allPages.length);
+            
+            allPages.forEach(function(page) {
+                page.classList.remove('active');
+                console.log('Ocultando página:', page.id);
+            });
+            
+            // Mostrar la página objetivo
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.classList.add('active');
+                console.log('✅ Página activada:', pageId);
+            } else {
+                console.error('❌ Página no encontrada:', pageId);
+            }
+        }
+
+        // ===== Toggle de contraseñas =====
+        function togglePassword(inputId, icon) {
+            const input = document.getElementById(inputId);
+            if (!input) {
+                console.log('Input no encontrado:', inputId);
+                return;
+            }
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // ===== Inicialización =====
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== DOM CARGADO ===');
+            
+            // Mostrar todas las páginas disponibles
+            const allPages = document.querySelectorAll('.page');
+            console.log('Páginas encontradas:', allPages.length);
+            allPages.forEach(page => {
+                console.log(' - ID:', page.id, 'Visible:', page.classList.contains('active'));
+            });
+            
+            // Verificar si hay página activa
+            const activePage = document.querySelector('.page.active');
+            if (activePage) {
+                console.log('Página activa inicial:', activePage.id);
+            } else {
+                console.log('No hay página activa, mostrando login por defecto');
+                // Forzar mostrar login si no hay página activa
+                const loginPage = document.getElementById('loginPage');
+                if (loginPage) {
+                    loginPage.classList.add('active');
+                }
+            }
+        });
+
+        // ===== Manejo de campos de usuario interno =====
+        function toggleInternalFields() {
+            const tipoUsuarioSelect = document.getElementById('newUserForm:newUserTipoUsuario');
+            const internalFieldsDiv = document.getElementById('newUserForm:internalUserFields');
+
+            if (!tipoUsuarioSelect || !internalFieldsDiv) return;
+
+            const isInternal = tipoUsuarioSelect.value === '1';
+            internalFieldsDiv.style.display = isInternal ? 'block' : 'none';
+
+            if (!isInternal) {
+                const rolSelect = document.getElementById('newUserForm:newUserRole');
+                const moduleSelect = document.getElementById('newUserForm:newUserModule');
+                if (rolSelect) rolSelect.value = '';
+                if (moduleSelect) moduleSelect.value = '';
+            }
+        }
+
+        // Inicializar campos al cargar
+        document.addEventListener('DOMContentLoaded', toggleInternalFields);
+
+        //]]>
+        </h:outputScript>
+    </h:body>
 </html>
