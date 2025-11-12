@@ -1,181 +1,83 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
-          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="jakarta.faces.html"
-      xmlns:f="jakarta.faces.core"
-      xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
-    <h:head>
-        <title>Registro - Sistema de Usuarios</title>
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" type="text/css" />
-        <style type="text/css">
-            :root {
-                --color-primario: #2c5aa0;
-                --color-secundario: #34495e;
-                --color-acento: #3498db;
-                --color-exito: #27ae60;
-                --luz-bg: #f8f9fa;
-                --texto-oscuro: #2c3e50;
-            }
-            body {
-                margin: 0;
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                background-color: var(--luz-bg);
-                color: var(--texto-oscuro);
-            }
-            .header {
-                background-color: var(--color-primario);
-                color: white;
-                padding: 15px 30px;
-                text-align: center;
-            }
-            .auth-box {
-                max-width: 500px;
-                margin: 50px auto;
-                background: white;
-                border-radius: 10px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-                padding: 40px;
-            }
-            .auth-box h2 {
-                text-align: center;
-                color: var(--texto-oscuro);
-                margin-bottom: 30px;
-            }
-            .btn-primary-custom {
-                background: var(--color-acento);
-                border: none;
-                padding: 12px;
-                font-weight: bold;
-                transition: all 0.3s;
-                color: white;
-                width: 100%;
-            }
-            .btn-primary-custom:hover {
-                background: var(--color-primario);
-            }
-            .password-toggle {
-                cursor: pointer;
-                position: absolute;
-                right: 10px;
-                top: 50%;
-                transform: translateY(-50%);
-                color: var(--color-secundario);
-            }
-            .form-group-custom {
-                position: relative;
-                margin-bottom: 0;
-            }
-            .form-group-custom input.form-control {
-                padding-right: 35px;
-            }
-            .messages-container {
-                max-width: 500px;
-                margin: 20px auto;
-            }
-        </style>
-    </h:head>
-    <h:body>
-        <div class="header">
-            <h1>Registro de Empleados</h1>
-        </div>
+      xmlns:f="jakarta.faces.core">
+<h:head>
+    <title>Registro de Usuario</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" 
+          rel="stylesheet" type="text/css"/>
+</h:head>
 
-        <div class="messages-container">
-            <h:messages globalOnly="false" layout="list" showDetail="true" showSummary="true" 
-                       infoClass="alert alert-info" warnClass="alert alert-warning" 
-                       errorClass="alert alert-danger" fatalClass="alert alert-danger"/>
-        </div>
+<h:body style="background-color:#f8f9fa;">
+    <div class="container mt-5">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h3>Registrar nuevo usuario</h3>
+            </div>
+            <div class="card-body">
+                <h:form id="registerForm">
 
-        <div class="auth-box">
-            <h2>Registrar Empleado</h2>
-            <h:form id="registerForm">
-                <div class="mb-3">
-                    <h:outputLabel for="registerEmail" value="Correo electrónico" styleClass="form-label" />
-                    <h:inputText id="registerEmail"
-                                 value="#{loginBean.registerEmail}"
-                                 styleClass="form-control"
-                                 required="true"
-                                 requiredMessage="El correo electrónico es obligatorio."
-                                 validatorMessage="Formato de correo electrónico inválido.">
-                        <f:validateRegex pattern="[\w\.-]*[a-zA-Z0-9_]@[\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]" />
-                    </h:inputText>
-                    <h:message for="registerEmail" styleClass="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <h:outputLabel for="registerName" value="Nombre completo" styleClass="form-label" />
-                    <h:inputText id="registerName"
-                                 value="#{loginBean.registerName}"
-                                 styleClass="form-control"
-                                 required="true"
-                                 requiredMessage="El nombre completo es obligatorio." />
-                    <h:message for="registerName" styleClass="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <h:outputLabel for="registerPhone" value="Teléfono" styleClass="form-label" />
-                    <h:inputText id="registerPhone"
-                                 value="#{loginBean.registerPhone}"
-                                 styleClass="form-control"
-                                 pt:maxlength="10"
-                                 required="true"
-                                 requiredMessage="El teléfono es obligatorio."
-                                 validatorMessage="El teléfono debe tener 10 dígitos numéricos.">
-                        <f:validateRegex pattern="^[0-9]{10}$" />
-                    </h:inputText>
-                    <h:message for="registerPhone" styleClass="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <h:outputLabel for="registerPassword" value="Contraseña" styleClass="form-label" />
-                    <div class="form-group-custom">
-                        <h:inputSecret id="registerPassword"
-                                       value="#{loginBean.registerPassword}"
-                                       styleClass="form-control"
-                                       required="true"
-                                       pt:minlength="6"
-                                       requiredMessage="La contraseña es obligatoria." />
-                        <i class="fas fa-eye password-toggle" onclick="togglePassword('registerForm:registerPassword', this)"></i>
+                    <!-- Nombre completo -->
+                    <div class="mb-3">
+                        <h:outputLabel for="nombre" value="Nombre completo:" styleClass="form-label"/>
+                        <h:inputText id="nombre" value="#{usuarioBean.usuario.nombreCompleto}"
+                                     styleClass="form-control" required="true"
+                                     requiredMessage="El nombre es obligatorio."/>
+                        <h:message for="nombre" styleClass="text-danger"/>
                     </div>
-                    <h:message for="registerPassword" styleClass="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <h:outputLabel for="registerConfirmPassword" value="Confirmar Contraseña" styleClass="form-label" />
-                    <div class="form-group-custom">
-                        <h:inputSecret id="registerConfirmPassword"
-                                       value="#{loginBean.registerConfirmPassword}"
-                                       styleClass="form-control"
-                                       required="true"
-                                       pt:minlength="6"
-                                       requiredMessage="La confirmación de contraseña es obligatoria." />
-                        <i class="fas fa-eye password-toggle" onclick="togglePassword('registerForm:registerConfirmPassword', this)"></i>
+
+                    <!-- Username -->
+                    <div class="mb-3">
+                        <h:outputLabel for="username" value="Nombre de usuario:" styleClass="form-label"/>
+                        <h:inputText id="username" value="#{usuarioBean.usuario.username}"
+                                     styleClass="form-control" required="true"
+                                     requiredMessage="El nombre de usuario es obligatorio."
+                                     maxlength="20"/>
+                        <h:message for="username" styleClass="text-danger"/>
                     </div>
-                    <h:message for="registerConfirmPassword" styleClass="text-danger" />
-                </div>
-                <h:commandButton value="Registrar Empleado"
-                                 styleClass="btn btn-primary-custom mt-3"
-                                 action="#{loginBean.register}">
-                    <f:ajax execute="@form" render="@messages" />
-                </h:commandButton>
-                <div class="text-center mt-3">
-                    <small>¿Ya tienes cuenta? <h:link outcome="login" value="Inicia sesión" /></small>
-                </div>
-            </h:form>
+
+                    <!-- Correo -->
+                    <div class="mb-3">
+                        <h:outputLabel for="correo" value="Correo electrónico:" styleClass="form-label"/>
+                        <h:inputText id="correo" value="#{usuarioBean.usuario.correoElectronico}"
+                                     styleClass="form-control" required="true"
+                                     requiredMessage="El correo es obligatorio."
+                                     validatorMessage="Ingrese un correo válido.">
+                            <f:validateRegex pattern="^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$" />
+                        </h:inputText>
+                        <h:message for="correo" styleClass="text-danger"/>
+                    </div>
+
+                    <!-- Contraseña -->
+                    <div class="mb-3">
+                        <h:outputLabel for="password" value="Contraseña:" styleClass="form-label"/>
+                        <h:inputSecret id="password" value="#{usuarioBean.usuario.contrasena}"
+                                       styleClass="form-control" required="true"
+                                       requiredMessage="La contraseña es obligatoria."/>
+                        <h:message for="password" styleClass="text-danger"/>
+                    </div>
+
+                    <!-- Teléfono -->
+                    <div class="mb-3">
+                        <h:outputLabel for="telefono" value="Teléfono:" styleClass="form-label"/>
+                        <h:inputText id="telefono" value="#{usuarioBean.usuario.telefono}"
+                                     styleClass="form-control" maxlength="15"/>
+                        <h:message for="telefono" styleClass="text-danger"/>
+                    </div>
+
+                    <!-- Botones -->
+                   <h:commandButton value="Registrar"
+                 action="#{usuarioBean.createUsuario}"
+                 styleClass="btn btn-success">
+    <f:ajax execute="@form" render="@form"/>
+</h:commandButton>
+
+                    </div>
+
+                    <h:messages globalOnly="true" styleClass="alert alert-info mt-3"/>
+                </h:form>
+            </div>
         </div>
-
-        <script>
-            function togglePassword(inputId, icon) {
-                const input = document.getElementById(inputId);
-                if (!input) return;
-
-                if (input.type === 'password') {
-                    input.type = 'text';
-                    icon.classList.remove('fa-eye');
-                    icon.classList.add('fa-eye-slash');
-                } else {
-                    input.type = 'password';
-                    icon.classList.remove('fa-eye-slash');
-                    icon.classList.add('fa-eye');
-                }
-            }
-        </script>
-    </h:body>
+    </div>
+</h:body>
 </html>

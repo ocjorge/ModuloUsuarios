@@ -42,64 +42,57 @@ public class LoginBean implements Serializable {
     private String newUserModule; // ID del módulo
     private Integer newUserStatus = 1; // Por defecto Activo (ID 1)
 
-    @Transactional
-    public String login() {
-        try {
-            TypedQuery<Usuario> query = em.createQuery(
-                    "SELECT u FROM Usuario u WHERE u.correoElectronico = :email", Usuario.class);
-            query.setParameter("email", username);
-            Usuario user = query.getSingleResult();
+@Transactional
+public String login() {
+    try {
+        // Buscar por username
+        TypedQuery<Usuario> query = em.createQuery(
+            "SELECT u FROM Usuario u WHERE u.username = :username", Usuario.class);
+        query.setParameter("username", username);  // <-- nombre del parámetro cuadra con la JPQL
 
-            if (BCrypt.checkpw(password, user.getContrasena())) {
-                if (user.getIdEstadoCuenta().getNombreEstado().equals("Activo")) {
-                    currentUser = user;
-                    user.setUltimaSesion(OffsetDateTime.now());
-                    em.merge(user); // Actualizar última sesión
+        Usuario user = query.getSingleResult();
 
-                    // Registrar auditoría de acceso exitoso (ID 1 para 'Login')
-                    TipoEvento loginExitoso = em.find(TipoEvento.class, 1);
-                    AuditoriaAcceso auditoria = new AuditoriaAcceso(user, loginExitoso);
-                    em.persist(auditoria);
+        if (BCrypt.checkpw(password, user.getContrasena())) {
+            if ("Activo".equalsIgnoreCase(user.getIdEstadoCuenta().getNombreEstado())) {
+                currentUser = user;
+                user.setUltimaSesion(OffsetDateTime.now());
+                em.merge(user);
 
-                    FacesContext.getCurrentInstance().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_INFO, "Inicio de sesión exitoso.", "Bienvenido, " + currentUser.getNombreCompleto()));
-                    return "/index.xhtml?faces-redirect=true"; // Redirigir a la página principal
-                } else {
-                    FacesContext.getCurrentInstance().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_WARN, "Cuenta " + user.getIdEstadoCuenta().getNombreEstado() + ".", "Contacte al administrador."));
+                // Auditoría: Login (id_tipo_evento = 1)
+                TipoEvento loginExitoso = em.find(TipoEvento.class, 1);
+                em.persist(new AuditoriaAcceso(user, loginExitoso));
 
-                    // Registrar auditoría de acceso denegado (estado inactivo/bloqueado) (ID 3 para 'Acceso Denegado')
-                    TipoEvento accesoDenegado = em.find(TipoEvento.class, 3);
-                    AuditoriaAcceso auditoria = new AuditoriaAcceso(user, accesoDenegado);
-                    em.persist(auditoria);
-                }
+                FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Inicio de sesión exitoso.", "Bienvenido, " + currentUser.getNombreCompleto()));
+                return "/usuarios.xhtml?faces-redirect=true";
             } else {
                 FacesContext.getCurrentInstance().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Credenciales incorrectas.", "Verifique su usuario y contraseña."));
+                    new FacesMessage(FacesMessage.SEVERITY_WARN, "Cuenta " + user.getIdEstadoCuenta().getNombreEstado() + ".", "Contacte al administrador."));
 
-                // Si se encuentra el usuario pero la contraseña es incorrecta, registrar intento fallido (ID 3 para 'Acceso Denegado')
-                TypedQuery<Usuario> findUserQuery = em.createQuery(
-                        "SELECT u FROM Usuario u WHERE u.correoElectronico = :email", Usuario.class);
-                findUserQuery.setParameter("email", username);
-                try {
-                    Usuario existingUser = findUserQuery.getSingleResult();
-                    TipoEvento accesoDenegado = em.find(TipoEvento.class, 3);
-                    AuditoriaAcceso auditoria = new AuditoriaAcceso(existingUser, accesoDenegado);
-                    em.persist(auditoria);
-                } catch (NoResultException ex) {
-                    // Usuario no encontrado, no se registra auditoría para evitar enumeración de usuarios
-                }
+                // Auditoría: Acceso denegado (id_tipo_evento = 3)
+                TipoEvento accesoDenegado = em.find(TipoEvento.class, 3);
+                em.persist(new AuditoriaAcceso(user, accesoDenegado));
             }
-        } catch (NoResultException e) {
+        } else {
             FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Credenciales incorrectas.", "Verifique su usuario y contraseña."));
-        } catch (Exception e) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_FATAL, "Error en el sistema.", "Ocurrió un error inesperado."));
-            e.printStackTrace();
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Credenciales incorrectas.", "Verifique su usuario y contraseña."));
+
+            // Intento fallido: si existe el usuario, auditar acceso denegado
+            TipoEvento accesoDenegado = em.find(TipoEvento.class, 3);
+            em.persist(new AuditoriaAcceso(user, accesoDenegado));
         }
-        return null; // Mantenerse en la misma página
+    } catch (NoResultException e) {
+        FacesContext.getCurrentInstance().addMessage(null,
+            new FacesMessage(FacesMessage.SEVERITY_ERROR, "Credenciales incorrectas.", "Verifique su usuario y contraseña."));
+    } catch (Exception e) {
+        FacesContext.getCurrentInstance().addMessage(null,
+            new FacesMessage(FacesMessage.SEVERITY_FATAL, "Error en el sistema.", "Ocurrió un error inesperado."));
+        e.printStackTrace();
     }
+    return null;
+}
+
+
 
     @Transactional
     public void register() { // Cambiado a void para f:ajax

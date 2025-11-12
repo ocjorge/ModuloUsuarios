@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
-          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="jakarta.faces.html"
       xmlns:f="jakarta.faces.core"
@@ -32,7 +32,7 @@
             }
             .auth-box {
                 max-width: 450px;
-                margin: 100px auto;
+                margin: 80px auto;
                 background: white;
                 border-radius: 10px;
                 box-shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -83,61 +83,54 @@
 
         <div class="messages-container">
             <h:messages globalOnly="false" layout="list" showDetail="true" showSummary="true" 
-                       infoClass="alert alert-info" warnClass="alert alert-warning" 
-                       errorClass="alert alert-danger" fatalClass="alert alert-danger"/>
+                        infoClass="alert alert-info" warnClass="alert alert-warning" 
+                        errorClass="alert alert-danger" fatalClass="alert alert-danger"/>
         </div>
 
         <div class="auth-box">
             <h2>Iniciar Sesión</h2>
+            
             <h:form id="loginForm">
                 <div class="mb-3">
-                    <h:outputLabel for="username" value="Nombre de Usuario" styleClass="form-label" />
-                    <h:inputText id="username"
-                                 value="#{loginBean.username}"
+                    <h:outputLabel for="username" value="Usuario" styleClass="form-label"/>
+                    <h:inputText id="username" value="#{loginBean.username}" 
                                  styleClass="form-control"
                                  required="true"
-                                 requiredMessage="Nombre de Usuario." />
-                    <h:message for="username" styleClass="text-danger" />
+                                 requiredMessage="El nombre de usuario es obligatorio."/>
+                    <h:message for="username" styleClass="text-danger"/>
                 </div>
+
                 <div class="mb-3">
-                    <h:outputLabel for="password" value="Contraseña" styleClass="form-label" />
-                    <div class="form-group-custom">
-                        <h:inputSecret id="password"
-                                       value="#{loginBean.password}"
-                                       styleClass="form-control"
-                                       required="true"
-                                       pt:minlength="6"
-                                       requiredMessage="La contraseña es obligatoria." />
-                        <i class="fas fa-eye password-toggle" onclick="togglePassword('loginForm:password', this)"></i>
-                    </div>
-                    <h:message for="password" styleClass="text-danger" />
+                    <h:outputLabel for="password" value="Contraseña" styleClass="form-label"/>
+                    <h:inputSecret id="password" value="#{loginBean.password}" 
+                                   styleClass="form-control"
+                                   required="true"
+                                   requiredMessage="La contraseña es obligatoria."/>
+                    <h:message for="password" styleClass="text-danger"/>
                 </div>
-                <h:commandButton value="Iniciar Sesión"
-                                 styleClass="btn btn-primary-custom mt-3"
-                                 action="#{loginBean.login}">
-                    <f:ajax execute="@form" render="@messages" />
-                </h:commandButton>
-                <div class="text-center mt-3">
-                    <small>¿No tienes cuenta? <h:link outcome="registro" value="Regístrate" /></small>
-                </div>
+
+                <h:commandButton value="Iniciar sesión"
+                                 styleClass="btn btn-primary w-100"
+                                 action="#{loginBean.login}"/>
+                <h:messages globalOnly="true" styleClass="alert alert-info mt-3"/>
             </h:form>
         </div>
-
-        <script>
-            function togglePassword(inputId, icon) {
-                const input = document.getElementById(inputId);
-                if (!input) return;
-
-                if (input.type === 'password') {
-                    input.type = 'text';
-                    icon.classList.remove('fa-eye');
-                    icon.classList.add('fa-eye-slash');
-                } else {
-                    input.type = 'password';
-                    icon.classList.remove('fa-eye-slash');
-                    icon.classList.add('fa-eye');
-                }
-            }
-        </script>
     </h:body>
+    <script>
+        function togglePassword(inputId, icon) {
+            const input = document.getElementById(inputId);
+            if (!input)
+                return;
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+    </script>
 </html>

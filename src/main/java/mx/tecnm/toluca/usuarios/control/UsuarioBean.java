@@ -29,13 +29,13 @@ public class UsuarioBean implements Serializable {
 
     @Inject
     private EntityManager em;
-    
+
     @Inject
     private LoginBean loginBean; // Para obtener el usuario actual en auditoría
 
     private List<Usuario> usuarios;
     private Usuario selectedUser; // Para editar/detalles
-    
+
     // Campos para la creación de nuevo usuario
     private String newUserName;
     private String newUserEmail;
@@ -47,22 +47,23 @@ public class UsuarioBean implements Serializable {
     private String newUserModule; // ID del módulo
     private Integer newUserStatus = 1; // Por defecto Activo (ID 1)
     private String newUserAddress;
+    private String newUserUsername;
 
     // Listas para dropdowns
     private List<TipoUsuario> tiposUsuarios;
     private List<RolInterno> rolesInternos;
     private List<EstadoCuenta> estadosCuenta;
     private List<Modulo> modulos;
-    
+
     private UUID selectedUserId;
     private String selectedUserIdStr; // Para manejar parámetros URL     
-    
+
     @PostConstruct
     public void init() {
         loadUsuarios();
         loadDropdowns();
     }
-    
+
     // En UsuarioBean.java - agregar estos métodos:
     public void onTipoUsuarioChange() {
         // Solo para que el f:ajax funcione
@@ -96,11 +97,11 @@ public class UsuarioBean implements Serializable {
             newUserModule = (selectedUser.getIdModulo() != null) ? selectedUser.getIdModulo().getIdModulo() : null;
             newUserStatus = selectedUser.getIdEstadoCuenta().getIdEstadoCuenta();
             newUserAddress = selectedUser.getDireccion(); // Cargar la dirección si existe
-            
-             FacesContext.getCurrentInstance().addMessage(null,
+
+            FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Usuario seleccionado", "Usuario " + selectedUser.getNombreCompleto() + " cargado para edición."));
         } else {
-             FacesContext.getCurrentInstance().addMessage(null,
+            FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se encontró el usuario seleccionado."));
         }
     }
@@ -122,9 +123,9 @@ public class UsuarioBean implements Serializable {
             selectedUser.setIdRol(newUserRole != null ? em.find(RolInterno.class, newUserRole) : null);
             selectedUser.setIdEstadoCuenta(newUserStatus != null ? em.find(EstadoCuenta.class, newUserStatus) : null);
             selectedUser.setIdModulo(newUserModule != null && !newUserModule.isEmpty() ? em.find(Modulo.class, newUserModule) : null);
-            
+
             em.merge(selectedUser);
-            
+
             // Registrar auditoría de acción (ID 2 para 'Editar')
             if (loginBean.getCurrentUser() != null) {
                 AuditoriaAccion auditoria = new AuditoriaAccion(loginBean.getCurrentUser());
@@ -134,7 +135,6 @@ public class UsuarioBean implements Serializable {
                 auditoria.setDetallesCambio("{\"accion\": \"Actualización de datos de usuario\", \"usuario_afectado\": \"" + selectedUser.getCorreoElectronico() + "\"}");
                 em.persist(auditoria);
             }
-
 
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Usuario actualizado correctamente."));
@@ -149,69 +149,100 @@ public class UsuarioBean implements Serializable {
 
     @Transactional
     public void createUsuario() {
-        if (!newUserPassword.equals(newUserConfirmPassword)) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error de registro.", "Las contraseñas no coinciden."));
-            return;
-        }
-
         try {
-             // Verificar si el correo ya existe
-            TypedQuery<Long> countQuery = em.createQuery("SELECT COUNT(u) FROM Usuario u WHERE u.correoElectronico = :email", Long.class);
-            countQuery.setParameter("email", newUserEmail);
-            if (countQuery.getSingleResult() > 0) {
+            // Validar que las contraseñas coincidan antes de crear el objeto
+            if (!newUserPassword.equals(newUserConfirmPassword)) {
                 FacesContext.getCurrentInstance().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error de registro.", "El correo electrónico ya está en uso."));
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Error de registro", "Las contraseñas no coinciden."));
                 return;
             }
 
+            // Verificar si el correo ya existe
+            TypedQuery<Long> countEmail = em.createQuery(
+                    "SELECT COUNT(u) FROM Usuario u WHERE u.correoElectronico = :email", Long.class);
+            countEmail.setParameter("email", newUserEmail);
+            if (countEmail.getSingleResult() > 0) {
+                FacesContext.getCurrentInstance().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Error de registro", "El correo electrónico ya está en uso."));
+                return;
+            }
+
+            // Verificar si el username ya existe
+            TypedQuery<Long> countUsername = em.createQuery(
+                    "SELECT COUNT(u) FROM Usuario u WHERE u.username = :username", Long.class);
+            countUsername.setParameter("username", newUserUsername);
+            if (countUsername.getSingleResult() > 0) {
+                FacesContext.getCurrentInstance().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Error de registro", "El nombre de usuario ya está en uso."));
+                return;
+            }
+
+            // Crear la nueva entidad Usuario
             Usuario newUser = new Usuario();
+            newUser.setUsername(newUserUsername); // ✅ ahora se guarda el username
             newUser.setCorreoElectronico(newUserEmail);
             newUser.setNombreCompleto(newUserName);
             newUser.setTelefono(newUserPhone);
             newUser.setContrasena(BCrypt.hashpw(newUserPassword, BCrypt.gensalt()));
+            newUser.setDireccion(newUserAddress);
+            newUser.setFechaCreacion(OffsetDateTime.now());
 
-            // Obtener TipoUsuario, EstadoCuenta, RolInterno y Modulo por ID
+            // Asignar tipo y estado
             TipoUsuario tipoUsuario = em.find(TipoUsuario.class, newUserTipoUsuario);
             EstadoCuenta estadoCuenta = em.find(EstadoCuenta.class, newUserStatus);
-
             newUser.setIdTipoUsuario(tipoUsuario);
             newUser.setIdEstadoCuenta(estadoCuenta);
 
-            if (newUserTipoUsuario == 1) { // Si es interno (ID 1 para 'Interno')
+            // Asignar rol/módulo si aplica
+            if (newUserTipoUsuario != null && newUserTipoUsuario == 1) { // 1 = Interno
                 RolInterno rol = em.find(RolInterno.class, newUserRole);
                 newUser.setIdRol(rol);
                 if (newUserModule != null && !newUserModule.isEmpty()) {
                     Modulo modulo = em.find(Modulo.class, newUserModule);
                     newUser.setIdModulo(modulo);
                 }
-            } else { // Si no es interno, asegúrate de que el rol y módulo sean null
-                 newUser.setIdRol(null);
-                 newUser.setIdModulo(null);
+            } else {
+                newUser.setIdRol(null);
+                newUser.setIdModulo(null);
             }
-            newUser.setDireccion(newUserAddress);
-            newUser.setFechaCreacion(OffsetDateTime.now());
 
+            // Persistir usuario
             em.persist(newUser);
-            
-            // Registrar auditoría de acción (ID 1 para 'Crear')
+
+            // Auditoría (opcional)
             if (loginBean.getCurrentUser() != null) {
                 AuditoriaAccion auditoria = new AuditoriaAccion(loginBean.getCurrentUser());
-                auditoria.setIdModulo(em.find(Modulo.class, "Usuarios")); // Módulo de Usuarios
+                auditoria.setIdModulo(em.find(Modulo.class, "Usuarios"));
                 auditoria.setIdAccion(em.find(Accion.class, 1)); // Acción 'Crear' (ID 1)
                 auditoria.setIdRegistroAfectado(newUser.getIdUsuario().toString());
-                auditoria.setDetallesCambio("{\"accion\": \"Creación de nuevo usuario\", \"usuario_creado\": \"" + newUser.getCorreoElectronico() + "\", \"tipo_usuario\": \"" + tipoUsuario.getNombreTipo() + "\"}");
+                auditoria.setDetallesCambio(String.format(
+                        "{\"accion\": \"Creación de nuevo usuario\", "
+                        + "\"usuario_creado\": \"%s\", "
+                        + "\"username\": \"%s\", "
+                        + "\"tipo_usuario\": \"%s\"}",
+                        newUser.getCorreoElectronico(),
+                        newUser.getUsername(),
+                        tipoUsuario != null ? tipoUsuario.getNombreTipo() : "Desconocido"
+                ));
+
                 em.persist(auditoria);
             }
 
             FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Usuario " + newUserName + " creado correctamente."));
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Éxito", "Usuario " + newUserUsername + " creado correctamente."));
+
             resetNewUserFields();
             loadUsuarios();
+
         } catch (Exception e) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_FATAL, "Error al crear usuario", "No se pudo crear el usuario: " + e.getMessage()));
             e.printStackTrace();
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_FATAL,
+                            "Error al crear usuario", "No se pudo crear el usuario: " + e.getMessage()));
         }
     }
 
@@ -234,7 +265,7 @@ public class UsuarioBean implements Serializable {
             Usuario userToDelete = em.find(Usuario.class, idUsuario);
             if (userToDelete != null) {
                 em.remove(userToDelete);
-                
+
                 // Registrar auditoría de acción (ID 3 para 'Eliminar')
                 if (loginBean.getCurrentUser() != null) {
                     AuditoriaAccion auditoria = new AuditoriaAccion(loginBean.getCurrentUser());
@@ -244,7 +275,7 @@ public class UsuarioBean implements Serializable {
                     auditoria.setDetallesCambio("{\"accion\": \"Eliminación de usuario\", \"usuario_eliminado_email\": \"" + userToDelete.getCorreoElectronico() + "\"}");
                     em.persist(auditoria);
                 }
-                
+
                 FacesContext.getCurrentInstance().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Usuario eliminado correctamente."));
                 loadUsuarios();
@@ -258,7 +289,7 @@ public class UsuarioBean implements Serializable {
             e.printStackTrace();
         }
     }
-    
+
     // Método para la lógica de alternar campos internos del formulario de nuevo usuario
     public void toggleInternalFields() {
         // La lógica de display CSS se manejará directamente en el XHTML con EL
@@ -268,8 +299,15 @@ public class UsuarioBean implements Serializable {
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Debug", "Tipo de usuario cambiado a: " + newUserTipoUsuario));
     }
 
-
     // --- Getters y Setters ---
+    public String getNewUserUsername() {
+        return newUserUsername;
+    }
+
+    public void setNewUserUsername(String newUserUsername) {
+        this.newUserUsername = newUserUsername;
+    }
+
     public List<Usuario> getUsuarios() {
         return usuarios;
     }
@@ -385,69 +423,69 @@ public class UsuarioBean implements Serializable {
     // Para convertir OffsetDateTime a String para inputs de fecha/hora
     // Se usa un formateador local de fecha-hora para compatibilidad con input type="datetime-local"
     public String getFormattedLastSession() {
-        return selectedUser != null && selectedUser.getUltimaSesion() != null ?
-               selectedUser.getUltimaSesion().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")) : "";
+        return selectedUser != null && selectedUser.getUltimaSesion() != null
+                ? selectedUser.getUltimaSesion().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")) : "";
     }
     // No necesitamos un setter si el input es readonly
 
     public String getFormattedRegDate() {
-        return selectedUser != null && selectedUser.getFechaCreacion() != null ?
-               selectedUser.getFechaCreacion().format(DateTimeFormatter.ISO_LOCAL_DATE) : "";
+        return selectedUser != null && selectedUser.getFechaCreacion() != null
+                ? selectedUser.getFechaCreacion().format(DateTimeFormatter.ISO_LOCAL_DATE) : "";
     }
-    
+
 // Getters y Setters
-public UUID getSelectedUserId() {
-    return selectedUserId;
-}
+    public UUID getSelectedUserId() {
+        return selectedUserId;
+    }
 
-public void setSelectedUserId(UUID selectedUserId) {
-    this.selectedUserId = selectedUserId;
-}
+    public void setSelectedUserId(UUID selectedUserId) {
+        this.selectedUserId = selectedUserId;
+    }
 
-public String getSelectedUserIdStr() {
-    return selectedUserIdStr;
-}
+    public String getSelectedUserIdStr() {
+        return selectedUserIdStr;
+    }
 
-public void setSelectedUserIdStr(String selectedUserIdStr) {
-    this.selectedUserIdStr = selectedUserIdStr;
-    if (selectedUserIdStr != null && !selectedUserIdStr.isEmpty()) {
-        try {
-            this.selectedUserId = UUID.fromString(selectedUserIdStr);
-            loadUserForEdit();
-        } catch (IllegalArgumentException e) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "ID de usuario inválido"));
+    public void setSelectedUserIdStr(String selectedUserIdStr) {
+        this.selectedUserIdStr = selectedUserIdStr;
+        if (selectedUserIdStr != null && !selectedUserIdStr.isEmpty()) {
+            try {
+                this.selectedUserId = UUID.fromString(selectedUserIdStr);
+                loadUserForEdit();
+            } catch (IllegalArgumentException e) {
+                FacesContext.getCurrentInstance().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "ID de usuario inválido"));
+            }
         }
     }
-}
 
 // Método para cargar usuario cuando se accede por URL
-public void loadUserForEdit() {
-    if (selectedUserId != null) {
-        try {
-            this.selectedUser = em.find(Usuario.class, selectedUserId);
-            if (selectedUser != null) {
-                // Cargar los IDs de las entidades relacionadas
-                newUserRole = (selectedUser.getIdRol() != null) ? selectedUser.getIdRol().getIdRol() : null;
-                newUserModule = (selectedUser.getIdModulo() != null) ? selectedUser.getIdModulo().getIdModulo() : null;
-                newUserStatus = selectedUser.getIdEstadoCuenta().getIdEstadoCuenta();
-                newUserAddress = selectedUser.getDireccion();
-                
+    public void loadUserForEdit() {
+        if (selectedUserId != null) {
+            try {
+                this.selectedUser = em.find(Usuario.class, selectedUserId);
+                if (selectedUser != null) {
+                    // Cargar los IDs de las entidades relacionadas
+                    newUserRole = (selectedUser.getIdRol() != null) ? selectedUser.getIdRol().getIdRol() : null;
+                    newUserModule = (selectedUser.getIdModulo() != null) ? selectedUser.getIdModulo().getIdModulo() : null;
+                    newUserStatus = selectedUser.getIdEstadoCuenta().getIdEstadoCuenta();
+                    newUserAddress = selectedUser.getDireccion();
+
+                    FacesContext.getCurrentInstance().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_INFO, "Usuario cargado",
+                                    "Editando usuario: " + selectedUser.getNombreCompleto()));
+                } else {
+                    FacesContext.getCurrentInstance().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Usuario no encontrado"));
+                }
+            } catch (Exception e) {
                 FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Usuario cargado", 
-                    "Editando usuario: " + selectedUser.getNombreCompleto()));
-            } else {
-                FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Usuario no encontrado"));
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
+                                "No se pudo cargar el usuario: " + e.getMessage()));
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", 
-                "No se pudo cargar el usuario: " + e.getMessage()));
-            e.printStackTrace();
         }
     }
-}
 
 // Método alternativo para compatibilidad con f:viewParam
 /*    public void loadUserForEdit(ComponentSystemEvent event) {

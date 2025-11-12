@@ -68,6 +68,11 @@ public class Usuario implements Serializable {
     @ManyToOne(optional = false)
     private EstadoCuenta idEstadoCuenta;
 
+    @NotNull
+    @Size(min = 3, max = 20)
+    @Column(name = "username", unique = true, length = 20)
+    private String username;
+
     @JoinColumn(name = "id_modulo", referencedColumnName = "id_modulo")
     @ManyToOne
     private Modulo idModulo;
@@ -248,4 +253,13 @@ public class Usuario implements Serializable {
     public String toString() {
         return "Usuario[id=" + idUsuario + ", email=" + correoElectronico + "]";
     }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
 }
