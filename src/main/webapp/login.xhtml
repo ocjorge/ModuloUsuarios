@@ -1,143 +1,31 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
-          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="jakarta.faces.html"
-      xmlns:f="jakarta.faces.core"
-      xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
-    <h:head>
-        <title>Login - Sistema de Usuarios</title>
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" type="text/css" />
-        <style type="text/css">
-            :root {
-                --color-primario: #2c5aa0;
-                --color-secundario: #34495e;
-                --color-acento: #3498db;
-                --color-exito: #27ae60;
-                --luz-bg: #f8f9fa;
-                --texto-oscuro: #2c3e50;
-            }
-            body {
-                margin: 0;
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                background-color: var(--luz-bg);
-                color: var(--texto-oscuro);
-            }
-            .header {
-                background-color: var(--color-primario);
-                color: white;
-                padding: 15px 30px;
-                text-align: center;
-            }
-            .auth-box {
-                max-width: 450px;
-                margin: 100px auto;
-                background: white;
-                border-radius: 10px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-                padding: 40px;
-            }
-            .auth-box h2 {
-                text-align: center;
-                color: var(--texto-oscuro);
-                margin-bottom: 30px;
-            }
-            .btn-primary-custom {
-                background: var(--color-acento);
-                border: none;
-                padding: 12px;
-                font-weight: bold;
-                transition: all 0.3s;
-                color: white;
-                width: 100%;
-            }
-            .btn-primary-custom:hover {
-                background: var(--color-primario);
-            }
-            .password-toggle {
-                cursor: pointer;
-                position: absolute;
-                right: 10px;
-                top: 50%;
-                transform: translateY(-50%);
-                color: var(--color-secundario);
-            }
-            .form-group-custom {
-                position: relative;
-                margin-bottom: 0;
-            }
-            .form-group-custom input.form-control {
-                padding-right: 35px;
-            }
-            .messages-container {
-                max-width: 450px;
-                margin: 20px auto;
-            }
-        </style>
-    </h:head>
-    <h:body>
-        <div class="header">
-            <h1>Sistema de Gestión de Usuarios</h1>
-        </div>
-
-        <div class="messages-container">
-            <h:messages globalOnly="false" layout="list" showDetail="true" showSummary="true" 
-                       infoClass="alert alert-info" warnClass="alert alert-warning" 
-                       errorClass="alert alert-danger" fatalClass="alert alert-danger"/>
-        </div>
-
-        <div class="auth-box">
-            <h2>Iniciar Sesión</h2>
-            <h:form id="loginForm">
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
+<h:head>
+    <title>Iniciar Sesión</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
+</h:head>
+<h:body style="background-color:#f5f6fa;">
+<h:form>
+    <h:panelGroup layout="block" styleClass="container" style="max-width:420px;margin:60px auto;">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h3 class="text-center mb-4">Sistema de Gestión de Usuarios</h3>
+                <h:messages globalOnly="true" styleClass="alert alert-danger" infoClass="alert alert-info"/>
                 <div class="mb-3">
-                    <h:outputLabel for="username" value="Nombre de Usuario" styleClass="form-label" />
-                    <h:inputText id="username"
-                                 value="#{loginBean.username}"
-                                 styleClass="form-control"
-                                 required="true"
-                                 requiredMessage="Nombre de Usuario." />
-                    <h:message for="username" styleClass="text-danger" />
+                    <label class="form-label">Usuario</label>
+                    <h:inputText value="#{loginBean.username}" styleClass="form-control" required="true"
+                                 requiredMessage="Ingrese su usuario" />
                 </div>
-                <div class="mb-3">
-                    <h:outputLabel for="password" value="Contraseña" styleClass="form-label" />
-                    <div class="form-group-custom">
-                        <h:inputSecret id="password"
-                                       value="#{loginBean.password}"
-                                       styleClass="form-control"
-                                       required="true"
-                                       pt:minlength="6"
-                                       requiredMessage="La contraseña es obligatoria." />
-                        <i class="fas fa-eye password-toggle" onclick="togglePassword('loginForm:password', this)"></i>
-                    </div>
-                    <h:message for="password" styleClass="text-danger" />
+                <div class="mb-4">
+                    <label class="form-label">Contraseña</label>
+                    <h:inputSecret value="#{loginBean.password}" styleClass="form-control" required="true"
+                                   requiredMessage="Ingrese su contraseña" />
                 </div>
-                <h:commandButton value="Iniciar Sesión"
-                                 styleClass="btn btn-primary-custom mt-3"
-                                 action="#{loginBean.login}">
-                    <f:ajax execute="@form" render="@messages" />
-                </h:commandButton>
-                <div class="text-center mt-3">
-                    <small>¿No tienes cuenta? <h:link outcome="registro" value="Regístrate" /></small>
-                </div>
-            </h:form>
+                <h:commandButton value="Iniciar sesión" actionListener="#{loginBean.login}" styleClass="btn btn-primary w-100"/>
+            </div>
         </div>
-
-        <script>
-            function togglePassword(inputId, icon) {
-                const input = document.getElementById(inputId);
-                if (!input) return;
-
-                if (input.type === 'password') {
-                    input.type = 'text';
-                    icon.classList.remove('fa-eye');
-                    icon.classList.add('fa-eye-slash');
-                } else {
-                    input.type = 'password';
-                    icon.classList.remove('fa-eye-slash');
-                    icon.classList.add('fa-eye');
-                }
-            }
-        </script>
-    </h:body>
+    </h:panelGroup>
+</h:form>
+</h:body>
 </html>

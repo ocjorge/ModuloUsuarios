@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<h:head>
+    <title>Usuario</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
+</h:head>
+<h:body style="background-color:#f0f2f5;">
+<f:metadata>
+    <f:viewParam name="id" value="#{param.id}" />
+    <f:viewAction action="#{usuarioBean.verificarSesion}" />
+    <f:viewAction action="#{usuarioBean.cargarParaEdicion(param.id)}" />
+</f:metadata>
+<div class="container py-4" style="max-width:900px;">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>#{usuarioBean.edicion ? 'Editar usuario' : 'Nuevo usuario'}</h2>
+        <h:link outcome="usuarios.xhtml" styleClass="btn btn-secondary">Volver</h:link>
+    </div>
+    <h:form>
+        <h:messages globalOnly="true"/>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Nombre completo *</label>
+                <h:inputText value="#{usuarioBean.usuarioSeleccionado.nombreCompleto}" styleClass="form-control" required="true"/>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Usuario *</label>
+                <h:inputText value="#{usuarioBean.usuarioSeleccionado.username}" styleClass="form-control" required="true"/>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Correo electrónico *</label>
+                <h:inputText value="#{usuarioBean.usuarioSeleccionado.correoElectronico}" styleClass="form-control" required="true"/>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Teléfono</label>
+                <h:inputText value="#{usuarioBean.usuarioSeleccionado.telefono}" styleClass="form-control" />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Tipo de usuario *</label>
+                <h:selectOneMenu value="#{usuarioBean.usuarioSeleccionado.tipoUsuario}">
+                    <f:selectItems value="#{usuarioBean.tiposUsuario}" var="t" itemValue="#{t}" itemLabel="#{t.nombre}" />
+                </h:selectOneMenu>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Rol interno</label>
+                <h:selectOneMenu value="#{usuarioBean.usuarioSeleccionado.rolInterno}">
+                    <f:selectItem itemLabel="Sin rol" itemValue="#{null}" />
+                    <f:selectItems value="#{usuarioBean.rolesInternos}" var="r" itemValue="#{r}" itemLabel="#{r.nombre}" />
+                </h:selectOneMenu>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Estado de cuenta *</label>
+                <h:selectOneMenu value="#{usuarioBean.usuarioSeleccionado.estadoCuenta}">
+                    <f:selectItems value="#{usuarioBean.estadosCuenta}" var="e" itemValue="#{e}" itemLabel="#{e.nombre}" />
+                </h:selectOneMenu>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Módulo</label>
+                <h:selectOneMenu value="#{usuarioBean.usuarioSeleccionado.modulo}">
+                    <f:selectItem itemLabel="Ninguno" itemValue="#{null}" />
+                    <f:selectItems value="#{usuarioBean.modulos}" var="m" itemValue="#{m}" itemLabel="#{m.nombre}" />
+                </h:selectOneMenu>
+            </div>
+            <div class="col-md-12">
+                <label class="form-label">Dirección</label>
+                <h:inputTextarea value="#{usuarioBean.usuarioSeleccionado.direccion}" styleClass="form-control" rows="2" />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Contraseña #{usuarioBean.edicion ? '(dejar vacío para mantener)' : '*'} </label>
+                <h:inputSecret value="#{usuarioBean.passwordPlano}" styleClass="form-control" required="#{!usuarioBean.edicion}" />
+            </div>
+        </div>
+        <div class="mt-4 d-flex gap-2">
+            <h:commandButton value="Guardar" actionListener="#{usuarioBean.guardar}" styleClass="btn btn-primary" />
+            <h:link outcome="usuarios.xhtml" styleClass="btn btn-secondary">Cancelar</h:link>
+        </div>
+    </h:form>
+</div>
+</h:body>
+</html>
