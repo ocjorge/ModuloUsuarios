@@ -1,0 +1,1495 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Sistema de Usuarios</title>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" type="text/css" />
+        <style type="text/css">
+            /*<![CDATA[*/
+            :root {
+                --color-primario: #2c5aa0;
+                --color-secundario: #34495e;
+                --color-acento: #3498db;
+                --color-exito: #27ae60;
+                --color-peligro: #e74c3c;
+                --color-advertencia: #f39c12;
+                --luz-bg: #f8f9fa;
+                --texto-oscuro: #2c3e50;
+            }
+
+            body {
+                margin: 0;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background-color: var(--luz-bg);
+                color: var(--texto-oscuro);
+            }
+
+            .page {
+                display: none;
+            }
+
+            .page.active {
+                display: block;
+            }
+
+            .header {
+                background-color: var(--color-primario);
+                color: white;
+                padding: 15px 30px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .header h1 {
+                margin: 0;
+                font-size: 1.5em;
+            }
+
+            .header-right {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .header-right span {
+                font-size: 0.95em;
+            }
+
+            .header-right .btn-logout {
+                background-color: var(--color-peligro);
+                color: white;
+                border: none;
+                padding: 8px 16px;
+                border-radius: 6px;
+                font-weight: bold;
+                cursor: pointer;
+                text-transform: uppercase;
+                transition: background-color 0.3s ease;
+            }
+
+            .header-right .btn-logout:hover {
+                background-color: #c0392b;
+            }
+
+            .container-custom {
+                max-width: 1200px;
+                margin: 30px auto;
+                padding: 30px;
+                background-color: #ffffff;
+                border-radius: 10px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            }
+
+            h2 {
+                color: var(--color-secundario);
+                text-align: center;
+                margin-bottom: 20px;
+            }
+
+            .buttons-nav {
+                display: flex;
+                gap: 15px;
+                margin-bottom: 20px;
+            }
+
+            .buttons-nav button {
+                padding: 10px 20px;
+                border: none;
+                border-radius: 6px;
+                font-weight: bold;
+                text-transform: uppercase;
+                cursor: pointer;
+                color: white;
+                transition: background-color 0.3s ease, transform 0.2s ease;
+            }
+
+            .buttons-nav .new-user {
+                background-color: var(--color-exito);
+            }
+            .buttons-nav .new-user:hover {
+                background-color: #1e8449;
+                transform: translateY(-2px);
+            }
+
+            .buttons-nav .filter {
+                background-color: var(--color-acento);
+            }
+            .buttons-nav .filter:hover {
+                background-color: #2d80c4;
+                transform: translateY(-2px);
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                background-color: #fff;
+                border-radius: 8px;
+                overflow: hidden;
+            }
+
+            th, td {
+                padding: 12px;
+                text-align: left;
+                border-bottom: 1px solid #ddd;
+            }
+
+            th {
+                background-color: var(--luz-bg);
+                font-weight: 600;
+                text-transform: uppercase;
+                font-size: 0.9em;
+            }
+
+            tbody tr:hover {
+                background-color: #f1f7fe;
+            }
+
+            .actions {
+                display: flex;
+                gap: 8px;
+            }
+
+            .actions button {
+                padding: 6px 10px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 0.9em;
+                color: white;
+                text-transform: uppercase;
+                transition: transform 0.2s;
+            }
+
+            .actions .edit {
+                background-color: var(--color-acento);
+            }
+            .actions .edit:hover {
+                background-color: #2d80c4;
+                transform: translateY(-2px);
+            }
+
+            .actions .delete {
+                background-color: var(--color-peligro);
+            }
+            .actions .delete:hover {
+                background-color: #c0392b;
+                transform: translateY(-2px);
+            }
+
+            .badge {
+                padding: 4px 10px;
+                border-radius: 12px;
+                color: white;
+                font-size: 0.85em;
+                font-weight: bold;
+                text-align: center;
+                display: inline-block;
+            }
+            .activo {
+                background-color: var(--color-exito);
+            }
+            .inactivo {
+                background-color: var(--color-peligro);
+            }
+
+            .auth-box {
+                max-width: 450px;
+                margin: 100px auto;
+                background: white;
+                border-radius: 10px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                padding: 40px;
+            }
+
+            .auth-box h2 {
+                text-align: center;
+                color: var(--texto-oscuro);
+                margin-bottom: 30px;
+            }
+
+            .form-control:focus {
+                border-color: var(--color-acento);
+                box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+            }
+
+            .btn-primary-custom {
+                background: var(--color-acento);
+                border: none;
+                padding: 12px;
+                font-weight: bold;
+                transition: all 0.3s;
+                color: white;
+            }
+
+            .btn-primary-custom:hover {
+                background: var(--color-primario);
+                transform: translateY(-2px);
+            }
+
+            .password-toggle {
+                cursor: pointer;
+                position: absolute;
+                right: 10px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--color-secundario);
+            }
+
+            .form-group-custom {
+                position: relative;
+                margin-bottom: 0;
+                flex: 2 0 250px;
+            }
+
+            .detail-container {
+                max-width: 900px;
+                margin: 20px auto;
+                background: white;
+                border-radius: 6px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                overflow: hidden;
+            }
+
+            .header-form {
+                background: var(--color-primario);
+                color: white;
+                padding: 10px 15px;
+                font-weight: bold;
+            }
+
+            .form-section {
+                padding: 20px;
+                border-bottom: 1px solid #ddd;
+            }
+
+            .form-section h3 {
+                margin-top: 0;
+                color: var(--color-secundario);
+                border-bottom: 2px solid var(--color-acento);
+                padding-bottom: 10px;
+            }
+
+            .form-group {
+                margin-bottom: 15px;
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+            }
+
+            .form-group label {
+                flex: 1 0 200px;
+                margin-right: 10px;
+                font-weight: bold;
+            }
+
+            .form-group input,
+            .form-group select {
+                flex: 2 0 250px;
+                padding: 8px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+            }
+
+            .form-actions {
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+                padding: 20px;
+            }
+
+            .btn-success-custom {
+                background: var(--color-exito);
+                color: white;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 4px;
+                font-weight: bold;
+                cursor: pointer;
+                transition: all 0.3s;
+            }
+
+            .btn-success-custom:hover {
+                background: #1e8449;
+                transform: translateY(-2px);
+            }
+
+            .btn-secondary-custom {
+                background: var(--color-secundario);
+                color: white;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 4px;
+                font-weight: bold;
+                cursor: pointer;
+                transition: all 0.3s;
+            }
+
+            .btn-secondary-custom:hover {
+                background: #2c3e50;
+                transform: translateY(-2px);
+            }
+
+            .detail-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+            }
+
+            .detail-table, .detail-table th, .detail-table td {
+                border: 1px solid #ddd;
+            }
+
+            .detail-table th, .detail-table td {
+                text-align: left;
+                padding: 8px;
+            }
+
+            .detail-table th {
+                background: var(--color-acento);
+                color: white;
+            }
+
+            .alert-custom {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 9999;
+                min-width: 300px;
+                animation: slideIn 0.3s ease-out;
+            }
+
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+
+            .buttons-nav .tickets {
+                background-color: var(--color-secundario);
+            }
+            .buttons-nav .tickets:hover {
+                background-color: #2c4056;
+                transform: translateY(-2px);
+            }
+
+            .pendiente {
+                background-color: var(--color-advertencia);
+            }
+            .aprobado {
+                background-color: var(--color-exito);
+            }
+            .rechazado {
+                background-color: var(--color-peligro);
+            }
+            .revision {
+                background-color: var(--color-acento);
+            }
+            .actions .review {
+                background-color: var(--color-secundario);
+            }
+            .actions .review:hover {
+                background-color: #2c4056;
+                transform: translateY(-2px);
+            }
+
+            .btn-close-white {
+                filter: invert(1);
+            }
+
+            #modalDetalles p {
+                margin-bottom: 5px;
+                font-size: 0.9em;
+                font-family: monospace;
+            }
+
+            #modalAprobarBtn[disabled] {
+                background-color: #95a5a6;
+                cursor: not-allowed;
+                transform: none;
+            }
+            /*]]>*/
+        </style>
+    </head>
+    <body>
+
+        <!-- PÁGINA DE LOGIN -->
+        <div id="loginPage" class="page active">
+            <div class="header">
+                <h1>Sistema de Gestión de Usuarios</h1>
+            </div>
+
+            <div class="auth-box">
+                <h2>Iniciar Sesión</h2>
+                <form id="loginForm" onsubmit="return handleLogin(event)">
+                    <div class="mb-3">
+                        <label for="loginUsername" class="form-label">Nombre de usuario</label>
+                        <input type="text" class="form-control" id="loginUsername" required="required" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="loginPassword" class="form-label">Contraseña</label>
+                        <div class="form-group-custom">
+                            <input type="password" class="form-control" id="loginPassword" required="required" />
+                            <i class="fas fa-eye password-toggle" onclick="togglePassword('loginPassword', this)"></i>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary-custom w-100 mt-3">Iniciar Sesión</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- PÁGINA DE REGISTRO -->
+        <div id="registerPage" class="page">
+            <div class="header">
+                <h1>Registro de Empleados</h1>
+            </div>
+
+            <div class="auth-box">
+                <h2>Registrar Empleado</h2>
+                <form id="registerForm" onsubmit="return handleRegister(event)">
+                    <div class="mb-3">
+                        <label for="registerEmail" class="form-label">Correo electrónico</label>
+                        <input type="email" class="form-control" id="registerEmail" required="required" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="registerName" class="form-label">Nombre completo</label>
+                        <input type="text" class="form-control" id="registerName" required="required" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="registerPhone" class="form-label">Teléfono</label>
+                        <input type="tel" class="form-control" id="registerPhone" maxlength="10" required="required" />
+                    </div>
+                    <div class="form-group-custom">
+                        <label for="registerPassword" class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" id="registerPassword" minlength="6" required="required" />
+                        <i class="fas fa-eye password-toggle" onclick="togglePassword('registerPassword', this)"></i>
+                    </div>
+                    <div class="form-group-custom">
+                        <label for="registerConfirmPassword" class="form-label">Confirmar Contraseña</label>
+                        <input type="password" class="form-control" id="registerConfirmPassword" minlength="6" required="required" />
+                        <i class="fas fa-eye password-toggle" onclick="togglePassword('registerConfirmPassword', this)"></i>
+                    </div>
+                    <button type="submit" class="btn btn-primary-custom w-100 mt-3">Registrar Empleado</button>
+                </form>
+                <div class="text-center mt-3">
+                    <small>¿Ya tienes cuenta? <a href="#login" onclick="showPage('loginPage'); return false;">Inicia sesión</a></small>
+                </div>
+            </div>
+        </div>
+
+        <!-- PÁGINA PRINCIPAL -->
+        <div id="mainPage" class="page">
+            <div class="header">
+                <h1>Usuarios</h1>
+                <div class="header-right">
+                    <span>Bienvenido, <strong id="currentUserName"></strong></span>
+                    <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
+                </div>
+            </div>
+
+            <div class="container-custom">
+                <h2>Lista de Usuarios</h2>
+
+                <div class="buttons-nav">
+                    <button class="new-user" onclick="showPage('newUserPage')">+ Nuevo Usuario</button>
+                    <button class="tickets" onclick="showPage('ticketsPage')">
+                        <i class="fas fa-ticket-alt"></i> Tickets Pendientes
+                    </button>
+                    <button class="filter" onclick="filterUsers()">&#128269; Filtrar</button>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Correo</th>
+                            <th>Módulo</th>
+                            <th>Teléfono</th>
+                            <th>Estado</th>
+                            <th>Rol</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <!-- Los usuarios se cargarán dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- PÁGINA DE DETALLES/EDITAR USUARIO -->
+        <div id="detailsPage" class="page">
+            <div class="header">
+                <div>Usuarios</div>
+                <div class="header-right">
+                    <span>Bienvenido, <strong id="currentUserName2"></strong></span>
+                    <button class="btn-logout" onclick="showPage('mainPage')">Volver</button>
+                </div>
+            </div>
+
+            <div class="detail-container">
+                <div class="header-form">Editar Usuario</div>
+
+                <form id="editUserForm" onsubmit="return handleEditUser(event)">
+                    <input type="hidden" id="editUserId" />
+
+                    <div class="form-section">
+                        <h3>Información Personal</h3>
+                        <div class="form-group">
+                            <label>Nombre completo *</label>
+                            <input type="text" id="editUserName" required="required" />
+                        </div>
+                        <div class="form-group">
+                            <label>Correo electrónico *</label>
+                            <input type="email" id="editUserEmail" required="required" />
+                        </div>
+                        <div class="form-group">
+                            <label>Teléfono *</label>
+                            <input type="tel" id="editUserPhone" maxlength="10" required="required" />
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha de registro</label>
+                            <input type="date" id="editUserRegDate" readonly="readonly" />
+                        </div>
+                        <div class="form-group">
+                            <label>Última sesión</label>
+                            <input type="datetime-local" id="editUserLastSession" readonly="readonly" />
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Estado y Acceso</h3>
+                        <div class="form-group">
+                            <label>Rol asignado *</label>
+                            <select id="editUserRole" required="required">
+                                <option value="Jefe">Jefe</option>
+                                <option value="Gerente">Gerente</option>
+                                <option value="Operador">Operador</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Estado de cuenta</label>
+                            <select id="editUserStatus">
+                                <option value="Activo">Activo</option>
+                                <option value="Inactivo">Inactivo</option>
+                                <option value="Bloqueado">Bloqueado</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Módulo</label>
+                            <input type="text" id="editUserModule" />
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Dirección (opcional)</h3>
+                        <div class="form-group"><label>Calle</label><input type="text" id="editStreet" /></div>
+                        <div class="form-group"><label>Número</label><input type="text" id="editNumber" /></div>
+                        <div class="form-group"><label>Colonia</label><input type="text" id="editColony" /></div>
+                        <div class="form-group"><label>Ciudad</label><input type="text" id="editCity" /></div>
+                        <div class="form-group"><label>Estado</label><input type="text" id="editState" /></div>
+                        <div class="form-group"><label>Código Postal</label><input type="text" id="editZip" maxlength="5" /></div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Privilegios del Sistema</h3>
+                        <p>[Lista de módulos y permisos específicos - En desarrollo]</p>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Historial de Actividad Reciente</h3>
+                        <table class="detail-table">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Acción</th>
+                                    <th>Módulo</th>
+                                </tr>
+                            </thead>
+                            <tbody id="activityTableBody">
+                                <tr>
+                                    <td>2025-10-15</td>
+                                    <td>Inicio de sesión</td>
+                                    <td>Usuarios</td>
+                                </tr>
+                                <tr>
+                                    <td>2025-10-14</td>
+                                    <td>Actualizó datos</td>
+                                    <td>Bancos</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-success-custom">ACTUALIZAR USUARIO</button>
+                        <button type="button" class="btn-secondary-custom" onclick="showPage('mainPage')">CANCELAR</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- PÁGINA DE NUEVO USUARIO -->
+        <div id="newUserPage" class="page">
+            <div class="header">
+                <h1>Nuevo Usuario</h1> <div class="header-right">
+                    <button class="btn-logout" onclick="showPage('mainPage')">Volver</button>
+                </div>
+            </div>
+
+            <div class="detail-container">
+                <div class="header-form">Crear Nuevo Usuario</div>
+
+                <form id="newUserForm" onsubmit="return handleNewUser(event)">
+                    <div class="form-section">
+                        <h3>Información Personal</h3>
+
+                        <div class="form-group">
+                            <label>Tipo de Usuario *</label>
+                            <select id="newUserTipoUsuario" required="required" onchange="toggleInternalFields()">
+                                <option value="">Seleccione...</option>
+                                <option value="1">Interno</option> 
+                                <option value="2">Cliente</option>
+                                <option value="3">Proveedor</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Nombre completo *</label>
+                            <input type="text" id="newUserName" required="required" />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Correo electrónico *</label>
+                            <input type="email" id="newUserEmail" required="required" />
+                        </div>
+
+                        <div class="form-group" style="margin-top: 15px; display: flex; align-items: flex-start;">
+                            <label style="flex: 1 0 200px; margin-right: 10px;">Contraseña *</label>
+                            <div class="form-group-custom" style="flex: 2 0 250px; margin-bottom: 0;">
+                                <input type="password" class="form-control" id="newUserPassword" minlength="6" required="required" style="width: 100%;" />
+                                <i class="fas fa-eye password-toggle" onclick="togglePassword('newUserPassword', this)"></i>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-top: 15px; display: flex; align-items: flex-start;">
+                            <label style="flex: 1 0 200px; margin-right: 10px;">Confirmar Contraseña *</label>
+                            <div class="form-group-custom" style="flex: 2 0 250px; margin-bottom: 0;">
+                                <input type="password" class="form-control" id="newUserConfirmPassword" minlength="6" required="required" style="width: 100%;" />
+                                <i class="fas fa-eye password-toggle" onclick="togglePassword('newUserConfirmPassword', this)"></i>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Teléfono</label>
+                            <input type="tel" id="newUserPhone" maxlength="20" />
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Estado y Acceso</h3>
+
+                        <div id="internalUserFields" style="display: none;">
+                            <div class="form-group">
+                                <label>Rol asignado *</label>
+                                <select id="newUserRole">
+                                    <option value="">Seleccione Rol...</option>
+                                    <option value="1">Gerente</option>
+                                    <option value="2">Jefe</option>
+                                    <option value="3">Operador</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Módulo Asignado</label>
+                                <select id="newUserModule">
+                                    <option value="">Ninguno / Sin Módulo</option>
+                                    <option value="ERP">ERP Central</option>
+                                    <option value="CRM">CRM</option>
+                                    <option value="PRV">Proveedores</option>
+                                    <option value="BCO">Módulo de Bancos</option>
+                                    <option value="Usuarios">Módulo de Usuarios</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Estado de cuenta *</label>
+                            <select id="newUserStatus" required="required">
+                                <option value="1">Activo</option>
+                                <option value="2">Inactivo</option>
+                                <option value="3">Bloqueado</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Dirección (opcional)</h3>
+                        <div class="form-group">
+                            <label>Dirección Completa</label>
+                            <textarea id="newUserAddress" rows="3" placeholder="Ej: Av. Reforma 123, Col. Centro, CDMX, CP 00000"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-success-custom">GUARDAR USUARIO</button>
+                        <button type="button" class="btn-secondary-custom" onclick="showPage('mainPage')">CANCELAR</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- PÁGINA DE TICKETS -->
+        <div id="ticketsPage" class="page">
+            <div class="header">
+                <h1>Tickets de Revisión</h1>
+                <div class="header-right">
+                    <span>Bienvenido, <strong id="currentUserNameTickets"></strong></span>
+                    <button class="btn-logout" onclick="showPage('mainPage')">Volver a Usuarios</button>
+                </div>
+            </div>
+
+            <div class="container-custom">
+                <h2>Listado de Solicitudes Pendientes</h2>
+
+                <div class="buttons-nav">
+                    <button class="filter" onclick="filterTickets('Todos')">Todos</button>
+                    <button class="filter" style="background-color: var(--color-advertencia);" onclick="filterTickets('Pendiente')">Pendientes</button>
+                    <button class="filter" style="background-color: var(--color-acento);" onclick="filterTickets('En Revisión')">En Revisión</button>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID Ticket</th>
+                            <th>Tipo de Cambio</th>
+                            <th>Módulo</th>
+                            <th>Fecha Solicitud</th>
+                            <th>Estado</th>
+                            <th>Usuario Solicitante</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ticketsTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- MODAL DE REVISIÓN -->
+        <div class="modal fade" id="reviewTicketModal" tabindex="-1" aria-labelledby="reviewTicketModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: var(--color-secundario); color: white;">
+                        <h5 class="modal-title" id="reviewTicketModalLabel"><i class="fas fa-ticket-alt"></i> Revisar Ticket: <span id="modalTicketId"></span></h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p><strong>Tipo de Cambio:</strong> <span id="modalTipoCambio"></span></p>
+                        <p><strong>Usuario Solicitante:</strong> <span id="modalUsuarioSolicitante"></span></p>
+
+                        <h6 class="mt-3" style="color: var(--color-acento);">Detalles de la Solicitud (Datos Propuestos)</h6>
+                        <div id="modalDetalles" style="background-color: var(--luz-bg); padding: 10px; border-radius: 5px; border: 1px solid #ddd;">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="button" class="btn btn-danger" id="modalRechazarBtn">
+                            <i class="fas fa-times"></i> Rechazar
+                        </button>
+                        <button type="button" class="btn btn-primary-custom" id="modalAprobarBtn">
+                            <i class="fas fa-edit"></i> Ir a Editar Usuario
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js" type="text/javascript"></script>
+        <script type="text/javascript">
+                        //<![CDATA[
+                        var users = [
+                            /* Aquí Java escribe los datos de la base de datos en tu JavaScript */
+                            <c:forEach var="u" items="${listaUsuarios}" varStatus="status">
+                            {
+                                id: "${u.id}", 
+                                name: "${u.nombre}",
+                                email: "${u.correo}",
+                                module: "${u.modulo != null ? u.modulo : 'Sin Módulo'}",
+                                phone: "${u.telefono}",
+                                status: "${u.estado}", 
+                                role: "${u.rol != null ? u.rol : 'Externo'}",
+                                regDate: "2024-01-01",
+                                lastSession: "2025-10-20"
+                            }${!status.last ? ',' : ''} 
+                            </c:forEach>
+                        ];
+
+                        var tickets = [
+                            {id: 'TK-001', tipo: 'Asignación Rol', modulo: 'ERP Central', fecha: '2025-10-22', estado: 'Pendiente', usuarioSolicitante: 'María (user@gmail.com)', detalles: {email: 'user@gmail.com', rol_propuesto: 'Jefe', justificacion: 'Promoción por desempeño'}},
+                            {id: 'TK-002', tipo: 'Edición Usuario', modulo: 'Portal de Proveedores', fecha: '2025-10-23', estado: 'En Revisión', usuarioSolicitante: 'Lucía (lucia@proveedor.com)', detalles: {email: 'lucia@proveedor.com', telefono: '5598765999', cambio: 'Actualización de contacto'}},
+                            {id: 'TK-003', tipo: 'Creación Usuario', modulo: 'Gestión de Clientes', fecha: '2025-10-19', estado: 'Aprobado', usuarioSolicitante: 'Gerente CRM', detalles: {email: 'nuevo.operador@tienda.com', cambio: 'Creación de nuevo usuario'}},
+                            {id: 'TK-004', tipo: 'Cambio Estado', modulo: 'ERP Central', fecha: '2025-10-14', estado: 'Rechazado', usuarioSolicitante: 'Ana (ana@empresa.com)', detalles: {email: 'usuario.inactivo@tienda.com', estado_propuesto: 'Activo', motivo_rechazo: 'Documentación incompleta'}},
+                            {id: 'TK-005', tipo: 'Edición Usuario', modulo: 'Gestión de Clientes', fecha: '2025-10-24', estado: 'Pendiente', usuarioSolicitante: 'Cliente 2', detalles: {email: 'usuario@gmail.com.mx', telefono: '5511223344', cambio: 'Actualización de número de cliente'}}
+                        ];
+
+                        var currentUser = null;
+
+                        var validCredentials = {
+                            'admin': 'admin123',
+                            'usuario': 'password',
+                            'KC': '12345'
+                        };
+
+                        function showPage(pageId) {
+                            var pages = document.querySelectorAll('.page');
+                            for (var i = 0; i < pages.length; i++) {
+                                pages[i].classList.remove('active');
+                            }
+                            document.getElementById(pageId).classList.add('active');
+
+                            if (pageId === 'mainPage') {
+                                loadUsers();
+                            } else if (pageId === 'ticketsPage') {
+                                if (currentUser) {
+                                    document.getElementById('currentUserNameTickets').textContent = currentUser.name;
+                                }
+                                loadTickets();
+                            } else if (pageId === 'newTicketPage') {
+                                if (currentUser) {
+                                    document.getElementById('currentUserName3').textContent = currentUser.name;
+                                    document.getElementById('newTicketUserEmail').value = currentUser.email;
+                                    populateNewTicketDropdowns();
+                                } else {
+                                    showAlert('Error de sesión. Intente iniciar sesión de nuevo.', 'danger');
+                                    showPage('loginPage');
+                                }
+                            }
+                        }
+
+                        function showAlert(message, type) {
+                            var alertDiv = document.createElement('div');
+                            alertDiv.className = 'alert alert-' + type + ' alert-dismissible fade show alert-custom';
+                            alertDiv.innerHTML = message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+                            document.body.appendChild(alertDiv);
+
+                            setTimeout(function () {
+                                alertDiv.remove();
+                            }, 4000);
+                        }
+
+                        function togglePassword(inputId, icon) {
+                            var input = document.getElementById(inputId);
+                            if (input.type === 'password') {
+                                input.type = 'text';
+                                icon.classList.remove('fa-eye');
+                                icon.classList.add('fa-eye-slash');
+                            } else {
+                                input.type = 'password';
+                                icon.classList.remove('fa-eye-slash');
+                                icon.classList.add('fa-eye');
+                            }
+                        }
+
+                        function handleLogin(e) {
+                            e.preventDefault();
+                            var username = document.getElementById('loginUsername').value;
+                            var password = document.getElementById('loginPassword').value;
+
+                            if (validCredentials[username] && validCredentials[username] === password) {
+                                currentUser = {name: username, email: username + '@sistema.com'};
+                                document.getElementById('currentUserName').textContent = currentUser.name;
+                                document.getElementById('currentUserName2').textContent = currentUser.name;
+                                showAlert('¡Inicio de sesión exitoso!', 'success');
+                                setTimeout(function () {
+                                    showPage('mainPage');
+                                }, 1000);
+                            } else {
+                                showAlert('Credenciales incorrectas. Intente nuevamente.', 'danger');
+                            }
+                            return false;
+                        }
+
+                        function handleRegister(e) {
+                            e.preventDefault();
+                            var email = document.getElementById('registerEmail').value;
+                            var name = document.getElementById('registerName').value;
+                            var phone = document.getElementById('registerPhone').value;
+                            var password = document.getElementById('registerPassword').value;
+                            var confirmPassword = document.getElementById('registerConfirmPassword').value;
+
+                            if (password !== confirmPassword) {
+                                showAlert('Las contraseñas no coinciden', 'warning');
+                                return false;
+                            }
+
+                            if (!/^[0-9]{10}$/.test(phone)) {
+                                showAlert('El teléfono debe tener 10 dígitos', 'warning');
+                                return false;
+                            }
+
+                            showAlert('¡Registro exitoso! Ya puede iniciar sesión', 'success');
+                            document.getElementById('registerForm').reset();
+                            setTimeout(function () {
+                                showPage('loginPage');
+                            }, 2000);
+
+                            return false;
+                        }
+
+                        function loadUsers() {
+                            var tbody = document.getElementById('usersTableBody');
+                            tbody.innerHTML = '';
+
+                            for (var i = 0; i < users.length; i++) {
+                                var user = users[i];
+                                var row = document.createElement('tr');
+                                row.innerHTML = '<td>' + user.name + '</td>' +
+                                        '<td>' + user.email + '</td>' +
+                                        '<td>' + user.module + '</td>' +
+                                        '<td>' + user.phone + '</td>' +
+                                        '<td><span class="badge ' + user.status.toLowerCase() + '">' + user.status + '</span></td>' +
+                                        '<td>' + user.role + '</td>' +
+                                        '<td class="actions">' +
+                                        '<button class="edit" onclick="editUser(' + user.id + ')">Editar</button>' +
+                                        '<button class="delete" onclick="deleteUser(' + user.id + ')">Eliminar</button>' +
+                                        '</td>';
+                                tbody.appendChild(row);
+                            }
+                        }
+
+                        function editUser(userId) {
+                            var user = null;
+                            for (var i = 0; i < users.length; i++) {
+                                if (users[i].id === userId) {
+                                    user = users[i];
+                                    break;
+                                }
+                            }
+
+                            if (user) {
+                                document.getElementById('editUserId').value = user.id;
+                                document.getElementById('editUserName').value = user.name;
+                                document.getElementById('editUserEmail').value = user.email;
+                                document.getElementById('editUserPhone').value = user.phone;
+                                document.getElementById('editUserModule').value = user.module || '';
+                                document.getElementById('editUserRole').value = user.role;
+                                document.getElementById('editUserStatus').value = user.status;
+                                document.getElementById('editUserRegDate').value = user.regDate || '';
+                                document.getElementById('editUserLastSession').value = user.lastSession || '';
+
+                                document.getElementById('editUserRole').style.backgroundColor = '';
+                                document.getElementById('editUserPhone').style.backgroundColor = '';
+                                document.getElementById('editUserStatus').style.backgroundColor = '';
+
+                                showPage('detailsPage');
+                            }
+                        }
+
+                        function handleEditUser(e) {
+                            e.preventDefault();
+
+                            var userId = document.getElementById('editUserId').value;
+                            var userIndex = -1;
+
+                            for (var i = 0; i < users.length; i++) {
+                                if (String(users[i].id) === String(userId)) {
+                                    userIndex = i;
+                                    break;
+                                }
+                            }
+
+                            if (userIndex !== -1) {
+                                users[userIndex].name = document.getElementById('editUserName').value;
+                                users[userIndex].email = document.getElementById('editUserEmail').value;
+                                users[userIndex].phone = document.getElementById('editUserPhone').value;
+                                users[userIndex].module = document.getElementById('editUserModule').value;
+                                users[userIndex].role = document.getElementById('editUserRole').value;
+                                users[userIndex].status = document.getElementById('editUserStatus').value;
+
+                                showAlert('Usuario actualizado exitosamente', 'success');
+                                setTimeout(function () {
+                                    showPage('mainPage');
+                                }, 1000);
+                            }
+
+                            return false;
+                        }
+
+                        function handleNewUser(e) {
+                            e.preventDefault();
+
+                            var userType = document.getElementById('newUserTipoUsuario').value;
+                            var userRole = document.getElementById('newUserRole').value;
+                            var password = document.getElementById('newUserPassword').value;
+                            var confirmPassword = document.getElementById('newUserConfirmPassword').value;
+                            var isInternal = userType === '1';
+
+                            // 1. Validar coincidencia de contraseñas
+                            if (password !== confirmPassword) {
+                                showAlert('Error: La contraseña y la confirmación no coinciden.', 'danger');
+                                return false;
+                            }
+
+                            // 2. Validación de Rol para usuarios Internos
+                            if (isInternal && !userRole) {
+                                showAlert('El Rol es obligatorio para un Usuario Interno.', 'warning');
+                                return false;
+                            }
+
+                            // 3. Crear el objeto de nuevo usuario (simulación)
+                            var newUser = {
+                                // Campos generados automáticamente por la BD (UUID, SERIAL, TIMESTAMPZ DEFAULT NOW())
+                                id: users.length + 1, // Simulación de UUID/ID
+                                regDate: new Date().toISOString().split('T')[0],
+                                lastSession: null,
+
+                                // Campos OBLIGATORIOS de entrada
+                                name: document.getElementById('newUserName').value, // nombre_completo 
+                                email: document.getElementById('newUserEmail').value, // correo_electronico 
+                                password: password, // contrasena [cite: 17]
+                                id_tipo_usuario: parseInt(userType), // id_tipo_usuario [cite: 17]
+                                id_estado_cuenta: parseInt(document.getElementById('newUserStatus').value), // id_estado_cuenta [cite: 17]
+
+                                // Campos opcionales de entrada
+                                phone: document.getElementById('newUserPhone').value || null, // telefono 
+                                address: document.getElementById('newUserAddress').value || null, // direccion 
+
+                                // Campos condicionales
+                                id_rol: isInternal ? parseInt(userRole) : null, // id_rol 
+                                id_modulo: document.getElementById('newUserModule').value || null, // id_modulo 
+
+                                // Propiedades de la lista de usuarios para la tabla de visualización (simulación)
+                                role: isInternal ? document.getElementById('newUserRole').options[document.getElementById('newUserRole').selectedIndex].text : 'N/A',
+                                status: document.getElementById('newUserStatus').options[document.getElementById('newUserStatus').selectedIndex].text,
+                                module: document.getElementById('newUserModule').value || 'N/A'
+                            };
+                            // La lógica real aquí sería enviar los datos a tu backend/API
+                            console.log('Datos a enviar al backend:', newUser);
+
+                            // Simulación de éxito
+                            users.push(newUser);
+                            showAlert('Usuario **' + newUser.name + '** creado exitosamente', 'success');
+                            document.getElementById('newUserForm').reset();
+                            setTimeout(function () {
+                                showPage('mainPage');
+                                toggleInternalFields(); // Restaurar el estado inicial
+                            }, 1000);
+
+                            return false;
+                        }
+
+                        function toggleInternalFields() {
+                            var tipoUsuarioSelect = document.getElementById('newUserTipoUsuario');
+                            var internalFieldsDiv = document.getElementById('internalUserFields');
+                            var rolSelect = document.getElementById('newUserRole');
+
+                            // El tipo de usuario 'Interno' tiene id_tipo_usuario = 1 [cite: 10]
+                            var isInternal = tipoUsuarioSelect.value === '1';
+
+                            if (isInternal) {
+                                internalFieldsDiv.style.display = 'block';
+                                // Rol es OBLIGATORIO para Internos según el CONSTRAINT de la BD [cite: 18]
+                                rolSelect.setAttribute('required', 'required');
+                            } else {
+                                internalFieldsDiv.style.display = 'none';
+                                rolSelect.removeAttribute('required');
+                                rolSelect.value = ""; // Limpiar valor
+                                document.getElementById('newUserModule').value = ""; // Limpiar módulo
+                            }
+                        }
+
+                        function deleteUser(userId) {
+                            if (confirm('¿Está seguro de eliminar este usuario?')) {
+                                var newUsers = [];
+                                for (var i = 0; i < users.length; i++) {
+                                    if (String(users[i].id) !== String(userId)) {
+                                        newUsers.push(users[i]);
+                                    }
+                                }
+                                users = newUsers;
+                                loadUsers();
+                                showAlert('Usuario eliminado exitosamente', 'info');
+                            }
+                        }
+
+                        function filterUsers() {
+                            var filterText = prompt('Ingrese el nombre o email a buscar:');
+                            if (filterText) {
+                                var filtered = [];
+                                for (var i = 0; i < users.length; i++) {
+                                    var user = users[i];
+                                    if (user.name.toLowerCase().indexOf(filterText.toLowerCase()) !== -1 ||
+                                            user.email.toLowerCase().indexOf(filterText.toLowerCase()) !== -1) {
+                                        filtered.push(user);
+                                    }
+                                }
+
+                                var tbody = document.getElementById('usersTableBody');
+                                tbody.innerHTML = '';
+
+                                if (filtered.length === 0) {
+                                    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No se encontraron resultados</td></tr>';
+                                } else {
+                                    for (var i = 0; i < filtered.length; i++) {
+                                        var user = filtered[i];
+                                        var row = document.createElement('tr');
+                                        row.innerHTML = '<td>' + user.name + '</td>' +
+                                                '<td>' + user.email + '</td>' +
+                                                '<td>' + user.module + '</td>' +
+                                                '<td>' + user.phone + '</td>' +
+                                                '<td><span class="badge ' + user.status.toLowerCase() + '">' + user.status + '</span></td>' +
+                                                '<td>' + user.role + '</td>' +
+                                                '<td class="actions">' +
+                                                '<button class="edit" onclick="editUser(' + user.id + ')">Editar</button>' +
+                                                '<button class="delete" onclick="deleteUser(' + user.id + ')">Eliminar</button>' +
+                                                '</td>';
+                                        tbody.appendChild(row);
+                                    }
+                                }
+                            }
+                        }
+
+                        function logout() {
+                            if (confirm('¿Está seguro de cerrar sesión?')) {
+                                currentUser = null;
+                                showAlert('Sesión cerrada correctamente', 'info');
+                                setTimeout(function () {
+                                    showPage('loginPage');
+                                    document.getElementById('loginForm').reset();
+                                }, 1000);
+                            }
+                        }
+
+                        var telInputs = document.querySelectorAll('input[type="tel"]');
+                        for (var i = 0; i < telInputs.length; i++) {
+                            telInputs[i].addEventListener('input', function (e) {
+                                this.value = this.value.replace(/[^0-9]/g, '');
+                            });
+                        }
+
+                        var nameInputs = document.querySelectorAll('#registerName, #newUserName, #editUserName');
+                        for (var i = 0; i < nameInputs.length; i++) {
+                            nameInputs[i].addEventListener('input', function (e) {
+                                this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '');
+                            });
+                        }
+
+                        var zipInput = document.getElementById('editZip');
+                        if (zipInput) {
+                            zipInput.addEventListener('input', function (e) {
+                                this.value = this.value.replace(/[^0-9]/g, '');
+                            });
+                        }
+
+                        function getTicketById(ticketId) {
+                            return tickets.find(function (t) {
+                                return t.id === ticketId;
+                            });
+                        }
+
+                        function handleNewTicket(e) {
+                            e.preventDefault();
+                            var module = document.getElementById('newTicketModule').value;
+                            var tipo = document.getElementById('newTicketTipoCambio').value;
+                            var detallesText = document.getElementById('newTicketDetalles').value;
+                            var userEmail = document.getElementById('newTicketUserEmail').value;
+
+                            var detalles;
+                            try {
+                                detalles = JSON.parse(detallesText);
+                            } catch (e) {
+                                detalles = {descripcion: detallesText};
+                            }
+
+                            detalles.email = userEmail;
+
+                            var newTicket = {
+                                id: 'TK-' + String(nextTicketId++).padStart(3, '0'),
+                                tipo: tipo,
+                                modulo: module,
+                                fecha: new Date().toISOString().split('T')[0],
+                                estado: 'Pendiente',
+                                usuarioSolicitante: currentUser.name + ' (' + currentUser.email + ')',
+                                userEmail: currentUser.email,
+                                detalles: detalles
+                            };
+
+                            tickets.push(newTicket);
+                            showAlert('Solicitud de cambio **' + newTicket.id + '** enviada con éxito.', 'success');
+                            document.getElementById('newTicketForm').reset();
+                            setTimeout(function () {
+                                showPage('ticketsPage');
+                            }, 1000);
+                            return false;
+                        }
+
+                        function loadTickets(ticketsData) {
+                            var tbody = document.getElementById('ticketsTableBody');
+                            tbody.innerHTML = '';
+
+                            var list = ticketsData || tickets;
+
+                            if (list.length === 0) {
+                                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No hay tickets para mostrar.</td></tr>';
+                                return;
+                            }
+
+                            for (var i = 0; i < list.length; i++) {
+                                var ticket = list[i];
+
+                                var statusClass = '';
+                                switch (ticket.estado) {
+                                    case 'Pendiente':
+                                        statusClass = 'pendiente';
+                                        break;
+                                    case 'Aprobado':
+                                        statusClass = 'aprobado';
+                                        break;
+                                    case 'Rechazado':
+                                        statusClass = 'rechazado';
+                                        break;
+                                    case 'En Revisión':
+                                        statusClass = 'revision';
+                                        break;
+                                    default:
+                                        statusClass = 'inactivo';
+                                }
+
+                                var buttonText = (ticket.estado === 'Pendiente' || ticket.estado === 'En Revisión') ? 'Revisar' : 'Ver';
+                                var buttonClass = (buttonText === 'Revisar') ? 'review' : 'edit';
+
+                                var row = document.createElement('tr');
+                                row.innerHTML = '<td>' + ticket.id + '</td>' +
+                                        '<td>' + ticket.tipo + '</td>' +
+                                        '<td>' + ticket.modulo + '</td>' +
+                                        '<td>' + ticket.fecha + '</td>' +
+                                        '<td><span class="badge ' + statusClass + '">' + ticket.estado + '</span></td>' +
+                                        '<td>' + ticket.usuarioSolicitante + '</td>' +
+                                        '<td class="actions">' +
+                                        '<button class="' + buttonClass + '" onclick="showReviewModal(\'' + ticket.id + '\')">' + buttonText + '</button>' +
+                                        '</td>';
+                                tbody.appendChild(row);
+                            }
+                        }
+
+                        function showReviewModal(ticketId) {
+                            var ticket = getTicketById(ticketId);
+                            if (!ticket) {
+                                showAlert('Error: Ticket no encontrado.', 'danger');
+                                return;
+                            }
+
+                            var modalElement = document.getElementById('reviewTicketModal');
+                            var modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+
+                            var isClosed = (ticket.estado === 'Aprobado' || ticket.estado === 'Rechazado');
+                            var isManualEdit = (ticket.tipo === 'Edición Usuario');
+
+                            document.getElementById('modalTicketId').textContent = ticket.id;
+                            document.getElementById('modalTipoCambio').textContent = ticket.tipo;
+                            document.getElementById('modalUsuarioSolicitante').textContent = ticket.usuarioSolicitante;
+
+                            var detallesDiv = document.getElementById('modalDetalles');
+                            detallesDiv.innerHTML = '';
+
+                            if (ticket.estado === 'Rechazado' && ticket.detalles.motivo_rechazo) {
+                                detallesDiv.innerHTML += '<p style="color: var(--color-peligro); font-weight: bold;">MOTIVO DE RECHAZO: ' + ticket.detalles.motivo_rechazo + '</p>';
+                            }
+
+                            for (var key in ticket.detalles) {
+                                if (!['email', 'id_usuario', 'motivo_rechazo', 'cambio', 'aprobado_por'].includes(key)) {
+                                    var highlightStyle = (isClosed && ticket.estado === 'Aprobado') ? 'style="color: var(--color-exito); font-weight: bold;"' : 'style="color: var(--texto-oscuro);"';
+                                    detallesDiv.innerHTML += '<p><strong>' + key.replace('_', ' ').toUpperCase() + ':</strong> <span ' + highlightStyle + '>' + ticket.detalles[key] + '</span></p>';
+                                }
+                            }
+
+                            var aprobarBtn = document.getElementById('modalAprobarBtn');
+                            var rejectBtn = document.getElementById('modalRechazarBtn');
+
+                            if (isClosed) {
+                                aprobarBtn.setAttribute('disabled', 'disabled');
+                                aprobarBtn.textContent = 'Ticket Cerrado (' + ticket.estado + ')';
+                                aprobarBtn.classList.remove('btn-success-custom');
+                                aprobarBtn.classList.add('btn-primary-custom');
+                                rejectBtn.style.display = 'none';
+                                aprobarBtn.onclick = function () {
+                                    modal.hide();
+                                };
+
+                            } else if (isManualEdit) {
+                                aprobarBtn.removeAttribute('disabled');
+                                aprobarBtn.innerHTML = '<i class="fas fa-edit"></i> Ir a Editar Usuario';
+                                aprobarBtn.classList.remove('btn-success-custom');
+                                aprobarBtn.classList.add('btn-primary-custom');
+                                rejectBtn.style.display = 'inline-block';
+
+                                aprobarBtn.onclick = function () {
+                                    modal.hide();
+                                    reviewAndEditUser(ticket.detalles.email, ticket.detalles, ticket.id);
+                                };
+                                rejectBtn.onclick = function () {
+                                    handleRejectTicket(ticketId, modal);
+                                };
+
+                            } else {
+                                aprobarBtn.removeAttribute('disabled');
+                                aprobarBtn.innerHTML = '<i class="fas fa-check"></i> Aprobar y Cerrar';
+                                aprobarBtn.classList.remove('btn-primary-custom');
+                                aprobarBtn.classList.add('btn-success-custom');
+                                rejectBtn.style.display = 'inline-block';
+
+                                aprobarBtn.onclick = function () {
+                                    handleApproveTicket(ticketId, modal);
+                                };
+                                rejectBtn.onclick = function () {
+                                    handleRejectTicket(ticketId, modal);
+                                };
+                            }
+
+                            modal.show();
+                        }
+
+                        function handleApproveTicket(ticketId, modalInstance) {
+                            if (!confirm('¿Confirma que desea APROBAR y cerrar el ticket ' + ticketId + '? Se aplicarán los cambios propuestos al usuario.')) {
+                                return;
+                            }
+
+                            var ticketIndex = tickets.findIndex(function (t) {
+                                return t.id === ticketId;
+                            });
+                            if (ticketIndex !== -1) {
+                                var ticket = tickets[ticketIndex];
+                                var userIndex = users.findIndex(function (u) {
+                                    return u.email === ticket.detalles.email;
+                                });
+
+                                if (userIndex !== -1) {
+                                    if (ticket.detalles.estado_propuesto) {
+                                        users[userIndex].status = ticket.detalles.estado_propuesto;
+                                    }
+                                    if (ticket.detalles.rol_propuesto) {
+                                        users[userIndex].role = ticket.detalles.rol_propuesto;
+                                    }
+                                    if (ticket.detalles.nombre_propuesto) {
+                                        users[userIndex].name = ticket.detalles.nombre_propuesto;
+                                    }
+
+                                    tickets[ticketIndex].estado = 'Aprobado';
+                                    tickets[ticketIndex].detalles.aprobado_por = currentUser.name;
+
+                                    showAlert('Ticket **' + ticketId + '** APROBADO y cambios aplicados al usuario **' + users[userIndex].name + '**.', 'success');
+                                } else {
+                                    showAlert('Ticket **' + ticketId + '** APROBADO, pero el usuario no se encontró para aplicar los cambios.', 'warning');
+                                    tickets[ticketIndex].estado = 'Aprobado';
+                                }
+
+                                modalInstance.hide();
+                                loadTickets();
+                            }
+                        }
+
+                        function handleRejectTicket(ticketId, modalInstance) {
+                            var rejectionReason = prompt('Ingrese el motivo del rechazo para el ticket ' + ticketId + ':');
+                            if (rejectionReason === null || rejectionReason.trim() === '') {
+                                showAlert('Rechazo cancelado o motivo no especificado.', 'info');
+                                return;
+                            }
+
+                            var ticketIndex = tickets.findIndex(function (t) {
+                                return t.id === ticketId;
+                            });
+                            if (ticketIndex !== -1) {
+                                tickets[ticketIndex].estado = 'Rechazado';
+                                tickets[ticketIndex].detalles.motivo_rechazo = rejectionReason.trim();
+
+                                showAlert('Ticket **' + ticketId + '** ha sido RECHAZADO. Motivo: ' + rejectionReason, 'danger');
+                                modalInstance.hide();
+                                loadTickets();
+                            } else {
+                                showAlert('Error al rechazar: Ticket no encontrado en la lista.', 'danger');
+                            }
+                        }
+
+                        function reviewAndEditUser(userEmail, proposedChanges, ticketId) {
+                            var userToEdit = users.find(function (u) {
+                                return u.email === userEmail;
+                            });
+
+                            if (userToEdit) {
+                                editUser(userToEdit.id);
+
+                                var highlightStyle = 'rgba(128, 255, 128, 0.2)';
+
+                                if (proposedChanges.rol_propuesto) {
+                                    document.getElementById('editUserRole').value = proposedChanges.rol_propuesto;
+                                    document.getElementById('editUserRole').style.backgroundColor = highlightStyle;
+                                }
+                                if (proposedChanges.telefono) {
+                                    document.getElementById('editUserPhone').value = proposedChanges.telefono;
+                                    document.getElementById('editUserPhone').style.backgroundColor = highlightStyle;
+                                }
+                                if (proposedChanges.estado_propuesto) {
+                                    document.getElementById('editUserStatus').value = proposedChanges.estado_propuesto;
+                                    document.getElementById('editUserStatus').style.backgroundColor = highlightStyle;
+                                }
+                                if (proposedChanges.nombre_propuesto) {
+                                    document.getElementById('editUserName').value = proposedChanges.nombre_propuesto;
+                                    document.getElementById('editUserName').style.backgroundColor = highlightStyle;
+                                }
+
+                                showAlert('Revise los campos resaltados y presione "ACTUALIZAR USUARIO" para aplicar el cambio del ticket: **' + ticketId + '**', 'warning');
+                            } else {
+                                showAlert('No se encontró el usuario: ' + userEmail + ' para el ticket: ' + ticketId, 'danger');
+                            }
+                        }
+
+                        function filterTickets(filterValue) {
+                            if (typeof filterValue !== 'string') {
+                                filterValue = prompt('Ingrese el ID, Módulo o Solicitante a buscar:');
+                            }
+
+                            if (filterValue) {
+                                var lowerFilter = filterValue.toLowerCase().trim();
+                                var filtered;
+                                var predefinedStates = ['Todos', 'Pendiente', 'En Revisión', 'Aprobado', 'Rechazado'];
+                                if (predefinedStates.includes(filterValue)) {
+
+                                    if (filterValue === 'Todos') {
+                                        filtered = tickets;
+                                    } else {
+                                        filtered = tickets.filter(function (t) {
+                                            return t.estado === filterValue;
+                                        });
+                                    }
+                                } else {
+                                    filtered = tickets.filter(function (ticket) {
+                                        return ticket.id.toLowerCase().indexOf(lowerFilter) !== -1 ||
+                                                ticket.modulo.toLowerCase().indexOf(lowerFilter) !== -1 ||
+                                                ticket.usuarioSolicitante.toLowerCase().indexOf(lowerFilter) !== -1 ||
+                                                ticket.tipo.toLowerCase().indexOf(lowerFilter) !== -1;
+                                    });
+                                }
+
+                                loadTickets(filtered);
+                                if (filtered.length === 0) {
+                                    showAlert('No se encontraron tickets con el criterio "' + filterValue + '".', 'warning');
+                                } else {
+                                    showAlert('Filtrando tickets por: ' + filterValue, 'info');
+                                }
+
+                            } else {
+                                loadTickets();
+                            }
+                        }
+                        //]]>
+        </script>
+    </body>
+</html>
