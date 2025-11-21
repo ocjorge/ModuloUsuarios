@@ -16,4 +16,23 @@ public class UsuarioService {
         // Hacemos una consulta JPQL (parecido a SQL pero con clases)
         return em.createQuery("SELECT u FROM UsuarioInfo u", UsuarioInfo.class).getResultList();
     }
+
+    public UsuarioInfo login(String user, String password) {
+        try {
+            String sql = "SELECT id_usuario FROM usuarios WHERE username = ?1 AND contrasena = ?2";
+
+            Object resultado = em.createNativeQuery(sql)
+                    .setParameter(1, user) // Pasamos el usuario
+                    .setParameter(2, password) // Pasamos la contraseña
+                    .getSingleResult();
+
+            if (resultado != null) {
+                java.util.UUID id = (java.util.UUID) resultado;
+                return em.find(UsuarioInfo.class, id);
+            }
+            return null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

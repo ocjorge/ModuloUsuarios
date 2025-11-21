@@ -423,7 +423,7 @@
     <body>
 
         <!-- PÁGINA DE LOGIN -->
-        <div id="loginPage" class="page active">
+        <div id="loginPage" class="page ${empty sessionScope.usuarioLogueado ? 'active' : ''}">
             <div class="header">
                 <h1>Sistema de Gestión de Usuarios</h1>
             </div>
@@ -487,7 +487,7 @@
         </div>
 
         <!-- PÁGINA PRINCIPAL -->
-        <div id="mainPage" class="page">
+        <div id="mainPage" class="page ${not empty sessionScope.usuarioLogueado ? 'active' : ''}">
             <div class="header">
                 <h1>Usuarios</h1>
                 <div class="header-right">
@@ -816,20 +816,20 @@
         <script type="text/javascript">
                         //<![CDATA[
                         var users = [
-                            /* Aquí Java escribe los datos de la base de datos en tu JavaScript */
-                            <c:forEach var="u" items="${listaUsuarios}" varStatus="status">
-                            {
-                                id: "${u.id}", 
+                                /* Aquí Java escribe los datos de la base de datos en tu JavaScript */
+            <c:forEach var="u" items="${listaUsuarios}" varStatus="status">
+                        {
+                        id: "${u.id}",
                                 name: "${u.nombre}",
                                 email: "${u.correo}",
                                 module: "${u.modulo != null ? u.modulo : 'Sin Módulo'}",
                                 phone: "${u.telefono}",
-                                status: "${u.estado}", 
+                                status: "${u.estado}",
                                 role: "${u.rol != null ? u.rol : 'Externo'}",
                                 regDate: "2024-01-01",
                                 lastSession: "2025-10-20"
-                            }${!status.last ? ',' : ''} 
-                            </c:forEach>
+                        }${!status.last ? ',' : ''}
+            </c:forEach>
                         ];
 
                         var tickets = [
@@ -841,6 +841,29 @@
                         ];
 
                         var currentUser = null;
+
+                        /* --- CÓDIGO NUEVO PARA MANTENER LA SESIÓN --- */
+            <c:if test="${not empty sessionScope.usuarioLogueado}">
+                        // Recuperamos los datos que Java guardó en la sesión
+                        currentUser = {
+                            name: "${sessionScope.usuarioLogueado.nombre}",
+                            email: "${sessionScope.usuarioLogueado.correo}"
+                        };
+
+                        // Llenamos los textos de bienvenida
+                        document.addEventListener("DOMContentLoaded", function () {
+                            if (document.getElementById('currentUserName'))
+                                document.getElementById('currentUserName').textContent = currentUser.name;
+                            if (document.getElementById('currentUserName2'))
+                                document.getElementById('currentUserName2').textContent = currentUser.name;
+                            if (document.getElementById('currentUserNameTickets'))
+                                document.getElementById('currentUserNameTickets').textContent = currentUser.name;
+
+                            // IMPORTANTE: Cargar la tabla de usuarios automáticamente
+                            loadUsers();
+                        });
+            </c:if>
+                        /* --------------------------------------------- */
 
                         var validCredentials = {
                             'admin': 'admin123',
@@ -900,20 +923,46 @@
 
                         function handleLogin(e) {
                             e.preventDefault();
-                            var username = document.getElementById('loginUsername').value;
-                            var password = document.getElementById('loginPassword').value;
 
-                            if (validCredentials[username] && validCredentials[username] === password) {
-                                currentUser = {name: username, email: username + '@sistema.com'};
-                                document.getElementById('currentUserName').textContent = currentUser.name;
-                                document.getElementById('currentUserName2').textContent = currentUser.name;
-                                showAlert('¡Inicio de sesión exitoso!', 'success');
-                                setTimeout(function () {
-                                    showPage('mainPage');
-                                }, 1000);
-                            } else {
-                                showAlert('Credenciales incorrectas. Intente nuevamente.', 'danger');
-                            }
+                            // Obtenemos lo que el usuario escribió
+                            var usernameVal = document.getElementById('loginUsername').value;
+                            var passwordVal = document.getElementById('loginPassword').value;
+
+                            // Enviamos los datos al Servlet "/login" usando AJAX (sin recargar)
+                            fetch('login', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                },
+                                // Aquí se envían las variables al Servlet
+                                body: 'username=' + encodeURIComponent(usernameVal) + '&password=' + encodeURIComponent(passwordVal)
+                            })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.status === 'ok') {
+                                            // SI EL LOGIN ES CORRECTO:
+                                            currentUser = {name: data.nombre, email: usernameVal};
+
+                                            // Actualizamos los textos de bienvenida en la interfaz
+                                            document.getElementById('currentUserName').textContent = currentUser.name;
+                                            document.getElementById('currentUserName2').textContent = currentUser.name;
+
+                                            showAlert('¡Bienvenido ' + data.nombre + '!', 'success');
+
+                                            // Esperamos 1 segundo y mostramos la lista de usuarios
+                                            setTimeout(function () {
+                                                window.location.href = 'usuarios'; // Redirige al Servlet principal
+                                            }, 1000);
+                                        } else {
+                                            // SI FALLA:
+                                            showAlert(data.message, 'danger');
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Error:', error);
+                                        showAlert('Error de conexión con el servidor', 'danger');
+                                    });
+
                             return false;
                         }
 
