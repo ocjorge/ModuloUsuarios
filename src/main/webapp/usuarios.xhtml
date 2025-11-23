@@ -1,59 +1,81 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
 <h:head>
     <title>Usuarios</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
 </h:head>
+
 <h:body style="background-color:#f0f2f5;">
+
 <f:metadata>
     <f:viewAction action="#{usuarioBean.verificarSesion}" />
 </f:metadata>
+
 <div class="container py-4">
+
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2>Usuarios</h2>
         <div>
-            <h:outputText value="Bienvenido, #{usuarioBean.sessionManager.usuarioActual.nombreCompleto}" />
-            <h:commandLink value="Cerrar sesión" actionListener="#{usuarioBean.sessionManager.cerrarSesion}" styleClass="btn btn-link text-danger ms-3"/>
+            <h:outputText value="Bienvenido, #{sessionManager.usuarioActual.nombreCompleto}" />
+            <h:commandLink value="Cerrar sesión"
+                           action="#{sessionManager.cerrarSesion}"
+                           styleClass="btn btn-link text-danger ms-3"/>
         </div>
     </div>
+
     <div class="mb-3">
-        <h:link outcome="usuario-form.xhtml" styleClass="btn btn-success">Nuevo usuario</h:link>
+        <h:link outcome="usuario-form.xhtml" styleClass="btn btn-success">
+            Nuevo usuario
+        </h:link>
     </div>
+
     <h:messages globalOnly="true"/>
+
     <h:form>
         <table class="table table-striped table-hover">
             <thead class="table-primary">
-            <tr>
-                <th>Usuario</th>
-                <th>Nombre</th>
-                <th>Correo</th>
-                <th>Rol</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-            </tr>
-            </thead>
-            <tbody>
-            <ui:repeat value="#{usuarioBean.usuarios}" var="u" xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
                 <tr>
-                    <td><h:outputText value="#{u.username}"/></td>
-                    <td><h:outputText value="#{u.nombreCompleto}"/></td>
-                    <td><h:outputText value="#{u.correoElectronico}"/></td>
-                    <td><h:outputText value="#{u.rolInterno != null ? u.rolInterno.nombre : 'N/A'}"/></td>
-                    <td><h:outputText value="#{u.estadoCuenta.nombre}"/></td>
-                    <td>
-                        <h:link outcome="usuario-form.xhtml" styleClass="btn btn-sm btn-primary" includeViewParams="true">
-                            <f:param name="id" value="#{u.id}" />Editar
-                        </h:link>
-                        <h:commandButton value="Eliminar" styleClass="btn btn-sm btn-danger ms-2" actionListener="#{usuarioBean.eliminar(u.id)}"
-                                         onclick="return confirm('¿Eliminar usuario?');"/>
-                    </td>
+                    <th>Usuario</th>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th>Rol</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
                 </tr>
-            </ui:repeat>
+            </thead>
+
+            <tbody>
+                <ui:repeat value="#{usuarioBean.usuarios}" var="u">
+                    <tr>
+                        <td><h:outputText value="#{u.username}"/></td>
+                        <td><h:outputText value="#{u.nombreCompleto}"/></td>
+                        <td><h:outputText value="#{u.correoElectronico}"/></td>
+                        <td><h:outputText value="#{u.rolInterno != null ? u.rolInterno.nombre : 'N/A'}"/></td>
+                        <td><h:outputText value="#{u.estadoCuenta.nombre}"/></td>
+                        <td>
+                            <h:link outcome="usuario-form.xhtml"
+                                    styleClass="btn btn-sm btn-primary"
+                                    includeViewParams="true">
+                                <f:param name="id" value="#{u.id}" />
+                                Editar
+                            </h:link>
+
+                            <h:commandButton value="Eliminar"
+                                             styleClass="btn btn-sm btn-danger ms-2"
+                                             action="#{usuarioBean.eliminar(u.id)}"
+                                             onclick="return confirm('¿Eliminar usuario?');"/>
+                        </td>
+                    </tr>
+                </ui:repeat>
             </tbody>
         </table>
     </h:form>
 </div>
+
 </h:body>
 </html>

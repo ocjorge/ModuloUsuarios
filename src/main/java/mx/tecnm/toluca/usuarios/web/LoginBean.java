@@ -22,30 +22,25 @@ public class LoginBean {
     @Inject
     private SessionManager sessionManager;
 
-    public String getUsername() {
-        return username;
-    }
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void login() throws IOException {
+    public String login() {
         Usuario usuario = usuarioService.autenticar(username, password);
+
         if (usuario != null) {
-            sessionManager.setUsuarioActual(usuario);
-            FacesContext.getCurrentInstance().getExternalContext().redirect("usuarios.xhtml");
+            sessionManager.establecerSesion(usuario);
+
+            // Redirige correctamente
+            return "dashboard.xhtml?faces-redirect=true";
         } else {
             FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Credenciales inválidas", ""));
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                                 "Credenciales inválidas", ""));
+            return null;
         }
     }
 }

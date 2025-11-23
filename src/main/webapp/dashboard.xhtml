@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+<h:head>
+    <title>Panel Principal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css"/>
+</h:head>
+
+<h:body style="background-color:#eef1f5;">
+
+<f:metadata>
+    <f:viewAction action="#{usuarioBean.verificarSesion}" />
+</f:metadata>
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between mb-3">
+        <h2>Dashboard</h2>
+        <h:commandLink value="Cerrar sesión"
+                       actionListener="#{loginBean.sessionManager.cerrarSesion}"
+                       styleClass="btn btn-danger"/>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h4>Bienvenido, #{sessionManager.usuarioActual.nombreCompleto}</h4>
+            <p><b>Rol:</b> #{sessionManager.usuarioActual.rolInterno != null ?
+                sessionManager.usuarioActual.rolInterno.nombre : 'Sin rol'}</p>
+
+            <p><b>Última sesión:</b> #{sessionManager.usuarioActual.ultimaSesion}</p>
+        </div>
+    </div>
+
+    <div class="row mt-4 g-3">
+
+        <div class="col-md-4">
+            <a href="usuarios.xhtml" class="text-decoration-none">
+                <div class="card p-3 shadow-sm text-center">
+                    <h4>Gestión de Usuarios</h4>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <a href="#" class="text-decoration-none">
+                <div class="card p-3 shadow-sm text-center">
+                    <h4>Reportes</h4>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <a href="#" class="text-decoration-none">
+                <div class="card p-3 shadow-sm text-center">
+                    <h4>Configuración</h4>
+                </div>
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+</h:body>
+</html>
