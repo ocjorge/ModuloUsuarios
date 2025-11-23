@@ -6,32 +6,76 @@
 
 <h:head>
     <title>Usuarios</title>
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
+
+    <style>
+        body { background-color:#f0f2f5; }
+        .topbar {
+            background:#275fa7;
+            color:white;
+            padding:12px 24px;
+            font-size:20px;
+            font-weight:bold;
+        }
+        .btn-dashboard{
+            background:#275fa7 !important;
+            color:white !important;
+            border-radius:6px;
+            padding:6px 14px;
+        }
+        .btn-logout{
+            background:#c0392b !important;
+            color:white !important;
+            border-radius:6px;
+            padding:6px 14px;
+        }
+        .estado-activo{
+            padding:4px 10px;
+            background:#27ae60;
+            color:white;
+            border-radius:6px;
+            font-size:13px;
+        }
+        .estado-inactivo{
+            padding:4px 10px;
+            background:#c0392b;
+            color:white;
+            border-radius:6px;
+            font-size:13px;
+        }
+    </style>
 </h:head>
 
-<h:body style="background-color:#f0f2f5;">
+<h:body>
 
-<f:metadata>
-    <f:viewAction action="#{usuarioBean.verificarSesion}" />
-</f:metadata>
+<!-- ===================== TOP BAR ========================== -->
+<div class="topbar d-flex justify-content-between align-items-center">
+    Usuarios
+    <div>
+        <h:form style="display:inline;">
+            <span style="margin-right:18px;">Bienvenido, #{sessionManager.usuarioActual.nombreCompleto}</span>
+            <h:commandLink value="Dashboard" action="dashboard.xhtml?faces-redirect=true" styleClass="btn-dashboard"/>
+            <h:commandLink value="Cerrar Sesión" actionListener="#{sessionManager.cerrarSesion}" styleClass="btn-logout ms-2"/>
+        </h:form>
+    </div>
+</div>
 
+<!-- ===================== CONTENIDO ========================== -->
 <div class="container py-4">
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>Usuarios</h2>
-        <div>
-            <h:outputText value="Bienvenido, #{sessionManager.usuarioActual.nombreCompleto}" />
-            <h:commandLink value="Cerrar sesión"
-                           action="#{sessionManager.cerrarSesion}"
-                           styleClass="btn btn-link text-danger ms-3"/>
-        </div>
-    </div>
+    <div class="mb-3 d-flex gap-3">
 
-    <div class="mb-3">
         <h:link outcome="usuario-form.xhtml" styleClass="btn btn-success">
-            Nuevo usuario
+            NUEVO USUARIO
         </h:link>
+
+        <h:link outcome="tickets.xhtml" styleClass="btn btn-dark">
+            TICKETS PENDIENTES
+        </h:link>
+
+        <h:form style="display:inline;">
+            <h:commandButton value="🔍 FILTRAR" styleClass="btn btn-primary"/>
+        </h:form>
     </div>
 
     <h:messages globalOnly="true"/>
@@ -43,35 +87,42 @@
                     <th>Usuario</th>
                     <th>Nombre</th>
                     <th>Correo</th>
-                    <th>Rol</th>
+                    <th>Módulo</th>
+                    <th>Teléfono</th>
                     <th>Estado</th>
+                    <th>Rol</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
 
             <tbody>
-                <ui:repeat value="#{usuarioBean.usuarios}" var="u">
-                    <tr>
-                        <td><h:outputText value="#{u.username}"/></td>
-                        <td><h:outputText value="#{u.nombreCompleto}"/></td>
-                        <td><h:outputText value="#{u.correoElectronico}"/></td>
-                        <td><h:outputText value="#{u.rolInterno != null ? u.rolInterno.nombre : 'N/A'}"/></td>
-                        <td><h:outputText value="#{u.estadoCuenta.nombre}"/></td>
-                        <td>
-                            <h:link outcome="usuario-form.xhtml"
-                                    styleClass="btn btn-sm btn-primary"
-                                    includeViewParams="true">
-                                <f:param name="id" value="#{u.id}" />
-                                Editar
-                            </h:link>
+            <ui:repeat value="#{usuarioBean.usuarios}" var="u">
+                <tr>
+                    <td>#{u.username}</td>
+                    <td>#{u.nombreCompleto}</td>
+                    <td>#{u.correoElectronico}</td>
+                    <td>#{u.modulo != null ? u.modulo.nombre : 'N/A'}</td>
+                    <td>#{u.telefono}</td>
+                    <td>
+                        <span class="#{u.estadoCuenta.nombre eq 'Activo' ? 'estado-activo' : 'estado-inactivo'}">
+                            #{u.estadoCuenta.nombre}
+                        </span>
+                    </td>
+                    <td>#{u.rolInterno != null ? u.rolInterno.nombre : 'N/A'}</td>
 
-                            <h:commandButton value="Eliminar"
-                                             styleClass="btn btn-sm btn-danger ms-2"
-                                             action="#{usuarioBean.eliminar(u.id)}"
-                                             onclick="return confirm('¿Eliminar usuario?');"/>
-                        </td>
-                    </tr>
-                </ui:repeat>
+                    <td>
+                        <h:link outcome="usuario-form.xhtml" styleClass="btn btn-sm btn-primary" includeViewParams="true">
+                            <f:param name="id" value="#{u.id}" />
+                            EDITAR
+                        </h:link>
+
+                        <h:commandButton value="ELIMINAR"
+                                         styleClass="btn btn-sm btn-danger ms-2"
+                                         actionListener="#{usuarioBean.eliminar(u.id)}"
+                                         onclick="return confirm('¿Eliminar usuario?');"/>
+                    </td>
+                </tr>
+            </ui:repeat>
             </tbody>
         </table>
     </h:form>

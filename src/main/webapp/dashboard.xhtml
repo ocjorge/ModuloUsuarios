@@ -4,63 +4,88 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core">
 
 <h:head>
-    <title>Panel Principal</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css"/>
+    <title>Dashboard</title>
+    <link rel="stylesheet" 
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
 </h:head>
 
-<h:body style="background-color:#eef1f5;">
+<h:body style="background-color:#f0f2f5;">
 
 <f:metadata>
     <f:viewAction action="#{usuarioBean.verificarSesion}" />
 </f:metadata>
 
+<!-- NAVBAR SUPERIOR -->
+<nav class="navbar navbar-dark" style="background-color:#225ca8;">
+    <div class="container-fluid">
+        <span class="navbar-brand mb-0 h1">Panel Principal</span>
+
+        <div class="d-flex align-items-center">
+            <span class="text-white me-3">
+                Bienvenido, #{usuarioBean.sessionManager.usuarioActual.nombreCompleto}
+            </span>
+
+            <h:form>
+                <h:commandLink value="Cerrar Sesión" 
+                               action="#{usuarioBean.sessionManager.cerrarSesion}"
+                               styleClass="btn btn-danger"/>
+            </h:form>
+        </div>
+    </div>
+</nav>
+
+<!-- CONTENIDO -->
 <div class="container py-4">
 
-    <div class="d-flex justify-content-between mb-3">
-        <h2>Dashboard</h2>
-        <h:commandLink value="Cerrar sesión"
-                       actionListener="#{loginBean.sessionManager.cerrarSesion}"
-                       styleClass="btn btn-danger"/>
-    </div>
+    <div class="row g-4">
 
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <h4>Bienvenido, #{sessionManager.usuarioActual.nombreCompleto}</h4>
-            <p><b>Rol:</b> #{sessionManager.usuarioActual.rolInterno != null ?
-                sessionManager.usuarioActual.rolInterno.nombre : 'Sin rol'}</p>
-
-            <p><b>Última sesión:</b> #{sessionManager.usuarioActual.ultimaSesion}</p>
-        </div>
-    </div>
-
-    <div class="row mt-4 g-3">
-
+        <!-- Tarjeta 1 -->
         <div class="col-md-4">
-            <a href="usuarios.xhtml" class="text-decoration-none">
-                <div class="card p-3 shadow-sm text-center">
-                    <h4>Gestión de Usuarios</h4>
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Gestión de Usuarios</h5>
+                    <p class="card-text">Crear, editar o eliminar usuarios del sistema.</p>
+
+                    <h:link outcome="usuarios.xhtml" styleClass="btn btn-primary">
+                        Ir a Usuarios
+                    </h:link>
                 </div>
-            </a>
+            </div>
         </div>
 
+        <!-- Tarjeta 2 -->
         <div class="col-md-4">
-            <a href="#" class="text-decoration-none">
-                <div class="card p-3 shadow-sm text-center">
-                    <h4>Reportes</h4>
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Tickets Pendientes</h5>
+                    <p class="card-text">Revisar solicitudes pendientes del sistema.</p>
+
+                    <h:form>
+                        <h:commandButton 
+                            value="Ver Tickets"
+                            action="tickets?faces-redirect=true"
+                            styleClass="btn btn-secondary" />
+                    </h:form>
+
                 </div>
-            </a>
+            </div>
         </div>
 
+        <!-- Tarjeta 3 -->
         <div class="col-md-4">
-            <a href="#" class="text-decoration-none">
-                <div class="card p-3 shadow-sm text-center">
-                    <h4>Configuración</h4>
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Reportes</h5>
+                    <p class="card-text">Ver estadísticas, gráficas y reportes.</p>
+
+                    <h:link outcome="reportes.xhtml" styleClass="btn btn-info text-white">
+                        Ir a Reportes
+                    </h:link>
                 </div>
-            </a>
+            </div>
         </div>
 
     </div>
-
 </div>
 
 </h:body>

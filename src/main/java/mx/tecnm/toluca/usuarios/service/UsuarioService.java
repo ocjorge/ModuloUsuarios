@@ -165,4 +165,8 @@ System.out.println(">>> PRUEBA LOCAL = " +
             em.remove(usuario);
         }
     }
+    
+    public Object buscarEntidadGenerica(UUID id) {
+    return em.find(Object.class, id); 
+}
 }
