@@ -4,105 +4,130 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core">
 
 <h:head>
-    <title>Reportes</title>
+    <title>Reportes del Sistema</title>
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
+
+    <style>
+        body { background-color:#f2f4f8; }
+        .topbar {
+            background:#225ca8;
+            color:white;
+            padding:14px 24px;
+            font-size:22px;
+            font-weight:bold;
+        }
+        .card-mini {
+            border-left:5px solid #225ca8;
+        }
+    </style>
 </h:head>
 
-<h:body style="background-color:#f0f2f5;">
+<h:body>
 
-<f:metadata>
-    <f:viewAction action="#{usuarioBean.verificarSesion}" />
-</f:metadata>
+<!-- TOPBAR -->
+<div class="topbar d-flex justify-content-between align-items-center">
+    Reportes del Sistema
+    <h:form>
+        <h:commandLink value="Dashboard"
+                       action="dashboard.xhtml?faces-redirect=true"
+                       styleClass="btn btn-light"/>
+    </h:form>
+</div>
 
-<!-- NAVBAR SUPERIOR -->
-<nav class="navbar navbar-dark" style="background-color:#225ca8;">
-    <div class="container-fluid">
+<div class="container my-4">
 
-        <span class="navbar-brand mb-0 h1">Reportes del Sistema</span>
+    <f:metadata>
+        <f:viewAction action="#{reportesBean.verificarSesion}" />
+        <f:viewAction action="#{reportesBean.init}" />
+    </f:metadata>
 
-        <div class="d-flex align-items-center text-white me-2">
-            Bienvenido, #{usuarioBean.sessionManager.usuarioActual.nombreCompleto}
-
-            <h:form>
-                <h:commandLink value="Cerrar Sesión"
-                               actionListener="#{usuarioBean.sessionManager.cerrarSesion}"
-                               styleClass="btn btn-danger ms-3"/>
-            </h:form>
-        </div>
-    </div>
-</nav>
-
-<!-- CONTENIDO PRINCIPAL -->
-<div class="container py-4">
-
-    <div class="mb-3">
-        <h:link outcome="dashboard.xhtml" styleClass="btn btn-secondary">
-            ← Regresar al Dashboard
-        </h:link>
-    </div>
-
-    <h3 class="mb-4">Panel de Reportes</h3>
-
+    <!-- RESUMEN -->
     <div class="row g-4">
 
-        <!-- Reporte 1 -->
         <div class="col-md-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Usuarios registrados</h5>
-                    <p class="card-text">Visualiza el total de usuarios activos en el sistema.</p>
-                    <div class="display-6 text-primary text-center">--</div>
-                </div>
+            <div class="card card-mini p-3 shadow-sm">
+                <h5>Total Accesos</h5>
+                <h3 class="text-primary">#{reportesBean.totalAccesos}</h3>
             </div>
         </div>
 
-        <!-- Reporte 2 -->
         <div class="col-md-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Últimos accesos</h5>
-                    <p class="card-text">Listado de usuarios que han iniciado sesión recientemente.</p>
-                    <div class="text-muted text-center">Pendiente de datos...</div>
-                </div>
+            <div class="card card-mini p-3 shadow-sm">
+                <h5>Cambios Realizados</h5>
+                <h3 class="text-success">#{reportesBean.totalAcciones}</h3>
             </div>
         </div>
 
-        <!-- Reporte 3 -->
         <div class="col-md-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Actividad general</h5>
-                    <p class="card-text">Resumen de movimientos recientes del sistema.</p>
-                    <div class="text-muted text-center">En desarrollo...</div>
-                </div>
+            <div class="card card-mini p-3 shadow-sm">
+                <h5>Tickets Revisados</h5>
+                <h3 class="text-danger">#{reportesBean.totalTickets}</h3>
             </div>
         </div>
 
     </div>
 
+    <hr class="my-4"/>
 
-    <!-- Sección de tablas -->
-    <div class="card mt-4 shadow-sm">
-        <div class="card-body">
-            <h4 class="card-title">Tabla de detalle</h4>
-            <p class="text-muted">Aquí podrás integrar tablas o gráficos más avanzados.</p>
+    <!-- ACCESOS -->
+    <h2 class="mb-3">Historial de Accesos</h2>
 
-            <table class="table table-bordered table-striped mt-3">
-                <thead class="table-primary">
-                <tr>
-                    <th>ID</th>
-                    <th>Descripción</th>
-                    <th>Fecha</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr><td colspan="3" class="text-center text-muted">Sin datos por el momento</td></tr>
-                </tbody>
-            </table>
+    <h:dataTable value="#{reportesBean.accesos}"
+                 var="a"
+                 styleClass="table table-hover table-bordered">
 
-        </div>
-    </div>
+        <h:column>
+            <f:facet name="header">Usuario</f:facet>
+            #{a.usuario.nombreCompleto}
+        </h:column>
+
+        <h:column>
+            <f:facet name="header">Evento</f:facet>
+            #{a.tipoEvento.nombre}
+        </h:column>
+
+        <h:column>
+            <f:facet name="header">Fecha</f:facet>
+            <h:outputText value="#{a.fechaHora}">
+                <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+            </h:outputText>
+        </h:column>
+
+    </h:dataTable>
+
+    <hr/>
+
+    <!-- ACCIONES -->
+    <h2 class="mb-3">Acciones Realizadas</h2>
+
+    <h:dataTable value="#{reportesBean.acciones}"
+                 var="ac"
+                 styleClass="table table-hover table-bordered">
+
+        <h:column>
+            <f:facet name="header">Usuario</f:facet>
+            #{ac.usuario.nombreCompleto}
+        </h:column>
+
+        <h:column>
+            <f:facet name="header">Acción</f:facet>
+            #{ac.accion.nombre}
+        </h:column>
+
+        <h:column>
+            <f:facet name="header">Registro Afectado</f:facet>
+            #{ac.registroAfectado}
+        </h:column>
+
+        <h:column>
+            <f:facet name="header">Fecha</f:facet>
+            <h:outputText value="#{ac.fechaHora}">
+                <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+            </h:outputText>
+        </h:column>
+
+    </h:dataTable>
 
 </div>
 
