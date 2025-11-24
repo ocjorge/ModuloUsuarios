@@ -1,4 +1,4 @@
-
+package mx.tecnm.toluca.usuarios.web;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
@@ -26,13 +26,15 @@ public class UsuarioService {
                 .setParameter("username", username.toLowerCase())
                 .getResultList();
 
-        if (resultados.isEmpty()) return null;
+        if (resultados.isEmpty()) {
+            return null;
+        }
 
         Usuario candidato = resultados.get(0);
 
         System.out.println("DEBUG hash BD = [" + candidato.getContrasena() + "]");
-        System.out.println("DEBUG BCrypt = " +
-                BCrypt.checkpw(plainPassword, candidato.getContrasena()));
+        System.out.println("DEBUG BCrypt = "
+                + BCrypt.checkpw(plainPassword, candidato.getContrasena()));
 
         if (BCrypt.checkpw(plainPassword, candidato.getContrasena())) {
             candidato.setUltimaSesion(OffsetDateTime.now());
@@ -56,11 +58,11 @@ public class UsuarioService {
 
     public List<Usuario> listarUsuarios() {
         return em.createQuery(
-                "SELECT u FROM Usuario u " +
-                        "LEFT JOIN FETCH u.tipoUsuario " +
-                        "LEFT JOIN FETCH u.rolInterno " +
-                        "LEFT JOIN FETCH u.estadoCuenta " +
-                        "LEFT JOIN FETCH u.modulo ORDER BY u.nombreCompleto", Usuario.class)
+                "SELECT u FROM Usuario u "
+                + "LEFT JOIN FETCH u.tipoUsuario "
+                + "LEFT JOIN FETCH u.rolInterno "
+                + "LEFT JOIN FETCH u.estadoCuenta "
+                + "LEFT JOIN FETCH u.modulo ORDER BY u.nombreCompleto", Usuario.class)
                 .getResultList();
     }
 
@@ -109,4 +111,40 @@ public class UsuarioService {
             em.remove(usuario);
         }
     }
+    // ===================== BUSCAR POR ID ======================
+
+public TipoUsuario buscarTipoUsuarioPorId(Integer id) {
+    return (id == null) ? null : em.find(TipoUsuario.class, id);
+}
+
+public RolInterno buscarRolPorId(Integer id) {
+    return (id == null) ? null : em.find(RolInterno.class, id);
+}
+
+public EstadoCuenta buscarEstadoCuentaPorId(Integer id) {
+    return (id == null) ? null : em.find(EstadoCuenta.class, id);
+}
+
+public Modulo buscarModuloPorId(String id) {
+    return em.find(Modulo.class, id);
+}
+public Usuario buscarPorUsername(String username) {
+    if (username == null || username.isBlank()) return null;
+
+    List<Usuario> lista = em.createQuery(
+            "SELECT u FROM Usuario u WHERE LOWER(u.username) = :username",
+            Usuario.class
+    )
+    .setParameter("username", username.toLowerCase())
+    .getResultList();
+
+    return lista.isEmpty() ? null : lista.get(0);
+}
+
+
+
+
+
+
+
 }

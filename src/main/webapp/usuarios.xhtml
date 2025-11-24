@@ -73,9 +73,14 @@
             TICKETS PENDIENTES
         </h:link>
 
-        <h:form style="display:inline;">
-            <h:commandButton value="🔍 FILTRAR" styleClass="btn btn-primary"/>
-        </h:form>
+<h:form>
+    <div class="input-group mb-3" style="max-width:300px;">
+        <h:inputText value="#{usuarioBean.filtro}" styleClass="form-control"/>
+        <h:commandButton value="Filtrar" action="#{usuarioBean.filtrar}" 
+                         styleClass="btn btn-primary"/>
+    </div>
+</h:form>
+
     </div>
 
     <h:messages globalOnly="true"/>

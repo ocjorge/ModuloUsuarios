@@ -14,8 +14,13 @@ public class Usuario implements Serializable {
     @Column(name = "id_usuario", columnDefinition = "uuid")
     private UUID id;
 
-    @Column(name = "id_control")
-    private Integer idControl;
+//    @Column(name="id_control")
+// private Integer idControl;
+    
+    @Column(name = "id_control", insertable = false, updatable = false)
+private Integer idControl;
+
+
 
     @Column(name = "correo_electronico", nullable = false, unique = true)
     private String correoElectronico;
@@ -37,6 +42,9 @@ public class Usuario implements Serializable {
 
     @Column(name = "fecha_creacion")
     private OffsetDateTime fechaCreacion;
+    
+
+
 
     @ManyToOne
     @JoinColumn(name = "id_tipo_usuario", nullable = false)

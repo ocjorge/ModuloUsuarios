@@ -7,14 +7,15 @@ import jakarta.persistence.*;
 public class Modulo {
 
     @Id
-    @Column(name = "id_modulo")
-    private String id;
+@Column(name = "id_modulo")
+private String id;
 
     @Column(name = "prefijo_id", nullable = false, unique = true)
     private String prefijo;
 
     @Column(name = "nombre_modulo", nullable = false, unique = true)
     private String nombre;
+    
 
     public String getId() {
         return id;

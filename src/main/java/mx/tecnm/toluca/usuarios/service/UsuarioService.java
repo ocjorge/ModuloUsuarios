@@ -86,7 +86,7 @@ System.out.println(">>> PRUEBA LOCAL = " +
         return id == null ? null : em.find(EstadoCuenta.class, id);
     }
 
-    public Modulo buscarModuloPorId(UUID id) {
+    public Modulo buscarModuloPorId(String id) {
         return id == null ? null : em.find(Modulo.class, id);
     }
 
@@ -184,5 +184,9 @@ public EstadoCuenta buscarEstadoCuentaPorId(Integer id){
 public Modulo buscarModuloPorId(Integer id){
     return em.find(Modulo.class, id);
 }
+
+    public Usuario buscarPorUsername(String username) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 
 }
