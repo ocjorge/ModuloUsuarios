@@ -60,12 +60,12 @@
                     <h5 class="card-title">Tickets Pendientes</h5>
                     <p class="card-text">Revisar solicitudes pendientes del sistema.</p>
 
-                    <h:form>
-                        <h:commandButton 
-                            value="Ver Tickets"
-                            action="tickets?faces-redirect=true"
-                            styleClass="btn btn-secondary" />
-                    </h:form>
+                   <h:form>
+    <h:commandLink action="tickets.xhtml?faces-redirect=true"
+                   value="Ver Tickets"
+                   styleClass="btn btn-warning"/>
+</h:form>
+
 
                 </div>
             </div>

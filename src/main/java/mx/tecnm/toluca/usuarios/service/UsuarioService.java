@@ -169,4 +169,20 @@ System.out.println(">>> PRUEBA LOCAL = " +
     public Object buscarEntidadGenerica(UUID id) {
     return em.find(Object.class, id); 
 }
+    public TipoUsuario buscarTipoUsuarioPorId(Integer id){
+    return em.find(TipoUsuario.class, id);
+}
+
+public RolInterno buscarRolPorId(Integer id){
+    return em.find(RolInterno.class, id);
+}
+
+public EstadoCuenta buscarEstadoCuentaPorId(Integer id){
+    return em.find(EstadoCuenta.class, id);
+}
+
+public Modulo buscarModuloPorId(Integer id){
+    return em.find(Modulo.class, id);
+}
+
 }

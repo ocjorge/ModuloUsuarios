@@ -24,76 +24,73 @@ public class UsuarioBean implements Serializable {
     @Inject
     private SessionManager sessionManager;
 
-    // --- Parámetro recibido desde la vista
-    private UUID id;
+    // Parametro recibido por URL
+    private String idParam;
 
-    // --- IDs seleccionados en el formulario
-    private UUID tipoUsuarioId;
-    private UUID rolId;
-    private UUID estadoCuentaId;
-    private UUID moduloId;
-
-    // Datos del usuario
-    private List<Usuario> usuarios;
-    private Usuario usuarioSeleccionado = new Usuario();
-    private String passwordPlano;
+    // Estado del formulario
     private boolean edicion;
 
+    // Datos del usuario
+    private Usuario usuarioSeleccionado = new Usuario();
+    private String passwordPlano;
+
+    private List<Usuario> usuarios;
+
+    // ============================================================
     @PostConstruct
     public void init() {
         cargarUsuarios();
     }
 
-    // ---------------- SESIÓN ----------------
+    // ============================================================
     public void verificarSesion() throws IOException {
         sessionManager.redirigirSiNoAutenticado();
     }
 
-    // ---------------- LISTADO ----------------
-    private void cargarUsuarios() {
-        usuarios = usuarioService.listarUsuarios();
-    }
-
-    public List<Usuario> getUsuarios() {
-        return usuarios;
-    }
-
-    // ---------------- EDICIÓN ----------------
-public void cargarParaEdicion(String id) {
-    if (id != null) {
-        Usuario encontrado = usuarioService.buscarPorId(UUID.fromString(id));
-        if (encontrado != null) {
-            this.usuarioSeleccionado = encontrado;
-            this.edicion = true;
+    // ============================================================
+    public void initForm() {
+        if (idParam == null || idParam.isBlank()) {
+            prepararNuevo();
+        } else {
+            cargarParaEdicion(idParam);
         }
     }
-}
 
+    public void prepararNuevo() {
+        usuarioSeleccionado = new Usuario();
+        passwordPlano = null;
+        edicion = false;
+    }
 
-    // ---------------- GUARDAR ----------------
+    // ============================================================
+    public void cargarParaEdicion(String id) {
+        try {
+            UUID uuid = UUID.fromString(id);
+            Usuario encontrado = usuarioService.buscarPorId(uuid);
+            if (encontrado != null) {
+                usuarioSeleccionado = encontrado;
+                edicion = true;
+            }
+        } catch (Exception e) {
+            edicion = false;
+        }
+    }
+
+    // ============================================================
     public void guardar() {
         try {
 
-            // Cargar entidades a partir de los IDs seleccionados
-            usuarioSeleccionado.setTipoUsuario(usuarioService.buscarTipoUsuarioPorId(tipoUsuarioId));
-            usuarioSeleccionado.setRolInterno(usuarioService.buscarRolPorId(rolId));
-            usuarioSeleccionado.setEstadoCuenta(usuarioService.buscarEstadoCuentaPorId(estadoCuentaId));
-            usuarioSeleccionado.setModulo(usuarioService.buscarModuloPorId(moduloId));
-
             if (edicion) {
-
                 boolean rehash = passwordPlano != null && !passwordPlano.isBlank();
                 if (rehash) {
                     usuarioSeleccionado.setContrasena(passwordPlano);
                 }
-
                 usuarioService.actualizar(usuarioSeleccionado, rehash);
 
                 FacesContext.getCurrentInstance().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO, "Usuario actualizado", ""));
 
             } else {
-
                 if (passwordPlano == null || passwordPlano.isBlank()) {
                     FacesContext.getCurrentInstance().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_WARN,
@@ -116,43 +113,69 @@ public void cargarParaEdicion(String id) {
         }
     }
 
-    // ---------------- ELIMINAR ----------------
+    // ============================================================
     public void eliminar(UUID id) {
         usuarioService.eliminar(id);
         cargarUsuarios();
+
         FacesContext.getCurrentInstance().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, "Usuario eliminado", ""));
     }
 
-    // ----------- GETTERS / SETTERS ------------
+    // ============================================================
+    private void cargarUsuarios() {
+        usuarios = usuarioService.listarUsuarios();
+    }
 
-    public UUID getId() { return id; }
-    public void setId(UUID id) { this.id = id; }
+    // ============================================================
+    public List<Usuario> getUsuarios() {
+        return usuarios;
+    }
 
-    public Usuario getUsuarioSeleccionado() { return usuarioSeleccionado; }
-    public void setUsuarioSeleccionado(Usuario usuarioSeleccionado) { this.usuarioSeleccionado = usuarioSeleccionado; }
+    public Usuario getUsuarioSeleccionado() {
+        return usuarioSeleccionado;
+    }
 
-    public String getPasswordPlano() { return passwordPlano; }
-    public void setPasswordPlano(String passwordPlano) { this.passwordPlano = passwordPlano; }
+    public void setUsuarioSeleccionado(Usuario usuarioSeleccionado) {
+        this.usuarioSeleccionado = usuarioSeleccionado;
+    }
 
-    public boolean isEdicion() { return edicion; }
+    public String getPasswordPlano() {
+        return passwordPlano;
+    }
 
-    public List<TipoUsuario> getTiposUsuario() { return usuarioService.listarTiposUsuario(); }
-    public List<RolInterno> getRolesInternos() { return usuarioService.listarRoles(); }
-    public List<EstadoCuenta> getEstadosCuenta() { return usuarioService.listarEstadosCuenta(); }
-    public List<Modulo> getModulos() { return usuarioService.listarModulos(); }
+    public void setPasswordPlano(String passwordPlano) {
+        this.passwordPlano = passwordPlano;
+    }
 
-    public UUID getTipoUsuarioId() { return tipoUsuarioId; }
-    public void setTipoUsuarioId(UUID id) { this.tipoUsuarioId = id; }
+    public boolean isEdicion() {
+        return edicion;
+    }
 
-    public UUID getRolId() { return rolId; }
-    public void setRolId(UUID id) { this.rolId = id; }
+    public String getIdParam() {
+        return idParam;
+    }
 
-    public UUID getEstadoCuentaId() { return estadoCuentaId; }
-    public void setEstadoCuentaId(UUID id) { this.estadoCuentaId = id; }
+    public void setIdParam(String idParam) {
+        this.idParam = idParam;
+    }
 
-    public UUID getModuloId() { return moduloId; }
-    public void setModuloId(UUID id) { this.moduloId = id; }
+    // Datos de catálogos
+    public List<TipoUsuario> getTiposUsuario() {
+        return usuarioService.listarTiposUsuario();
+    }
+
+    public List<RolInterno> getRolesInternos() {
+        return usuarioService.listarRoles();
+    }
+
+    public List<EstadoCuenta> getEstadosCuenta() {
+        return usuarioService.listarEstadosCuenta();
+    }
+
+    public List<Modulo> getModulos() {
+        return usuarioService.listarModulos();
+    }
 
     public SessionManager getSessionManager() {
         return sessionManager;
