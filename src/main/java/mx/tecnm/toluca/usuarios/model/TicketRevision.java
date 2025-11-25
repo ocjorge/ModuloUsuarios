@@ -14,30 +14,29 @@ public class TicketRevision implements Serializable {
     @Column(name = "id_ticket", columnDefinition = "uuid")
     private UUID id;
 
-    @Column(name = "datos_propuestos", columnDefinition = "jsonb", nullable = false)
-    private String datosPropuestos;
+    @Column(name = "datos_propuestos", nullable = false, columnDefinition = "jsonb")
+    private String datosPropuestos; // JSON como texto
 
     @Column(name = "fecha_solicitud", nullable = false)
     private OffsetDateTime fechaSolicitud;
 
-    // ---------- Relaciones ----------
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "id_modulo", nullable = false)
     private Modulo modulo;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "id_tipo_cambio", nullable = false)
     private TipoCambio tipoCambio;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "id_estado", nullable = false)
     private EstadoTicket estado;
 
-    // --------- Getters/Setters ----------
+    // ===== getters/setters =====
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
 

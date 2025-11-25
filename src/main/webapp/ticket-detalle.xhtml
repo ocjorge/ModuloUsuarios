@@ -4,41 +4,53 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core">
 
 <h:head>
-    <title>Detalle de Ticket</title>
+    <title>Detalle Ticket</title>
     <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css"/>
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
 </h:head>
 
-<h:body class="p-4" style="background:#f0f2f5;">
+<h:body style="background-color:#f0f2f5;">
 
+<!-- METADATA DEBE IR DIRECTAMENTE BAJO h:body -->
 <f:metadata>
+    <f:viewAction action="#{ticketDetalleBean.verificarSesion}" />
     <f:viewParam name="id" value="#{ticketDetalleBean.idParam}" />
     <f:viewAction action="#{ticketDetalleBean.cargar}" />
 </f:metadata>
 
-<div class="container">
+<nav class="navbar navbar-dark" style="background-color:#225ca8;">
+    <div class="container-fluid">
+        <span class="navbar-brand">Detalle del Ticket</span>
+        <h:form>
+            <h:commandLink value="Volver a Tickets"
+                           action="tickets.xhtml?faces-redirect=true"
+                           styleClass="btn btn-light"/>
+        </h:form>
+    </div>
+</nav>
 
-    <h2 class="mb-4">Detalles del Ticket</h2>
+<div class="container py-4">
 
-    <h:panelGroup rendered="#{ticketDetalleBean.ticket != null}">
-
+    <h:panelGroup rendered="#{not empty ticketDetalleBean.ticket}">
         <div class="card shadow-sm">
             <div class="card-body">
 
-                <p><strong>ID Ticket:</strong> #{ticketDetalleBean.ticket.id}</p>
-                <p><strong>Usuario solicitante:</strong> #{ticketDetalleBean.ticket.usuario.nombreCompleto}</p>
-                <p><strong>Módulo:</strong> #{ticketDetalleBean.ticket.modulo.nombre}</p>
-                <p><strong>Tipo de cambio:</strong> #{ticketDetalleBean.ticket.tipoCambio.nombre}</p>
-                <p><strong>Estado:</strong> #{ticketDetalleBean.ticket.estado.nombre}</p>
-                <p><strong>Fecha solicitud:</strong> #{ticketDetalleBean.ticket.fechaSolicitud}</p>
+                <h4>Información general</h4>
+                <p><b>Fecha:</b> #{ticketDetalleBean.ticket.fechaSolicitud}</p>
+                <p><b>Usuario:</b> #{ticketDetalleBean.ticket.usuario.nombreCompleto}</p>
+                <p><b>Módulo:</b> #{ticketDetalleBean.ticket.modulo.nombre}</p>
+                <p><b>Tipo cambio:</b> #{ticketDetalleBean.ticket.tipoCambio.nombre}</p>
+                <p><b>Estado:</b> #{ticketDetalleBean.ticket.estado.nombre}</p>
 
-                <h5 class="mt-3">Datos propuestos (JSON):</h5>
-                <pre>#{ticketDetalleBean.ticket.datosPropuestos}</pre>
+                <hr />
 
-                <h:link outcome="tickets.xhtml" value="Volver" styleClass="btn btn-secondary mt-3"/>
+                <h4>Datos propuestos (JSON)</h4>
+                <pre class="bg-light p-3 rounded" style="white-space:pre-wrap;">
+#{ticketDetalleBean.jsonPretty}
+                </pre>
+
             </div>
         </div>
-
     </h:panelGroup>
 
 </div>

@@ -10,7 +10,8 @@
 </h:head>
 
 <h:body style="background-color:#f0f2f5;">
-
+<ui:include src="/WEB-INF/sidebar.xhtml" />
+<div style="margin-left:270px;">
 <f:metadata>
     <f:viewAction action="#{usuarioBean.verificarSesion}" />
 </f:metadata>
@@ -87,6 +88,6 @@
 
     </div>
 </div>
-
+</div>
 </h:body>
 </html>

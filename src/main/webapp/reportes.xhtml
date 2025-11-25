@@ -4,132 +4,135 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core">
 
 <h:head>
-    <title>Reportes del Sistema</title>
+    <title>Reportes</title>
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
-
-    <style>
-        body { background-color:#f2f4f8; }
-        .topbar {
-            background:#225ca8;
-            color:white;
-            padding:14px 24px;
-            font-size:22px;
-            font-weight:bold;
-        }
-        .card-mini {
-            border-left:5px solid #225ca8;
-        }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </h:head>
 
-<h:body>
+<h:body style="background-color:#f0f2f5;">
 
-<!-- TOPBAR -->
-<div class="topbar d-flex justify-content-between align-items-center">
-    Reportes del Sistema
-    <h:form>
-        <h:commandLink value="Dashboard"
-                       action="dashboard.xhtml?faces-redirect=true"
-                       styleClass="btn btn-light"/>
-    </h:form>
-</div>
+<f:metadata>
+    <f:viewAction action="#{reportesBean.verificarSesion}" />
+</f:metadata>
 
-<div class="container my-4">
+<nav class="navbar navbar-dark" style="background-color:#225ca8;">
+    <div class="container-fluid">
+        <span class="navbar-brand mb-0 h1">Reportes</span>
+        <h:form>
+            <h:commandLink value="Dashboard"
+                           action="dashboard.xhtml?faces-redirect=true"
+                           styleClass="btn btn-light me-2"/>
+            <h:commandLink value="Cerrar Sesión"
+                           actionListener="#{reportesBean.sessionManager.cerrarSesion}"
+                           styleClass="btn btn-danger"/>
+        </h:form>
+    </div>
+</nav>
 
-    <f:metadata>
-        <f:viewAction action="#{reportesBean.verificarSesion}" />
-        <f:viewAction action="#{reportesBean.init}" />
-    </f:metadata>
+<div class="container py-4">
 
-    <!-- RESUMEN -->
-    <div class="row g-4">
-
-        <div class="col-md-4">
-            <div class="card card-mini p-3 shadow-sm">
-                <h5>Total Accesos</h5>
-                <h3 class="text-primary">#{reportesBean.totalAccesos}</h3>
+    <!-- TARJETAS RESUMEN -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm text-center">
+                <div class="card-body">
+                    <h6>Total Accesos</h6>
+                    <h3>#{reportesBean.totalAccesos}</h3>
+                </div>
             </div>
         </div>
-
-        <div class="col-md-4">
-            <div class="card card-mini p-3 shadow-sm">
-                <h5>Cambios Realizados</h5>
-                <h3 class="text-success">#{reportesBean.totalAcciones}</h3>
+        <div class="col-md-3">
+            <div class="card shadow-sm text-center">
+                <div class="card-body">
+                    <h6>Exitosos</h6>
+                    <h3 class="text-success">#{reportesBean.accesosExitosos}</h3>
+                </div>
             </div>
         </div>
-
-        <div class="col-md-4">
-            <div class="card card-mini p-3 shadow-sm">
-                <h5>Tickets Revisados</h5>
-                <h3 class="text-danger">#{reportesBean.totalTickets}</h3>
+        <div class="col-md-3">
+            <div class="card shadow-sm text-center">
+                <div class="card-body">
+                    <h6>Fallidos</h6>
+                    <h3 class="text-danger">#{reportesBean.accesosFallidos}</h3>
+                </div>
             </div>
         </div>
-
+        <div class="col-md-3">
+            <div class="card shadow-sm text-center">
+                <div class="card-body">
+                    <h6>Tickets Pendientes</h6>
+                    <h3>#{reportesBean.ticketsPendientes}</h3>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <hr class="my-4"/>
+    <!-- GRAFICAS -->
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5>Accesos últimos 7 días</h5>
+                    <canvas id="chartAccesos"></canvas>
+                </div>
+            </div>
+        </div>
 
-    <!-- ACCESOS -->
-    <h2 class="mb-3">Historial de Accesos</h2>
-
-    <h:dataTable value="#{reportesBean.accesos}"
-                 var="a"
-                 styleClass="table table-hover table-bordered">
-
-        <h:column>
-            <f:facet name="header">Usuario</f:facet>
-            #{a.usuario.nombreCompleto}
-        </h:column>
-
-        <h:column>
-            <f:facet name="header">Evento</f:facet>
-            #{a.tipoEvento.nombre}
-        </h:column>
-
-        <h:column>
-            <f:facet name="header">Fecha</f:facet>
-            <h:outputText value="#{a.fechaHora}">
-                <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
-            </h:outputText>
-        </h:column>
-
-    </h:dataTable>
-
-    <hr/>
-
-    <!-- ACCIONES -->
-    <h2 class="mb-3">Acciones Realizadas</h2>
-
-    <h:dataTable value="#{reportesBean.acciones}"
-                 var="ac"
-                 styleClass="table table-hover table-bordered">
-
-        <h:column>
-            <f:facet name="header">Usuario</f:facet>
-            #{ac.usuario.nombreCompleto}
-        </h:column>
-
-        <h:column>
-            <f:facet name="header">Acción</f:facet>
-            #{ac.accion.nombre}
-        </h:column>
-
-        <h:column>
-            <f:facet name="header">Registro Afectado</f:facet>
-            #{ac.registroAfectado}
-        </h:column>
-
-        <h:column>
-            <f:facet name="header">Fecha</f:facet>
-            <h:outputText value="#{ac.fechaHora}">
-                <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
-            </h:outputText>
-        </h:column>
-
-    </h:dataTable>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5>Tickets por estado</h5>
+                    <canvas id="chartTickets"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </div>
+
+<script>
+    const accesosLabels = #{reportesBean.accesosLabelsJson};
+    const accesosData   = #{reportesBean.accesosDataJson};
+
+    new Chart(document.getElementById('chartAccesos'), {
+        type: 'line',
+        data: {
+            labels: accesosLabels,
+            datasets: [{
+                label: 'Accesos',
+                data: accesosData,
+                tension: 0.3
+            }]
+        }
+    });
+
+    const ticketsLabels = #{reportesBean.ticketsLabelsJson};
+    const ticketsData   = #{reportesBean.ticketsDataJson};
+
+    new Chart(document.getElementById('chartTickets'), {
+        type: 'bar',
+        data: {
+            labels: ticketsLabels,
+            datasets: [{
+                label: 'Tickets',
+                data: ticketsData
+            }]
+        }
+    });
+</script>
+
+<!-- FOOTER -->
+<nav class="navbar navbar-expand-lg navbar-dark fixed-bottom"
+     style="background-color:#87CEEB; border-top:2px solid #5aa7c8;">
+    <div class="container-fluid justify-content-center">
+        <span class="navbar-text fw-bold" style="color:#003366;">
+            Desarrollado por Brisa Hernández Reyes · Jorge Ortiz Ceballos ·
+            Luis Carlos Romero Corral — Módulo Usuarios —
+            Materia: Programación Web · Agosto–Diciembre 2025
+        </span>
+    </div>
+</nav>
 
 </h:body>
 </html>

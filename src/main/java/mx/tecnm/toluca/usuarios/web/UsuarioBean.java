@@ -37,6 +37,8 @@ public class UsuarioBean implements Serializable {
     private Integer rolId;
     private Integer estadoCuentaId;
     private String moduloId;
+    
+    private String filtro;
 
 
 
@@ -241,7 +243,6 @@ public void setEstadoCuentaId(Integer id) { this.estadoCuentaId = id; }
 
 public String getModuloId() { return moduloId; }
 public void setModuloId(String moduloId) { this.moduloId = moduloId; }
-private String filtro;
 
 public String getFiltro() {
     return filtro;
@@ -253,21 +254,20 @@ public void setFiltro(String filtro) {
 
 public void filtrar() {
     if (filtro == null || filtro.isBlank()) {
-        usuarios = usuarioService.listarUsuarios();
+        cargarUsuarios();
         return;
     }
 
     String f = filtro.toLowerCase();
 
-    usuarios = usuarioService.listarUsuarios()
-            .stream()
+    usuarios = usuarios.stream()
             .filter(u ->
                     (u.getNombreCompleto() != null && u.getNombreCompleto().toLowerCase().contains(f)) ||
                     (u.getCorreoElectronico() != null && u.getCorreoElectronico().toLowerCase().contains(f)) ||
                     (u.getUsername() != null && u.getUsername().toLowerCase().contains(f))
-            ).toList();
+            )
+            .toList();
 }
-
 
 
 }
