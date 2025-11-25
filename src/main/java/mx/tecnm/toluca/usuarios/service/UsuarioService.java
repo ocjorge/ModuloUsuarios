@@ -20,56 +20,58 @@ public class UsuarioService {
     private EntityManager em;
 
     // ----------- AUTENTICACIÓN -----------------
-
     public Usuario autenticar(String username, String plainPassword) {
         System.out.println(">>> HASH NUEVO 12345 = " + debugHash("12345"));
-System.out.println(">>> PRUEBA LOCAL = " +
-        BCrypt.checkpw("12345", debugHash("12345")));
+        System.out.println(">>> PRUEBA LOCAL = "
+                + BCrypt.checkpw("12345", debugHash("12345")));
 
+        if (username == null || plainPassword == null) {
+            return null;
+        }
 
-    if (username == null || plainPassword == null) return null;
+        username = username.trim().toLowerCase();
+        plainPassword = plainPassword.trim();
 
-    username = username.trim().toLowerCase();
-    plainPassword = plainPassword.trim();
+        List<Usuario> resultados = em.createQuery(
+                "SELECT u FROM Usuario u WHERE lower(u.username) = :username", Usuario.class)
+                .setParameter("username", username)
+                .getResultList();
 
-    List<Usuario> resultados = em.createQuery(
-            "SELECT u FROM Usuario u WHERE lower(u.username) = :username", Usuario.class)
-        .setParameter("username", username)
-        .getResultList();
+        if (resultados.isEmpty()) {
+            return null;
+        }
 
-    if (resultados.isEmpty()) return null;
+        Usuario candidato = resultados.get(0);
 
-    Usuario candidato = resultados.get(0);
+        String hashBD = candidato.getContrasena();
+        if (hashBD == null) {
+            return null;
+        }
+        hashBD = hashBD.trim();
 
-    String hashBD = candidato.getContrasena();
-    if (hashBD == null) return null;
-    hashBD = hashBD.trim();
+        System.out.println(">>> DEBUG: plain=[" + plainPassword + "]");
+        System.out.println(">>> DEBUG: hashBD=[" + hashBD + "]");
 
-    System.out.println(">>> DEBUG: plain=[" + plainPassword + "]");
-    System.out.println(">>> DEBUG: hashBD=[" + hashBD + "]");
+        boolean ok = BCrypt.checkpw(plainPassword, hashBD);
+        System.out.println(">>> DEBUG BCrypt.checkpw = " + ok);
 
-    boolean ok = BCrypt.checkpw(plainPassword, hashBD);
-    System.out.println(">>> DEBUG BCrypt.checkpw = " + ok);
-
-    if (ok) {
-        candidato.setUltimaSesion(OffsetDateTime.now());
-        // aquí tu merge si quieres
-        return candidato;
+        if (ok) {
+            candidato.setUltimaSesion(OffsetDateTime.now());
+            // aquí tu merge si quieres
+            return candidato;
+        }
+        return null;
     }
-    return null;
-}
 
     public String debugHash(String plain) {
-    return BCrypt.hashpw(plain, BCrypt.gensalt());
-}
-
+        return BCrypt.hashpw(plain, BCrypt.gensalt());
+    }
 
     private String hashPassword(String plainPassword) {
         return BCrypt.hashpw(plainPassword, BCrypt.gensalt());
     }
 
     // ---------------- BUSCAR --------------------
-
     public Usuario buscarPorId(UUID id) {
         return em.find(Usuario.class, id);
     }
@@ -91,15 +93,14 @@ System.out.println(">>> PRUEBA LOCAL = " +
     }
 
     // ---------------- LISTADOS --------------------
-
     public List<Usuario> listarUsuarios() {
         return em.createQuery(
-                "SELECT u FROM Usuario u " +
-                "LEFT JOIN FETCH u.tipoUsuario " +
-                "LEFT JOIN FETCH u.rolInterno " +
-                "LEFT JOIN FETCH u.estadoCuenta " +
-                "LEFT JOIN FETCH u.modulo " +
-                "ORDER BY u.nombreCompleto",
+                "SELECT u FROM Usuario u "
+                + "LEFT JOIN FETCH u.tipoUsuario "
+                + "LEFT JOIN FETCH u.rolInterno "
+                + "LEFT JOIN FETCH u.estadoCuenta "
+                + "LEFT JOIN FETCH u.modulo "
+                + "ORDER BY u.nombreCompleto",
                 Usuario.class
         ).getResultList();
     }
@@ -133,7 +134,6 @@ System.out.println(">>> PRUEBA LOCAL = " +
     }
 
     // ---------------- GUARDA / ACTUALIZA --------------------
-
     @Transactional
     public Usuario guardarNuevo(Usuario usuario, String plainPassword) {
         usuario.setContrasena(hashPassword(plainPassword));
@@ -157,7 +157,6 @@ System.out.println(">>> PRUEBA LOCAL = " +
     }
 
     // ---------------- ELIMINAR --------------------
-
     @Transactional
     public void eliminar(UUID id) {
         Usuario usuario = em.find(Usuario.class, id);
@@ -165,28 +164,40 @@ System.out.println(">>> PRUEBA LOCAL = " +
             em.remove(usuario);
         }
     }
-    
+
     public Object buscarEntidadGenerica(UUID id) {
-    return em.find(Object.class, id); 
-}
-    public TipoUsuario buscarTipoUsuarioPorId(Integer id){
-    return em.find(TipoUsuario.class, id);
-}
+        return em.find(Object.class, id);
+    }
 
-public RolInterno buscarRolPorId(Integer id){
-    return em.find(RolInterno.class, id);
-}
+    public TipoUsuario buscarTipoUsuarioPorId(Integer id) {
+        return em.find(TipoUsuario.class, id);
+    }
 
-public EstadoCuenta buscarEstadoCuentaPorId(Integer id){
-    return em.find(EstadoCuenta.class, id);
-}
+    public RolInterno buscarRolPorId(Integer id) {
+        return em.find(RolInterno.class, id);
+    }
 
-public Modulo buscarModuloPorId(Integer id){
-    return em.find(Modulo.class, id);
-}
+    public EstadoCuenta buscarEstadoCuentaPorId(Integer id) {
+        return em.find(EstadoCuenta.class, id);
+    }
 
+    public Modulo buscarModuloPorId(Integer id) {
+        return em.find(Modulo.class, id);
+    }
+
+   
     public Usuario buscarPorUsername(String username) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        if (username == null) {
+            return null;
+        }
+
+        List<Usuario> lista = em.createQuery(
+                "SELECT u FROM Usuario u WHERE lower(u.username) = :u",
+                Usuario.class)
+                .setParameter("u", username.toLowerCase())
+                .getResultList();
+
+        return lista.isEmpty() ? null : lista.get(0);
     }
 
 }
