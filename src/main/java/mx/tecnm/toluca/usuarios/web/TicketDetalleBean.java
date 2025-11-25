@@ -8,6 +8,9 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.UUID;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
 import mx.tecnm.toluca.usuarios.model.TicketRevision;
 import mx.tecnm.toluca.usuarios.service.TicketService;
 
@@ -21,17 +24,14 @@ public class TicketDetalleBean implements Serializable {
     @Inject
     private SessionManager sessionManager;
 
-    private String idParam;                 // Recibido por URL
-    private TicketRevision ticket;          // Ticket cargado
-
-    // JSON embellecido
-    private String jsonPretty;
+    private String idParam;            // ID recibido por URL
+    private TicketRevision ticket;     // Ticket cargado
+    private String jsonPretty;         // JSON embellecido
 
     @PostConstruct
     public void init() {
-        // Evita errores si la vista se carga primero
-        ticket = null;
         jsonPretty = "{}";
+        ticket = null;
     }
 
     public void verificarSesion() throws IOException {
@@ -40,32 +40,62 @@ public class TicketDetalleBean implements Serializable {
 
     public void cargar() {
         try {
-            if (idParam == null || idParam.isBlank())
+            if (idParam == null || idParam.isBlank()) {
+                jsonPretty = "{ \"error\": \"ID vacío\" }";
                 return;
+            }
 
             UUID id = UUID.fromString(idParam);
             ticket = ticketService.buscarPorId(id);
 
             if (ticket != null) {
                 jsonPretty = formatJson(ticket.getDatosPropuestos());
+            } else {
+                jsonPretty = "{ \"error\": \"Ticket no encontrado\" }";
             }
 
-        } catch (Exception e) {
-            ticket = null; // evita errores en la vista
+        } catch (Exception ex) {
+            jsonPretty = "{ \"error\": \"No se pudo cargar el ticket\" }";
+            ticket = null;
         }
     }
 
-    private String formatJson(String raw) {
+    // ================================
+    // FORMATEADOR ROBUSTO DE JSON
+    // ================================
+    private String formatJson(Object jsonRaw) {
         try {
-            // Usamos la librería interna de Java
-            var json = new org.json.JSONObject(raw);
-            return json.toString(4); // pretty print
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.enable(SerializationFeature.INDENT_OUTPUT);
+
+            if (jsonRaw == null) {
+                return "{ \"error\": \"JSON vacío\" }";
+            }
+
+            // Si el JSON viene como String desde PostgreSQL
+            if (jsonRaw instanceof String rawString) {
+                Object jsonObj = mapper.readValue(rawString, Object.class);
+                return mapper.writeValueAsString(jsonObj);
+            }
+
+            // Si viene como JSONObject desde org.json
+            if (jsonRaw instanceof org.json.JSONObject jsonObj) {
+                Object converted = mapper.readValue(jsonObj.toString(), Object.class);
+                return mapper.writeValueAsString(converted);
+            }
+
+            // Si viene como Map o LinkedHashMap (muy común con JSONB)
+            return mapper.writeValueAsString(jsonRaw);
+
         } catch (Exception e) {
-            return raw; // si no es JSON válido, se muestra crudo
+            return "{ \"error\": \"JSON inválido\" }";
         }
     }
 
-    // GETTERS y SETTERS
+    // ================================
+    // GETTERS Y SETTERS
+    // ================================
+
     public String getIdParam() {
         return idParam;
     }
