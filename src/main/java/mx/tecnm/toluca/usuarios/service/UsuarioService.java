@@ -21,47 +21,44 @@ public class UsuarioService {
 
     // ----------- AUTENTICACIÓN -----------------
     public Usuario autenticar(String username, String plainPassword) {
-        System.out.println(">>> HASH NUEVO 12345 = " + debugHash("12345"));
-        System.out.println(">>> PRUEBA LOCAL = "
-                + BCrypt.checkpw("12345", debugHash("12345")));
 
-        if (username == null || plainPassword == null) {
-            return null;
-        }
+    if (username == null || plainPassword == null) return null;
 
-        username = username.trim().toLowerCase();
-        plainPassword = plainPassword.trim();
+    username = username.trim().toLowerCase();
+    plainPassword = plainPassword.trim();
 
-        List<Usuario> resultados = em.createQuery(
-                "SELECT u FROM Usuario u WHERE lower(u.username) = :username", Usuario.class)
-                .setParameter("username", username)
-                .getResultList();
+  List<Usuario> resultados = em.createQuery(
+        "SELECT u FROM Usuario u " +
+        "LEFT JOIN FETCH u.modulo m " +
+        "WHERE lower(u.username) = :username " +
+        "AND m.id = 'USR' " +        // 👈 espacio al final
+        "AND u.estadoCuenta.id = 1", // 👈 estado activo
+        Usuario.class)
+    .setParameter("username", username)
+    .getResultList();
 
-        if (resultados.isEmpty()) {
-            return null;
-        }
 
-        Usuario candidato = resultados.get(0);
-
-        String hashBD = candidato.getContrasena();
-        if (hashBD == null) {
-            return null;
-        }
-        hashBD = hashBD.trim();
-
-        System.out.println(">>> DEBUG: plain=[" + plainPassword + "]");
-        System.out.println(">>> DEBUG: hashBD=[" + hashBD + "]");
-
-        boolean ok = BCrypt.checkpw(plainPassword, hashBD);
-        System.out.println(">>> DEBUG BCrypt.checkpw = " + ok);
-
-        if (ok) {
-            candidato.setUltimaSesion(OffsetDateTime.now());
-            // aquí tu merge si quieres
-            return candidato;
-        }
+    if (resultados.isEmpty()) {
+        System.out.println(">>> Usuario no pertenece al módulo USR");
         return null;
     }
+
+    Usuario candidato = resultados.get(0);
+
+    if (candidato.getContrasena() == null) return null;
+
+    boolean ok = BCrypt.checkpw(plainPassword, candidato.getContrasena());
+
+    System.out.println(">>> LOGIN BCrypt.checkpw = " + ok);
+
+    if (ok) {
+        candidato.setUltimaSesion(OffsetDateTime.now());
+        return candidato;
+    }
+
+    return null;
+}
+
 
     public String debugHash(String plain) {
         return BCrypt.hashpw(plain, BCrypt.gensalt());
