@@ -102,18 +102,24 @@
                         <td>#{t.tipoCambio.nombre}</td>
                         <td>#{t.estado.nombre}</td>
 
-                        <td class="d-flex gap-2">
+                        <td>
                             <h:form>
-                                <h:commandLink value="Detalle" action="#{ticketBean.verDetalle(t.id)}"
-                                               styleClass="btn btn-sm btn-outline-primary"/>
+                                <div class="d-flex gap-2"> 
 
-                                <h:commandButton value="Aprobar" actionListener="#{ticketBean.aprobar(t.id)}"
-                                                 styleClass="btn btn-sm btn-success"
-                                                 onclick="return confirm('¿Aprobar ticket?');"/>
+                                    <h:commandLink value="Detalle" 
+                                                   action="#{ticketBean.verDetalle(t.id)}"
+                                                   styleClass="btn btn-sm btn-primary"/>
 
-                                <h:commandButton value="Rechazar" actionListener="#{ticketBean.rechazar(t.id)}"
-                                                 styleClass="btn btn-sm btn-danger"
-                                                 onclick="return confirm('¿Rechazar ticket?');"/>
+                                    <h:commandButton value="Aprobar" 
+                                                     actionListener="#{ticketBean.aprobar(t.id)}"
+                                                     styleClass="btn btn-sm btn-success"
+                                                     onclick="return confirm('¿Aprobar ticket?');"/>
+
+                                    <h:commandButton value="Rechazar" 
+                                                     actionListener="#{ticketBean.rechazar(t.id)}"
+                                                     styleClass="btn btn-sm btn-danger"
+                                                     onclick="return confirm('¿Rechazar ticket?');"/>
+                                </div>
                             </h:form>
                         </td>
                     </tr>

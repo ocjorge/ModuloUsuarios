@@ -51,16 +51,28 @@
 <h:body>
 
 <!-- ===================== TOP BAR ========================== -->
-<div class="topbar d-flex justify-content-between align-items-center">
-    Usuarios
-    <div>
-        <h:form style="display:inline;">
-            <span style="margin-right:18px;">Bienvenido, #{sessionManager.usuarioActual.nombreCompleto}</span>
-            <h:commandLink value="Dashboard" action="dashboard.xhtml?faces-redirect=true" styleClass="btn-dashboard"/>
-            <h:commandLink value="Cerrar Sesión" actionListener="#{sessionManager.cerrarSesion}" styleClass="btn-logout ms-2"/>
-        </h:form>
+<nav class="navbar navbar-dark" style="background-color:#225ca8;">
+    <div class="container-fluid">
+        <span class="navbar-brand mb-0 h1">Gestión de Usuarios</span>
+
+        <div class="d-flex align-items-center">
+            
+            <span class="text-white me-3">
+                Bienvenido, #{sessionManager.usuarioActual.nombreCompleto}
+            </span>
+
+            <h:form>
+                <h:commandLink value="Dashboard" 
+                               action="dashboard.xhtml?faces-redirect=true"
+                               styleClass="btn btn-light me-2"/>
+                
+                <h:commandLink value="Cerrar Sesión" 
+                               actionListener="#{sessionManager.cerrarSesion}" 
+                               styleClass="btn btn-danger"/>
+            </h:form>
+        </div>
     </div>
-</div>
+</nav>
 
 <!-- ===================== CONTENIDO ========================== -->
 <div class="container py-4">
@@ -131,17 +143,20 @@
                     <td>#{u.rolInterno != null ? u.rolInterno.nombre : 'N/A'}</td>
 
                     <td>
-                        <h:link outcome="usuario-form.xhtml"
-                                styleClass="btn btn-sm btn-primary"
-                                includeViewParams="true">
-                            <f:param name="id" value="#{u.id}" />
-                            EDITAR
-                        </h:link>
+                        <div class="d-flex gap-2">
 
-                        <h:commandButton value="ELIMINAR"
-                                         styleClass="btn btn-sm btn-danger ms-2"
-                                         actionListener="#{usuarioBean.eliminar(u.id)}"
-                                         onclick="return confirm('¿Eliminar usuario?');"/>
+                            <h:link outcome="usuario-form.xhtml"
+                                    styleClass="btn btn-sm btn-primary"
+                                    includeViewParams="true">
+                                <f:param name="id" value="#{u.id}" />
+                                EDITAR
+                            </h:link>
+
+                            <h:commandButton value="ELIMINAR"
+                                             styleClass="btn btn-sm btn-danger"
+                                             actionListener="#{usuarioBean.eliminar(u.id)}"
+                                             onclick="return confirm('¿Eliminar usuario?');"/>
+                        </div>
                     </td>
                 </tr>
             </ui:repeat>
