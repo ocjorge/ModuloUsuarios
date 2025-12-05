@@ -31,6 +31,10 @@
             padding-bottom:6px;
             border-bottom:2px solid #275fa7;
         }
+        .help-text {
+            font-size: 0.80rem;
+            color: #555;
+        }
     </style>
 </h:head>
 
@@ -57,15 +61,15 @@
         </div>
     </nav>
 
+    <!-- METADATA (carga usuario + verifica sesión) -->
+    <f:metadata>
+        <f:viewParam name="id" value="#{usuarioBean.idParam}" />
+        <f:viewAction action="#{usuarioBean.verificarSesion}" />
+        <f:viewAction action="#{usuarioBean.initForm}" />
+    </f:metadata>
+
     <!-- CONTENIDO -->
     <div class="container py-4" style="max-width:900px;">
-
-        <!-- CARGAR DATOS -->
-        <f:metadata>
-            <f:viewParam name="id" value="#{usuarioBean.idParam}" />
-            <f:viewAction action="#{usuarioBean.verificarSesion}" />
-            <f:viewAction action="#{usuarioBean.initForm}" />
-        </f:metadata>
 
         <h:form prependId="false">
 
@@ -77,33 +81,33 @@
                         errorClass="alert alert-danger d-block" />
 
             <!-- SECCIÓN -->
-            <div class="seccion-titulo">Información Personal</div>
+            <div class="seccion-titulo">Información del Usuario</div>
 
             <div class="row g-3">
 
                 <!-- TIPO USUARIO -->
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <label class="form-label">Tipo de Usuario *</label>
                     <h:selectOneMenu id="comboTipo"
                                      value="#{usuarioBean.tipoUsuarioId}"
                                      styleClass="form-control">
-                        <!-- Cuando cambia el tipo, recargamos formulario -->
-                        <f:ajax listener="#{usuarioBean.initForm}" render="@form"/>
                         <f:selectItems value="#{usuarioBean.tiposUsuario}" var="t"
                                        itemLabel="#{t.nombre}" itemValue="#{t.id}" />
                     </h:selectOneMenu>
+                    <small class="help-text">
+                        1 = Interno, 2 = Externo (proveedor/banco), 3 = Cliente final
+                    </small>
                     <h:message for="comboTipo" styleClass="text-danger small mt-1"/>
                 </div>
 
                 <!-- NOMBRE -->
-                <div class="col-md-6">
+                <div class="col-md-8">
                     <label class="form-label">Nombre completo *</label>
                     <h:inputText id="txtNombre"
                                  value="#{usuarioBean.usuarioSeleccionado.nombreCompleto}"
                                  required="true"
                                  requiredMessage="El nombre es obligatorio"
                                  styleClass="form-control"/>
-
                     <h:message for="txtNombre" styleClass="text-danger small mt-1"/>
                 </div>
 
@@ -115,7 +119,6 @@
                                  required="true"
                                  requiredMessage="El correo es obligatorio"
                                  styleClass="form-control"/>
-
                     <h:message for="txtCorreo" styleClass="text-danger small mt-1"/>
                 </div>
 
@@ -126,51 +129,68 @@
                                  styleClass="form-control"/>
                 </div>
 
-                <!-- EMPRESA (SOLO EXTERNOS) -->
-                <h:panelGroup rendered="#{usuarioBean.externo}">
-                    <div class="col-md-6">
-                        <label class="form-label">Empresa *</label>
-                        <h:selectOneMenu value="#{usuarioBean.empresaCodigo}" styleClass="form-control">
-                            <f:selectItem itemValue="" itemLabel="Seleccione empresa"/>
-                            <f:selectItem itemValue="FV"  itemLabel="FrutoVerde"/>
-                            <f:selectItem itemValue="KNS" itemLabel="Mueblería KNS"/>
-                            <f:selectItem itemValue="GRN" itemLabel="Granelia"/>
-                            <f:selectItem itemValue="CRE" itemLabel="Carnes RE"/>
-                        </h:selectOneMenu>
-                    </div>
-                </h:panelGroup>
+                <!-- ROL INTERNO -->
+                <div class="col-md-6">
+                    <label class="form-label">
+                        Rol Interno #{usuarioBean.interno ? '*' : '(no aplica)'}
+                    </label>
+                    <h:selectOneMenu value="#{usuarioBean.rolId}"
+                                     styleClass="form-control"
+                                     disabled="#{!usuarioBean.interno}">
+                        <f:selectItem itemValue="#{null}" itemLabel="-- Sin rol --" />
+                        <f:selectItems value="#{usuarioBean.rolesInternos}" var="r"
+                                       itemLabel="#{r.nombre}" itemValue="#{r.id}" />
+                    </h:selectOneMenu>
+                    <small class="help-text">
+                        Solo usuarios internos (tipo 1) deben tener rol.
+                    </small>
+                </div>
 
-                <!-- ROL: SOLO INTERNOS -->
-                <h:panelGroup rendered="#{usuarioBean.interno}">
-                    <div class="col-md-6">
-                        <label class="form-label">Rol Interno *</label>
-                        <h:selectOneMenu value="#{usuarioBean.rolId}" styleClass="form-control">
-                            <f:selectItem itemValue="" itemLabel="Seleccione rol"/>
-                            <f:selectItems value="#{usuarioBean.rolesInternos}" var="r"
-                                           itemLabel="#{r.nombre}" itemValue="#{r.id}" />
-                        </h:selectOneMenu>
-                    </div>
-                </h:panelGroup>
-
-                <!-- ESTADO -->
+                <!-- ESTADO CUENTA -->
                 <div class="col-md-6">
                     <label class="form-label">Estado *</label>
-                    <h:selectOneMenu value="#{usuarioBean.estadoCuentaId}" styleClass="form-control">
+                    <h:selectOneMenu value="#{usuarioBean.estadoCuentaId}"
+                                     styleClass="form-control">
                         <f:selectItems value="#{usuarioBean.estadosCuenta}" var="e"
                                        itemLabel="#{e.nombre}" itemValue="#{e.id}" />
                     </h:selectOneMenu>
                 </div>
 
-                <!-- MÓDULO: SOLO INTERNOS (ERP, CRM, USR, etc.) -->
-                <h:panelGroup rendered="#{usuarioBean.interno}">
-                    <div class="col-md-6">
-                        <label class="form-label">Módulo *</label>
-                        <h:selectOneMenu value="#{usuarioBean.moduloId}" styleClass="form-control">
-                            <f:selectItems value="#{usuarioBean.modulos}" var="m"
-                                           itemLabel="#{m.nombre}" itemValue="#{m.id}" />
-                        </h:selectOneMenu>
-                    </div>
-                </h:panelGroup>
+                <!-- MÓDULO -->
+                <div class="col-md-6">
+                    <label class="form-label">
+                        Módulo
+                        <small class="help-text d-block">
+                            Interno: elige módulo; Externo: PRV o BCO; Cliente final: CLI (fijo).
+                        </small>
+                    </label>
+                    <h:selectOneMenu value="#{usuarioBean.moduloId}"
+                                     styleClass="form-control"
+                                     disabled="#{usuarioBean.clienteFinal}">
+                        <f:selectItem itemValue="#{null}" itemLabel="Seleccione módulo"/>
+                        <f:selectItems value="#{usuarioBean.modulos}" var="m"
+                                       itemLabel="#{m.nombre}" itemValue="#{m.id}" />
+                    </h:selectOneMenu>
+                </div>
+
+                <!-- EMPRESA (solo proveedores externos PRV, visualmente solo para tipo 2) -->
+                <div class="col-md-6">
+                    <label class="form-label">
+                        Empresa (externo proveedor)
+                    </label>
+                    <h:selectOneMenu value="#{usuarioBean.empresaCodigo}"
+                                     styleClass="form-control"
+                                     disabled="#{!usuarioBean.externo}">
+                        <f:selectItem itemValue="#{null}" itemLabel="-- Sin empresa / No aplica --"/>
+                        <f:selectItem itemValue="FV"  itemLabel="FrutoVerde (FV)"/>
+                        <f:selectItem itemValue="KNS" itemLabel="Mueblería KNS (KNS)"/>
+                        <f:selectItem itemValue="GRN" itemLabel="Granelia (GRN)"/>
+                        <f:selectItem itemValue="CRE" itemLabel="CarnesRE (CRE)"/>
+                    </h:selectOneMenu>
+                    <small class="help-text">
+                        Obligatorio solo cuando Tipo = Externo (2) y módulo = PRV.
+                    </small>
+                </div>
 
                 <!-- DIRECCIÓN -->
                 <div class="col-md-12">
@@ -186,9 +206,12 @@
                                  value="#{usuarioBean.usuarioSeleccionado.username}"
                                  required="true"
                                  requiredMessage="El usuario es obligatorio"
-                                 styleClass="form-control" 
-                                 maxlength="20"/>
-
+                                 styleClass="form-control"
+                                 maxlength="40"/>
+                    <small class="help-text">
+                        Interno: sin prefijo. Externo proveedor: se guardará como FV-usuario, KNS-usuario, etc.
+                        Cliente final: se guardará como CLI-usuario (en alta).
+                    </small>
                     <h:message for="txtUsername" styleClass="text-danger small mt-1"/>
                 </div>
 
@@ -202,7 +225,6 @@
                                    required="#{!usuarioBean.edicion}"
                                    requiredMessage="La contraseña es obligatoria para nuevos usuarios"
                                    styleClass="form-control"/>
-
                     <h:message for="txtPassword" styleClass="text-danger small mt-1"/>
                 </div>
 
