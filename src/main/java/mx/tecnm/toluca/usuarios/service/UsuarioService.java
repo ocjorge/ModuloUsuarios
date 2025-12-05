@@ -183,18 +183,14 @@ public class UsuarioService {
     }
 
    
-    public Usuario buscarPorUsername(String username) {
-        if (username == null) {
-            return null;
-        }
+public Usuario buscarPorUsername(String username) {
+    if (username == null) return null;
+    return em.createQuery(
+        "SELECT u FROM Usuario u WHERE lower(u.username)=:u",
+        Usuario.class
+    ).setParameter("u", username.toLowerCase())
+     .getResultStream().findFirst().orElse(null);
+}
 
-        List<Usuario> lista = em.createQuery(
-                "SELECT u FROM Usuario u WHERE lower(u.username) = :u",
-                Usuario.class)
-                .setParameter("u", username.toLowerCase())
-                .getResultList();
-
-        return lista.isEmpty() ? null : lista.get(0);
-    }
 
 }

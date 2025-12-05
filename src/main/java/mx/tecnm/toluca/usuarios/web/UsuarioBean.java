@@ -37,252 +37,235 @@ public class UsuarioBean implements Serializable {
 
     private List<Usuario> usuarios;
 
-    // IDs de selects
-    private Integer tipoUsuarioId;
+    // IDs seleccionados desde combos
+    private Integer tipoUsuarioId;     // 1 = interno, 2 = externo, 3 = cliente final
     private Integer rolId;
     private Integer estadoCuentaId;
     private String moduloId;
 
-    // FILTRO GLOBAL
+    // Filtro global
     private String filtro;
 
-    // ================================
+    // Empresas permitidas para externos
+    private String empresaCodigo; // FV, KNS, GRN, CRE
+
     @PostConstruct
     public void init() {
         cargarUsuarios();
     }
 
-    // ================================
+    // ============================================
     public void verificarSesion() throws IOException {
         sessionManager.redirigirSiNoAutenticado();
     }
 
-    // ================================
+    // ============================================
     public void initForm() {
-
         if (idParam == null || idParam.isBlank()) {
-            // Crear nuevo
             usuarioSeleccionado = new Usuario();
             edicion = false;
-
             tipoUsuarioId = null;
             rolId = null;
             estadoCuentaId = null;
             moduloId = null;
-
+            empresaCodigo = null;
             return;
         }
 
-        // Edición
         try {
             UUID uuid = UUID.fromString(idParam);
             Usuario u = usuarioService.buscarPorId(uuid);
 
             if (u != null) {
+
                 usuarioSeleccionado = u;
                 edicion = true;
 
-                tipoUsuarioId  = (u.getTipoUsuario() != null) ? u.getTipoUsuario().getId() : null;
-                rolId          = (u.getRolInterno() != null) ? u.getRolInterno().getId() : null;
+                tipoUsuarioId = (u.getTipoUsuario() != null) ? u.getTipoUsuario().getId() : null;
+                rolId = (u.getRolInterno() != null) ? u.getRolInterno().getId() : null;
                 estadoCuentaId = (u.getEstadoCuenta() != null) ? u.getEstadoCuenta().getId() : null;
-                moduloId       = (u.getModulo() != null) ? u.getModulo().getId() : null;
+                moduloId = (u.getModulo() != null) ? u.getModulo().getId() : null;
+
+                empresaCodigo = null;
+
+                if (isExterno() && usuarioSeleccionado.getUsername() != null) {
+                    String user = usuarioSeleccionado.getUsername();
+                    if (user.startsWith("FV-")) empresaCodigo = "FV";
+                    if (user.startsWith("KNS-")) empresaCodigo = "KNS";
+                    if (user.startsWith("GRN-")) empresaCodigo = "GRN";
+                    if (user.startsWith("CRE-")) empresaCodigo = "CRE";
+                }
             }
 
-        } catch (Exception ex) {
+        } catch (Exception e) {
             edicion = false;
         }
     }
 
-    // ================================
+    // ============================================
+    // Reglas de negocio
+    public boolean isInterno() {
+        return tipoUsuarioId != null && tipoUsuarioId == 1;
+    }
+
+    public boolean isExterno() {
+        return tipoUsuarioId != null && tipoUsuarioId == 2;
+    }
+
+    public boolean isClienteFinal() {
+        return tipoUsuarioId != null && tipoUsuarioId == 3;
+    }
+
+    // Acceso desde JSF
+    public boolean getInterno() { return isInterno(); }
+    public boolean getExterno() { return isExterno(); }
+    public boolean getClienteFinal() { return isClienteFinal(); }
+
+    // ============================================
     public void guardar() {
         try {
-
-            // Asignar entidades con los IDs
-            usuarioSeleccionado.setTipoUsuario(usuarioService.buscarTipoUsuarioPorId(tipoUsuarioId));
-            usuarioSeleccionado.setRolInterno(usuarioService.buscarRolPorId(rolId));
-            usuarioSeleccionado.setEstadoCuenta(usuarioService.buscarEstadoCuentaPorId(estadoCuentaId));
-            usuarioSeleccionado.setModulo(usuarioService.buscarModuloPorId(moduloId));
-
-            // Username obligatorio
-            if (usuarioSeleccionado.getUsername() == null || usuarioSeleccionado.getUsername().isBlank()) {
-                FacesContext.getCurrentInstance().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Debe ingresar un nombre de usuario", ""));
+            if (tipoUsuarioId == null) {
+                mensaje("Debe seleccionar el tipo de usuario", FacesMessage.SEVERITY_WARN);
                 return;
             }
 
-            // Validar username repetido
-            Usuario repetido = usuarioService.buscarPorUsername(usuarioSeleccionado.getUsername());
-            if (!edicion && repetido != null) {
-                FacesContext.getCurrentInstance().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "El nombre de usuario ya existe", ""));
-                return;
-            }
+            usuarioSeleccionado.setTipoUsuario(
+                usuarioService.buscarTipoUsuarioPorId(tipoUsuarioId)
+            );
 
-            if (edicion) {
+            usuarioSeleccionado.setEstadoCuenta(
+                usuarioService.buscarEstadoCuentaPorId(estadoCuentaId)
+            );
 
-                boolean rehash = passwordPlano != null && !passwordPlano.isBlank();
-                if (rehash) {
-                    usuarioSeleccionado.setContrasena(passwordPlano);
+            Modulo modulo = null;
+            RolInterno rol = null;
+
+            // ------- Interno -------
+            if (isInterno()) {
+                if (moduloId == null) {
+                    mensaje("Debe elegir un módulo para usuarios internos", FacesMessage.SEVERITY_WARN);
+                    return;
                 }
+                modulo = usuarioService.buscarModuloPorId(moduloId);
 
-                usuarioService.actualizar(usuarioSeleccionado, rehash);
+                if (rolId == null) {
+                    mensaje("Debe elegir un rol para usuarios internos", FacesMessage.SEVERITY_WARN);
+                    return;
+                }
+                rol = usuarioService.buscarRolPorId(rolId);
 
-                FacesContext.getCurrentInstance().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Usuario actualizado correctamente", ""));
+            // ------- Externo -------
+            } else if (isExterno()) {
+                modulo = usuarioService.buscarModuloPorId("PRV");
+                rol = null;
 
-            } else {
-
-                if (passwordPlano == null || passwordPlano.isBlank()) {
-                    FacesContext.getCurrentInstance().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_WARN,
-                                    "La contraseña es obligatoria", ""));
+                if (empresaCodigo == null || empresaCodigo.isBlank()) {
+                    mensaje("Debe seleccionar la empresa del proveedor/banco", FacesMessage.SEVERITY_WARN);
                     return;
                 }
 
-                usuarioService.guardarNuevo(usuarioSeleccionado, passwordPlano);
+                String base = usuarioSeleccionado.getUsername();
+                String prefijo = empresaCodigo + "-";
 
-                FacesContext.getCurrentInstance().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Usuario registrado correctamente", ""));
+                if (!base.startsWith(prefijo)) {
+                    usuarioSeleccionado.setUsername(prefijo + base);
+                }
+
+            // ------- Cliente Final -------
+            } else if (isClienteFinal()) {
+                modulo = usuarioService.buscarModuloPorId("CLI");
+                rol = null;
+                empresaCodigo = null;
+            }
+
+            usuarioSeleccionado.setModulo(modulo);
+            usuarioSeleccionado.setRolInterno(rol);
+
+            // ------- Validar username duplicado -------
+            Usuario repetido = usuarioService.buscarPorUsername(usuarioSeleccionado.getUsername());
+            if (!edicion && repetido != null) {
+                mensaje("El nombre de usuario ya existe", FacesMessage.SEVERITY_WARN);
+                return;
+            }
+
+            // ------- Guardar -------
+            if (!edicion) {
+                if (passwordPlano == null || passwordPlano.isBlank()) {
+                    mensaje("La contraseña es obligatoria", FacesMessage.SEVERITY_WARN);
+                    return;
+                }
+                usuarioService.guardarNuevo(usuarioSeleccionado, passwordPlano);
+                mensaje("Usuario registrado correctamente", FacesMessage.SEVERITY_INFO);
+            } else {
+                boolean rehash = passwordPlano != null && !passwordPlano.isBlank();
+                if (rehash) usuarioSeleccionado.setContrasena(passwordPlano);
+
+                usuarioService.actualizar(usuarioSeleccionado, rehash);
+                mensaje("Usuario actualizado correctamente", FacesMessage.SEVERITY_INFO);
             }
 
             cargarUsuarios();
 
-        } catch (Exception ex) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "No se pudo guardar el usuario", ex.getMessage()));
+        } catch (Exception e) {
+            mensaje("No se pudo guardar: " + e.getMessage(), FacesMessage.SEVERITY_ERROR);
         }
     }
 
-    // ================================
+    // ============================================
     public void eliminar(UUID id) {
         usuarioService.eliminar(id);
         cargarUsuarios();
-
-        FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, "Usuario eliminado", ""));
+        mensaje("Usuario eliminado", FacesMessage.SEVERITY_INFO);
     }
 
-    // ================================
     public void cargarUsuarios() {
         usuarios = usuarioService.listarUsuarios();
     }
 
-    // ================================
-    // FILTRO GLOBAL
     public void filtrar() {
         if (filtro == null || filtro.isBlank()) {
             cargarUsuarios();
             return;
         }
-
         String f = filtro.toLowerCase();
-
         usuarios = usuarios.stream()
                 .filter(u ->
-                        (u.getNombreCompleto() != null && u.getNombreCompleto().toLowerCase().contains(f)) ||
-                        (u.getCorreoElectronico() != null && u.getCorreoElectronico().toLowerCase().contains(f)) ||
-                        (u.getUsername() != null && u.getUsername().toLowerCase().contains(f))
-                )
-                .toList();
+                        u.getNombreCompleto().toLowerCase().contains(f) ||
+                        u.getCorreoElectronico().toLowerCase().contains(f) ||
+                        u.getUsername().toLowerCase().contains(f)
+                ).toList();
     }
 
-    // ================================
+    private void mensaje(String msg, FacesMessage.Severity tipo) {
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(tipo, msg, ""));
+    }
+
+    // ============================================
     // GETTERS / SETTERS
-    // ================================
-    public String getIdParam() {
-        return idParam;
-    }
+    public String getIdParam() { return idParam; }
+    public void setIdParam(String idParam) { this.idParam = idParam; }
+    public Usuario getUsuarioSeleccionado() { return usuarioSeleccionado; }
+    public void setUsuarioSeleccionado(Usuario u) { this.usuarioSeleccionado = u; }
+    public String getPasswordPlano() { return passwordPlano; }
+    public void setPasswordPlano(String p) { this.passwordPlano = p; }
+    public boolean isEdicion() { return edicion; }
+    public List<Usuario> getUsuarios() { return usuarios; }
+    public String getFiltro() { return filtro; }
+    public void setFiltro(String f) { this.filtro = f; }
+    public Integer getTipoUsuarioId() { return tipoUsuarioId; }
+    public void setTipoUsuarioId(Integer id) { this.tipoUsuarioId = id; }
+    public Integer getRolId() { return rolId; }
+    public void setRolId(Integer id) { this.rolId = id; }
+    public Integer getEstadoCuentaId() { return estadoCuentaId; }
+    public void setEstadoCuentaId(Integer id) { this.estadoCuentaId = id; }
+    public String getModuloId() { return moduloId; }
+    public void setModuloId(String id) { this.moduloId = id; }
+    public String getEmpresaCodigo() { return empresaCodigo; }
+    public void setEmpresaCodigo(String c) { this.empresaCodigo = c; }
+    public SessionManager getSessionManager() { return sessionManager; }
 
-    public void setIdParam(String idParam) {
-        this.idParam = idParam;
-    }
-
-    public Usuario getUsuarioSeleccionado() {
-        return usuarioSeleccionado;
-    }
-
-    public void setUsuarioSeleccionado(Usuario u) {
-        this.usuarioSeleccionado = u;
-    }
-
-    public String getPasswordPlano() {
-        return passwordPlano;
-    }
-
-    public void setPasswordPlano(String passwordPlano) {
-        this.passwordPlano = passwordPlano;
-    }
-
-    public boolean isEdicion() {
-        return edicion;
-    }
-
-    public List<Usuario> getUsuarios() {
-        return usuarios;
-    }
-
-    public String getFiltro() {
-        return filtro;
-    }
-
-    public void setFiltro(String filtro) {
-        this.filtro = filtro;
-    }
-
-    public Integer getTipoUsuarioId() {
-        return tipoUsuarioId;
-    }
-
-    public void setTipoUsuarioId(Integer tipoUsuarioId) {
-        this.tipoUsuarioId = tipoUsuarioId;
-    }
-
-    public Integer getRolId() {
-        return rolId;
-    }
-
-    public void setRolId(Integer rolId) {
-        this.rolId = rolId;
-    }
-
-    public Integer getEstadoCuentaId() {
-        return estadoCuentaId;
-    }
-
-    public void setEstadoCuentaId(Integer estadoCuentaId) {
-        this.estadoCuentaId = estadoCuentaId;
-    }
-
-    public String getModuloId() {
-        return moduloId;
-    }
-
-    public void setModuloId(String moduloId) {
-        this.moduloId = moduloId;
-    }
-
-    public SessionManager getSessionManager() {
-        return sessionManager;
-    }
-
-    public List<TipoUsuario> getTiposUsuario() {
-        return usuarioService.listarTiposUsuario();
-    }
-
-    public List<RolInterno> getRolesInternos() {
-        return usuarioService.listarRoles();
-    }
-
-    public List<EstadoCuenta> getEstadosCuenta() {
-        return usuarioService.listarEstadosCuenta();
-    }
-
-    public List<Modulo> getModulos() {
-        return usuarioService.listarModulos();
-    }
+    public List<TipoUsuario> getTiposUsuario() { return usuarioService.listarTiposUsuario(); }
+    public List<RolInterno> getRolesInternos() { return usuarioService.listarRoles(); }
+    public List<EstadoCuenta> getEstadosCuenta() { return usuarioService.listarEstadosCuenta(); }
+    public List<Modulo> getModulos() { return usuarioService.listarModulos(); }
 }

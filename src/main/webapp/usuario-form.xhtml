@@ -3,191 +3,224 @@
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core">
 
-    <h:head>
-        <title>Usuario</title>
-        <link rel="stylesheet"
-              href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
+<h:head>
+    <title>Usuario</title>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
 
-        <style>
-            body {
-                background-color:#f0f2f5;
-            }
-            .topbar {
-                background:#275fa7;
-                color:white;
-                padding:12px 24px;
-                font-size:20px;
-                font-weight:bold;
-            }
-            .btn-volver {
-                background:#c0392b !important;
-                color:white !important;
-                padding:6px 14px;
-                border-radius:6px;
-            }
-            .seccion-titulo {
-                font-size:20px;
-                margin-bottom:10px;
-                padding-bottom:6px;
-                border-bottom:2px solid #275fa7;
-            }
-        </style>
-    </h:head>
+    <style>
+        body {
+            background-color:#f0f2f5;
+        }
+        .topbar {
+            background:#275fa7;
+            color:white;
+            padding:12px 24px;
+            font-size:20px;
+            font-weight:bold;
+        }
+        .btn-volver {
+            background:#c0392b !important;
+            color:white !important;
+            padding:6px 14px;
+            border-radius:6px;
+        }
+        .seccion-titulo {
+            font-size:20px;
+            margin-bottom:10px;
+            padding-bottom:6px;
+            border-bottom:2px solid #275fa7;
+        }
+    </style>
+</h:head>
 
-    <h:body>
+<h:body>
 
-        <!-- BARRA SUPERIOR -->
-        <div class="topbar d-flex justify-content-between align-items-center">
-            #{usuarioBean.edicion ? 'Editar Usuario' : 'Nuevo Usuario'}
+    <!-- BARRA SUPERIOR -->
+    <nav class="navbar navbar-dark" style="background-color:#225ca8;">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">
+                #{usuarioBean.edicion ? 'Editar Usuario' : 'Nuevo Usuario'}
+            </span>
 
-            <div>
+            <div class="d-flex align-items-center">
                 <h:form>
                     <h:commandLink value="Volver"
                                    action="usuarios.xhtml?faces-redirect=true"
-                                   styleClass="btn-volver"/>
+                                   styleClass="btn btn-light me-2"/>
 
                     <h:commandLink value="Dashboard"
                                    action="dashboard.xhtml?faces-redirect=true"
-                                   styleClass="btn btn-light ms-2"/>
+                                   styleClass="btn btn-outline-light"/>
                 </h:form>
             </div>
         </div>
+    </nav>
 
-        <!-- CONTENIDO -->
-        <div class="container py-4" style="max-width:900px;">
+    <!-- CONTENIDO -->
+    <div class="container py-4" style="max-width:900px;">
 
-            <!-- CARGAR DATOS -->
-            <f:metadata>
-                <f:viewParam name="id" value="#{usuarioBean.idParam}" />
-                <f:viewAction action="#{usuarioBean.verificarSesion}" />
-                <f:viewAction action="#{usuarioBean.initForm}" />
-            </f:metadata>
+        <!-- CARGAR DATOS -->
+        <f:metadata>
+            <f:viewParam name="id" value="#{usuarioBean.idParam}" />
+            <f:viewAction action="#{usuarioBean.verificarSesion}" />
+            <f:viewAction action="#{usuarioBean.initForm}" />
+        </f:metadata>
 
-            <h:form prependId="false">
+        <h:form prependId="false">
 
-                <h:messages globalOnly="true" styleClass="alert alert-danger"/>
+            <h:messages globalOnly="true"
+                        layout="table"
+                        styleClass="w-100 mb-3"
+                        style="list-style:none; padding:0; margin:0;"
+                        infoClass="alert alert-success d-block"
+                        errorClass="alert alert-danger d-block" />
 
-                <!-- SECCIÓN -->
-                <div class="seccion-titulo">Información Personal</div>
+            <!-- SECCIÓN -->
+            <div class="seccion-titulo">Información Personal</div>
 
-                <div class="row g-3">
+            <div class="row g-3">
 
-                    <!-- TIPO USUARIO -->
-                    <div class="col-md-6">
-                        <label class="form-label">Tipo de Usuario *</label>
-<h:selectOneMenu value="#{usuarioBean.tipoUsuarioId}" styleClass="form-control">
-    <f:selectItems value="#{usuarioBean.tiposUsuario}" var="t"
-                   itemLabel="#{t.nombre}" itemValue="#{t.id}" />
-</h:selectOneMenu>
-
-
-
-
-
-
-                        >
-                    </div>
-
-                    <!-- NOMBRE -->
-                    <div class="col-md-6">
-                        <label class="form-label">Nombre completo *</label>
-                        <h:inputText value="#{usuarioBean.usuarioSeleccionado.nombreCompleto}"
-                                     required="true"
-                                     styleClass="form-control"/>
-                    </div>
-
-                    <!-- CORREO -->
-                    <div class="col-md-6">
-                        <label class="form-label">Correo electrónico *</label>
-                        <h:inputText value="#{usuarioBean.usuarioSeleccionado.correoElectronico}"
-                                     required="true"
-                                     styleClass="form-control"/>
-                    </div>
-
-                    <!-- TELÉFONO -->
-                    <div class="col-md-6">
-                        <label class="form-label">Teléfono</label>
-                        <h:inputText value="#{usuarioBean.usuarioSeleccionado.telefono}"
-                                     styleClass="form-control"/>
-                    </div>
-
-                    <!-- ROL -->
-                    <div class="col-md-6">
-                        <label class="form-label">Rol Interno</label>
-<h:selectOneMenu value="#{usuarioBean.rolId}" styleClass="form-control">
-    <f:selectItem itemValue="" itemLabel="Sin rol"/>
-    <f:selectItems value="#{usuarioBean.rolesInternos}" var="r"
-                   itemLabel="#{r.nombre}" itemValue="#{r.id}" />
-</h:selectOneMenu>
-
-                    </div>
-
-                    <!-- ESTADO -->
-                    <div class="col-md-6">
-                        <label class="form-label">Estado *</label>
-<h:selectOneMenu value="#{usuarioBean.estadoCuentaId}" styleClass="form-control">
-    <f:selectItems value="#{usuarioBean.estadosCuenta}" var="e"
-                   itemLabel="#{e.nombre}" itemValue="#{e.id}" />
-</h:selectOneMenu>
-
-
-
-                    </div>
-
-                    <!-- MÓDULO -->
-                    <div class="col-md-6">
-                        <label class="form-label">Módulo</label>
-<h:selectOneMenu value="#{usuarioBean.moduloId}" styleClass="form-control">
-    <f:selectItem itemValue="" itemLabel="Ninguno"/>
-    <f:selectItems value="#{usuarioBean.modulos}" var="m"
-                   itemLabel="#{m.nombre}" itemValue="#{m.id}" />
-</h:selectOneMenu>
-
-
-
-
-                    </div>
-
-                    <!-- DIRECCIÓN -->
-                    <div class="col-md-12">
-                        <label class="form-label">Dirección</label>
-                        <h:inputTextarea value="#{usuarioBean.usuarioSeleccionado.direccion}"
-                                         styleClass="form-control" rows="2"/>
-                    </div>
-                    <!-- USERNAME -->
-<div class="col-md-6">
-    <label class="form-label">Username *</label>
-    <h:inputText value="#{usuarioBean.usuarioSeleccionado.username}"
-                 required="true"
-                 styleClass="form-control" maxlength="20"/>
-</div>
-
-
-                    <!-- CONTRASEÑA -->
-                    <div class="col-md-6">
-                        <label class="form-label">
-                            Contraseña #{usuarioBean.edicion ? "(opcional)" : "*"}
-                        </label>
-                        <h:inputSecret value="#{usuarioBean.passwordPlano}"
-                                       required="#{!usuarioBean.edicion}"
-                                       styleClass="form-control"/>
-                    </div>
-
+                <!-- TIPO USUARIO -->
+                <div class="col-md-6">
+                    <label class="form-label">Tipo de Usuario *</label>
+                    <h:selectOneMenu id="comboTipo"
+                                     value="#{usuarioBean.tipoUsuarioId}"
+                                     styleClass="form-control">
+                        <!-- Cuando cambia el tipo, recargamos formulario -->
+                        <f:ajax listener="#{usuarioBean.initForm}" render="@form"/>
+                        <f:selectItems value="#{usuarioBean.tiposUsuario}" var="t"
+                                       itemLabel="#{t.nombre}" itemValue="#{t.id}" />
+                    </h:selectOneMenu>
+                    <h:message for="comboTipo" styleClass="text-danger small mt-1"/>
                 </div>
 
-                <!-- BOTONES -->
-                <div class="mt-4 d-flex gap-2">
-                    <h:commandButton value="Guardar"
-                                     actionListener="#{usuarioBean.guardar}"
-                                     styleClass="btn btn-primary" />
+                <!-- NOMBRE -->
+                <div class="col-md-6">
+                    <label class="form-label">Nombre completo *</label>
+                    <h:inputText id="txtNombre"
+                                 value="#{usuarioBean.usuarioSeleccionado.nombreCompleto}"
+                                 required="true"
+                                 requiredMessage="El nombre es obligatorio"
+                                 styleClass="form-control"/>
 
-                    <h:link outcome="usuarios.xhtml"
-                            value="Cancelar"
-                            styleClass="btn btn-secondary"/>
+                    <h:message for="txtNombre" styleClass="text-danger small mt-1"/>
                 </div>
 
-            </h:form>
-        </div>
+                <!-- CORREO -->
+                <div class="col-md-6">
+                    <label class="form-label">Correo electrónico *</label>
+                    <h:inputText id="txtCorreo"
+                                 value="#{usuarioBean.usuarioSeleccionado.correoElectronico}"
+                                 required="true"
+                                 requiredMessage="El correo es obligatorio"
+                                 styleClass="form-control"/>
 
-    </h:body>
+                    <h:message for="txtCorreo" styleClass="text-danger small mt-1"/>
+                </div>
+
+                <!-- TELÉFONO -->
+                <div class="col-md-6">
+                    <label class="form-label">Teléfono</label>
+                    <h:inputText value="#{usuarioBean.usuarioSeleccionado.telefono}"
+                                 styleClass="form-control"/>
+                </div>
+
+                <!-- EMPRESA (SOLO EXTERNOS) -->
+                <h:panelGroup rendered="#{usuarioBean.externo}">
+                    <div class="col-md-6">
+                        <label class="form-label">Empresa *</label>
+                        <h:selectOneMenu value="#{usuarioBean.empresaCodigo}" styleClass="form-control">
+                            <f:selectItem itemValue="" itemLabel="Seleccione empresa"/>
+                            <f:selectItem itemValue="FV"  itemLabel="FrutoVerde"/>
+                            <f:selectItem itemValue="KNS" itemLabel="Mueblería KNS"/>
+                            <f:selectItem itemValue="GRN" itemLabel="Granelia"/>
+                            <f:selectItem itemValue="CRE" itemLabel="Carnes RE"/>
+                        </h:selectOneMenu>
+                    </div>
+                </h:panelGroup>
+
+                <!-- ROL: SOLO INTERNOS -->
+                <h:panelGroup rendered="#{usuarioBean.interno}">
+                    <div class="col-md-6">
+                        <label class="form-label">Rol Interno *</label>
+                        <h:selectOneMenu value="#{usuarioBean.rolId}" styleClass="form-control">
+                            <f:selectItem itemValue="" itemLabel="Seleccione rol"/>
+                            <f:selectItems value="#{usuarioBean.rolesInternos}" var="r"
+                                           itemLabel="#{r.nombre}" itemValue="#{r.id}" />
+                        </h:selectOneMenu>
+                    </div>
+                </h:panelGroup>
+
+                <!-- ESTADO -->
+                <div class="col-md-6">
+                    <label class="form-label">Estado *</label>
+                    <h:selectOneMenu value="#{usuarioBean.estadoCuentaId}" styleClass="form-control">
+                        <f:selectItems value="#{usuarioBean.estadosCuenta}" var="e"
+                                       itemLabel="#{e.nombre}" itemValue="#{e.id}" />
+                    </h:selectOneMenu>
+                </div>
+
+                <!-- MÓDULO: SOLO INTERNOS (ERP, CRM, USR, etc.) -->
+                <h:panelGroup rendered="#{usuarioBean.interno}">
+                    <div class="col-md-6">
+                        <label class="form-label">Módulo *</label>
+                        <h:selectOneMenu value="#{usuarioBean.moduloId}" styleClass="form-control">
+                            <f:selectItems value="#{usuarioBean.modulos}" var="m"
+                                           itemLabel="#{m.nombre}" itemValue="#{m.id}" />
+                        </h:selectOneMenu>
+                    </div>
+                </h:panelGroup>
+
+                <!-- DIRECCIÓN -->
+                <div class="col-md-12">
+                    <label class="form-label">Dirección</label>
+                    <h:inputTextarea value="#{usuarioBean.usuarioSeleccionado.direccion}"
+                                     styleClass="form-control" rows="2"/>
+                </div>
+
+                <!-- USERNAME -->
+                <div class="col-md-6">
+                    <label class="form-label">Username *</label>
+                    <h:inputText id="txtUsername"
+                                 value="#{usuarioBean.usuarioSeleccionado.username}"
+                                 required="true"
+                                 requiredMessage="El usuario es obligatorio"
+                                 styleClass="form-control" 
+                                 maxlength="20"/>
+
+                    <h:message for="txtUsername" styleClass="text-danger small mt-1"/>
+                </div>
+
+                <!-- CONTRASEÑA -->
+                <div class="col-md-6">
+                    <label class="form-label">
+                        Contraseña #{usuarioBean.edicion ? "(opcional)" : "*"}
+                    </label>
+                    <h:inputSecret id="txtPassword"
+                                   value="#{usuarioBean.passwordPlano}"
+                                   required="#{!usuarioBean.edicion}"
+                                   requiredMessage="La contraseña es obligatoria para nuevos usuarios"
+                                   styleClass="form-control"/>
+
+                    <h:message for="txtPassword" styleClass="text-danger small mt-1"/>
+                </div>
+
+            </div>
+
+            <!-- BOTONES -->
+            <div class="mt-4 d-flex gap-2">
+                <h:commandButton value="Guardar"
+                                 actionListener="#{usuarioBean.guardar}"
+                                 styleClass="btn btn-primary" />
+
+                <h:link outcome="usuarios.xhtml"
+                        value="Cancelar"
+                        styleClass="btn btn-secondary"/>
+            </div>
+
+        </h:form>
+    </div>
+
+</h:body>
 </html>
