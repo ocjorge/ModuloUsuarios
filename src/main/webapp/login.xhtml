@@ -18,23 +18,32 @@
                     <h3 class="text-center mb-4">Sistema de Gestión de Usuarios</h3>
 
                     <h:messages globalOnly="true"
-                                styleClass="alert alert-danger"
+                                styleClass="alert alert-danger d-block"
+                                style="list-style:none; margin:0; padding:10px;"
                                 infoClass="alert alert-info"/>
 
                     <div class="mb-3">
                         <label class="form-label">Usuario</label>
-                        <h:inputText value="#{loginBean.username}" 
+
+                        <h:inputText id="txtUsuario" 
+                                     value="#{loginBean.username}" 
                                      styleClass="form-control"
                                      required="true"
                                      requiredMessage="Ingrese su usuario"/>
+
+                        <h:message for="txtUsuario" styleClass="text-danger small mt-1"/>
                     </div>
 
                     <div class="mb-4">
                         <label class="form-label">Contraseña</label>
-                        <h:inputSecret value="#{loginBean.password}"
+
+                        <h:inputSecret id="txtPassword" 
+                                       value="#{loginBean.password}"
                                        styleClass="form-control"
                                        required="true"
                                        requiredMessage="Ingrese su contraseña"/>
+
+                        <h:message for="txtPassword" styleClass="text-danger small mt-1"/>
                     </div>
 
                     <h:commandButton value="Iniciar sesión"

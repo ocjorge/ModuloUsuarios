@@ -37,21 +37,25 @@
     <h:body>
 
         <!-- BARRA SUPERIOR -->
-        <div class="topbar d-flex justify-content-between align-items-center">
-            #{usuarioBean.edicion ? 'Editar Usuario' : 'Nuevo Usuario'}
+        <nav class="navbar navbar-dark" style="background-color:#225ca8;">
+            <div class="container-fluid">
+                <span class="navbar-brand mb-0 h1">
+                    #{usuarioBean.edicion ? 'Editar Usuario' : 'Nuevo Usuario'}
+                </span>
 
-            <div>
-                <h:form>
-                    <h:commandLink value="Volver"
-                                   action="usuarios.xhtml?faces-redirect=true"
-                                   styleClass="btn-volver"/>
+                <div class="d-flex align-items-center">
+                    <h:form>
+                        <h:commandLink value="Volver"
+                                       action="usuarios.xhtml?faces-redirect=true"
+                                       styleClass="btn btn-light me-2"/>
 
-                    <h:commandLink value="Dashboard"
-                                   action="dashboard.xhtml?faces-redirect=true"
-                                   styleClass="btn btn-light ms-2"/>
-                </h:form>
+                        <h:commandLink value="Dashboard"
+                                       action="dashboard.xhtml?faces-redirect=true"
+                                       styleClass="btn btn-outline-light"/>
+                    </h:form>
+                </div>
             </div>
-        </div>
+        </nav>
 
         <!-- CONTENIDO -->
         <div class="container py-4" style="max-width:900px;">
@@ -65,7 +69,11 @@
 
             <h:form prependId="false">
 
-                <h:messages globalOnly="true" styleClass="alert alert-danger"/>
+                <h:messages globalOnly="true"
+                            styleClass="alert alert-danger d-block"
+                            style="list-style:none; margin-bottom: 20px; padding:10px;"
+                            infoClass="alert alert-info"
+                            errorClass="text-danger" />
 
                 <!-- SECCIÓN -->
                 <div class="seccion-titulo">Información Personal</div>
@@ -75,33 +83,37 @@
                     <!-- TIPO USUARIO -->
                     <div class="col-md-6">
                         <label class="form-label">Tipo de Usuario *</label>
-<h:selectOneMenu value="#{usuarioBean.tipoUsuarioId}" styleClass="form-control">
-    <f:selectItems value="#{usuarioBean.tiposUsuario}" var="t"
-                   itemLabel="#{t.nombre}" itemValue="#{t.id}" />
-</h:selectOneMenu>
-
-
-
-
-
-
-                        >
+                        <h:selectOneMenu id="comboTipo"
+                                         value="#{usuarioBean.tipoUsuarioId}"
+                                         styleClass="form-control">
+                            <f:selectItems value="#{usuarioBean.tiposUsuario}" var="t"
+                                           itemLabel="#{t.nombre}" itemValue="#{t.id}" />
+                        </h:selectOneMenu>
+                        <h:message for="comboTipo" styleClass="text-danger small mt-1"/>
                     </div>
 
                     <!-- NOMBRE -->
                     <div class="col-md-6">
                         <label class="form-label">Nombre completo *</label>
-                        <h:inputText value="#{usuarioBean.usuarioSeleccionado.nombreCompleto}"
+                        <h:inputText id="txtNombre"
+                                     value="#{usuarioBean.usuarioSeleccionado.nombreCompleto}"
                                      required="true"
+                                     requiredMessage="El nombre es obligatorio"
                                      styleClass="form-control"/>
+
+                        <h:message for="txtNombre" styleClass="text-danger small mt-1"/>
                     </div>
 
                     <!-- CORREO -->
                     <div class="col-md-6">
                         <label class="form-label">Correo electrónico *</label>
-                        <h:inputText value="#{usuarioBean.usuarioSeleccionado.correoElectronico}"
+                        <h:inputText id="txtCorreo"
+                                     value="#{usuarioBean.usuarioSeleccionado.correoElectronico}"
                                      required="true"
+                                     requiredMessage="El correo es obligatorio"
                                      styleClass="form-control"/>
+
+                        <h:message for="txtCorreo" styleClass="text-danger small mt-1"/>
                     </div>
 
                     <!-- TELÉFONO -->
@@ -155,12 +167,17 @@
                                          styleClass="form-control" rows="2"/>
                     </div>
                     <!-- USERNAME -->
-<div class="col-md-6">
-    <label class="form-label">Username *</label>
-    <h:inputText value="#{usuarioBean.usuarioSeleccionado.username}"
-                 required="true"
-                 styleClass="form-control" maxlength="20"/>
-</div>
+                    <div class="col-md-6">
+                        <label class="form-label">Username *</label>
+                        <h:inputText id="txtUsername"
+                                     value="#{usuarioBean.usuarioSeleccionado.username}"
+                                     required="true"
+                                     requiredMessage="El usuario es obligatorio"
+                                     styleClass="form-control" 
+                                     maxlength="20"/>
+
+                        <h:message for="txtUsername" styleClass="text-danger small mt-1"/>
+                    </div>
 
 
                     <!-- CONTRASEÑA -->
@@ -168,9 +185,13 @@
                         <label class="form-label">
                             Contraseña #{usuarioBean.edicion ? "(opcional)" : "*"}
                         </label>
-                        <h:inputSecret value="#{usuarioBean.passwordPlano}"
+                        <h:inputSecret id="txtPassword"
+                                       value="#{usuarioBean.passwordPlano}"
                                        required="#{!usuarioBean.edicion}"
+                                       requiredMessage="La contraseña es obligatoria para nuevos usuarios"
                                        styleClass="form-control"/>
+
+                        <h:message for="txtPassword" styleClass="text-danger small mt-1"/>
                     </div>
 
                 </div>
