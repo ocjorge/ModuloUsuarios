@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+<h:head>
+    <title>Detalle Ticket</title>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
+</h:head>
+
+<h:body style="background-color:#f0f2f5;">
+
+<!-- METADATA DEBE IR DIRECTAMENTE BAJO h:body -->
+<f:metadata>
+    <f:viewAction action="#{ticketDetalleBean.verificarSesion}" />
+    <f:viewParam name="id" value="#{ticketDetalleBean.idParam}" />
+    <f:viewAction action="#{ticketDetalleBean.cargar}" />
+</f:metadata>
+
+<nav class="navbar navbar-dark" style="background-color:#225ca8;">
+    <div class="container-fluid">
+        <span class="navbar-brand">Detalle del Ticket</span>
+        <h:form>
+            <h:commandLink value="Volver a Tickets"
+                           action="tickets.xhtml?faces-redirect=true"
+                           styleClass="btn btn-light"/>
+        </h:form>
+    </div>
+</nav>
+
+<div class="container py-4">
+
+    <h:panelGroup rendered="#{not empty ticketDetalleBean.ticket}">
+        <div class="card shadow-sm">
+            <div class="card-body">
+
+                <h4>Información general</h4>
+                <p><b>Fecha:</b> #{ticketDetalleBean.ticket.fechaSolicitud}</p>
+                <p><b>Usuario:</b> #{ticketDetalleBean.ticket.usuario.nombreCompleto}</p>
+                <p><b>Módulo:</b> #{ticketDetalleBean.ticket.modulo.nombre}</p>
+                <p><b>Tipo cambio:</b> #{ticketDetalleBean.ticket.tipoCambio.nombre}</p>
+                <p><b>Estado:</b> #{ticketDetalleBean.ticket.estado.nombre}</p>
+
+                <hr />
+
+                <h4>Datos propuestos (JSON)</h4>
+                <pre class="bg-light p-3 rounded" style="white-space:pre-wrap;">
+#{ticketDetalleBean.jsonPretty}
+                </pre>
+
+            </div>
+        </div>
+    </h:panelGroup>
+
+</div>
+
+</h:body>
+</html>

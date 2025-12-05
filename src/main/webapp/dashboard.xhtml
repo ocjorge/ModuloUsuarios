@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<h:head>
+    <title>Dashboard</title>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
+</h:head>
+
+<h:body style="background-color:#f0f2f5;">
+
+<!-- SIDEBAR -->
+<ui:include src="/WEB-INF/sidebar.xhtml" />
+
+<!-- METADATA (DEBE IR DIRECTAMENTE EN EL VIEW) -->
+<f:metadata>
+    <f:viewAction action="#{usuarioBean.verificarSesion}" />
+</f:metadata>
+
+<!-- CONTENEDOR PRINCIPAL -->
+<div style="margin-left:260px;">
+
+    <!-- NAVBAR SUPERIOR -->
+    <nav class="navbar navbar-dark" style="background-color:#225ca8;">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">Panel Principal</span>
+
+            <div class="d-flex align-items-center">
+                <span class="text-white me-3">
+                    Bienvenido, #{usuarioBean.sessionManager.usuarioActual.nombreCompleto}
+                </span>
+
+                <h:form>
+                    <h:commandLink value="Cerrar Sesión"
+                                   action="#{usuarioBean.sessionManager.cerrarSesion}"
+                                   styleClass="btn btn-danger"/>
+                </h:form>
+            </div>
+        </div>
+    </nav>
+
+    <!-- CONTENIDO -->
+    <div class="container py-4">
+        <div class="row g-4">
+
+            <!-- Tarjeta 1 -->
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Gestión de Usuarios</h5>
+                        <p class="card-text">Crear, editar o eliminar usuarios del sistema.</p>
+
+                        <h:link outcome="usuarios.xhtml" styleClass="btn btn-primary">
+                            Ir a Usuarios
+                        </h:link>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta 2 -->
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Tickets Pendientes</h5>
+                        <p class="card-text">Revisar solicitudes pendientes del sistema.</p>
+
+                        <h:link outcome="tickets.xhtml?faces-redirect=true"
+                                styleClass="btn btn-warning">
+                            Ver Tickets
+                        </h:link>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta 3 -->
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Reportes</h5>
+                        <p class="card-text">Ver estadísticas, gráficas y reportes.</p>
+
+                        <h:link outcome="reportes.xhtml"
+                                styleClass="btn btn-info text-white">
+                            Ir a Reportes
+                        </h:link>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+</h:body>
+</html>
