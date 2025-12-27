@@ -5,32 +5,16 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:p="http://xmlns.jcp.org/jsf/passthrough">
 
-
 <h:head>
     <title>Usuarios</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
 
     <style>
         body { background-color:#f0f2f5; }
-        .topbar {
-            background:#275fa7;
-            color:white;
-            padding:12px 24px;
-            font-size:20px;
-            font-weight:bold;
-        }
-        .btn-dashboard{
-            background:#275fa7 !important;
-            color:white !important;
-            border-radius:6px;
-            padding:6px 14px;
-        }
-        .btn-logout{
-            background:#c0392b !important;
-            color:white !important;
-            border-radius:6px;
-            padding:6px 14px;
-        }
+
+        /* ===== ESTADOS ===== */
         .estado-activo{
             padding:4px 10px;
             background:#27ae60;
@@ -38,6 +22,7 @@
             border-radius:6px;
             font-size:13px;
         }
+
         .estado-inactivo{
             padding:4px 10px;
             background:#c0392b;
@@ -45,125 +30,106 @@
             border-radius:6px;
             font-size:13px;
         }
+
+        /* ==================================================
+           CSS DE EMERGENCIA – SOLO VISUAL (MODULAR)
+           ================================================== */
+
+        /* Fondos */
+        .fondo-negro { background-color:#000 !important; }
+        .fondo-gris  { background-color:#f2f2f2 !important; }
+
+        /* Letras */
+        .letra-blanca { color:#fff !important; }
+        .letra-negra  { color:#000 !important; }
+        .letra-columna { font-weight:bold; }
+        .letra-header  { font-weight:bold; text-transform:uppercase; }
+
+        /* Semántica */
+        .columna-correo { }
     </style>
 </h:head>
 
 <h:body>
 
-<!-- ===================== TOP BAR ========================== -->
 <nav class="navbar navbar-dark" style="background-color:#225ca8;">
     <div class="container-fluid">
         <span class="navbar-brand mb-0 h1">Gestión de Usuarios</span>
-
-        <div class="d-flex align-items-center">
-            
-            <span class="text-white me-3">
-                Bienvenido, #{sessionManager.usuarioActual.nombreCompleto}
-            </span>
-
-            <h:form>
-                <h:commandLink value="Dashboard" 
-                               action="dashboard.xhtml?faces-redirect=true"
-                               styleClass="btn btn-light me-2"/>
-                
-                <h:commandLink value="Cerrar Sesión" 
-                               actionListener="#{sessionManager.cerrarSesion}" 
-                               styleClass="btn btn-danger"/>
-            </h:form>
-        </div>
     </div>
 </nav>
 
-<!-- ===================== CONTENIDO ========================== -->
 <div class="container py-4">
 
-    <div class="mb-3 d-flex gap-3">
+<h:form>
+<table class="table table-striped table-hover">
 
-        <h:link outcome="usuario-form.xhtml" styleClass="btn btn-success">
-            NUEVO USUARIO
-        </h:link>
+    <thead class="table-primary">
+        <tr>
+            <th>Usuario</th>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <ui:remove>
+            <th class="letra-header">Correo</th>
+            </ui:remove>
+            <th>Módulo</th>
+            <th>Teléfono</th>
+            <th>Estado</th>
+            <th>Rol</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
 
-        <h:link outcome="tickets.xhtml" styleClass="btn btn-dark">
-            TICKETS PENDIENTES
-        </h:link>
+    <tbody>
+    <ui:repeat value="#{usuarioBean.usuarios}" var="u">
 
-    </div>
+        <tr>
+            <td>#{u.username}</td>
+            <td>#{u.nombreCompleto}</td>
 
-    <!-- ===================== FILTRO GLOBAL ========================== -->
-<h:form styleClass="mb-4">
-    <div class="input-group" style="max-width:420px;">
-   <h:inputText value="#{usuarioBean.filtro}"
-             styleClass="form-control"
-             p:placeholder="Buscar por nombre, correo o usuario..."
-             />
+            <!-- ===== CORREO NORMAL ===== -->
+            <td class="columna-correo">
+                #{u.correoElectronico}
+            </td>
 
+            <!-- ===== CORREO EMERGENCIA (DESACTIVADO) ===== -->
+            <ui:remove>
+                <td class="columna-correo fondo-negro letra-blanca letra-columna">
+                    #{u.correoElectronico}
+                </td>
+            </ui:remove>
+            
+            <td class="letra-header">
+                    #{u.modulo != null ? u.modulo.nombre : 'N/A'}
+                </td>
+            <ui:remove>
+            <td>#{u.modulo != null ? u.modulo.nombre : 'N/A'}</td>
+            </ui:remove>
+            <td>#{u.telefono}</td>
 
-        <h:commandButton value="Buscar"
-                         action="#{usuarioBean.filtrar}"
-                         styleClass="btn btn-primary"/>
+            <td>
+                <span class="#{u.estadoCuenta.nombre eq 'Activo'
+                               ? 'estado-activo'
+                               : 'estado-inactivo'}">
+                    #{u.estadoCuenta.nombre}
+                </span>
+            </td>
 
-        <h:commandButton value="Limpiar"
-                         action="#{usuarioBean.cargarUsuarios}"
-                         styleClass="btn btn-secondary"
-                         immediate="true"/>
-    </div>
+            <td>#{u.rolInterno != null ? u.rolInterno.nombre : 'N/A'}</td>
+
+            <td>
+                <h:commandButton value="ELIMINAR"
+                                 styleClass="btn btn-sm btn-danger"
+                                 actionListener="#{usuarioBean.eliminar(u.id)}"
+                                 onclick="return confirm('¿Eliminar usuario?');"/>
+            </td>
+        </tr>
+
+    </ui:repeat>
+    </tbody>
+
+</table>
 </h:form>
 
-    <h:messages globalOnly="true"/>
-
-    <!-- ===================== TABLA ========================== -->
-    <h:form>
-        <table class="table table-striped table-hover">
-            <thead class="table-primary">
-            <tr>
-                <th>Usuario</th>
-                <th>Nombre</th>
-                <th>Correo</th>
-                <th>Módulo</th>
-                <th>Teléfono</th>
-                <th>Estado</th>
-                <th>Rol</th>
-                <th>Acciones</th>
-            </tr>
-            </thead>
-
-            <tbody>
-            <ui:repeat value="#{usuarioBean.usuarios}" var="u">
-                <tr>
-                    <td>#{u.username}</td>
-                    <td>#{u.nombreCompleto}</td>
-                    <td>#{u.correoElectronico}</td>
-                    <td>#{u.modulo != null ? u.modulo.nombre : 'N/A'}</td>
-                    <td>#{u.telefono}</td>
-                    <td>
-                        <span class="#{u.estadoCuenta.nombre eq 'Activo' ? 'estado-activo' : 'estado-inactivo'}">
-                            #{u.estadoCuenta.nombre}
-                        </span>
-                    </td>
-                    <td>#{u.rolInterno != null ? u.rolInterno.nombre : 'N/A'}</td>
-
-                    <td>
-                        <div class="d-flex gap-2">
-
-                            <h:link outcome="usuario-form.xhtml"
-                                    styleClass="btn btn-sm btn-primary"
-                                    includeViewParams="true">
-                                <f:param name="id" value="#{u.id}" />
-                                EDITAR
-                            </h:link>
-
-                            <h:commandButton value="ELIMINAR"
-                                             styleClass="btn btn-sm btn-danger"
-                                             actionListener="#{usuarioBean.eliminar(u.id)}"
-                                             onclick="return confirm('¿Eliminar usuario?');"/>
-                        </div>
-                    </td>
-                </tr>
-            </ui:repeat>
-            </tbody>
-        </table>
-    </h:form>
 </div>
-
 </h:body>
 </html>
