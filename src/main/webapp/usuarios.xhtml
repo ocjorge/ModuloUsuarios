@@ -5,131 +5,148 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:p="http://xmlns.jcp.org/jsf/passthrough">
 
-<h:head>
-    <title>Usuarios</title>
+    <h:head>
+        <title>Usuarios</title>
 
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
+        <link rel="stylesheet"
+              href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
 
-    <style>
-        body { background-color:#f0f2f5; }
+        <style>
+            body {
+                background-color:#f0f2f5;
+            }
 
-        /* ===== ESTADOS ===== */
-        .estado-activo{
-            padding:4px 10px;
-            background:#27ae60;
-            color:white;
-            border-radius:6px;
-            font-size:13px;
-        }
+            /* ===== ESTADOS ===== */
+            .estado-activo{
+                padding:4px 10px;
+                background:#27ae60;
+                color:white;
+                border-radius:6px;
+                font-size:13px;
+            }
 
-        .estado-inactivo{
-            padding:4px 10px;
-            background:#c0392b;
-            color:white;
-            border-radius:6px;
-            font-size:13px;
-        }
+            .estado-inactivo{
+                padding:4px 10px;
+                background:#c0392b;
+                color:white;
+                border-radius:6px;
+                font-size:13px;
+            }
 
-        /* ==================================================
-           CSS DE EMERGENCIA – SOLO VISUAL (MODULAR)
-           ================================================== */
+            /* ==================================================
+               CSS DE EMERGENCIA – SOLO VISUAL (MODULAR)
+               ================================================== */
 
-        /* Fondos */
-        .fondo-negro { background-color:#000 !important; }
-        .fondo-gris  { background-color:#f2f2f2 !important; }
+            /* Fondos */
+            .fondo-negro {
+                background-color:#000 !important;
+            }
+            .fondo-gris  {
+                background-color:#f2f2f2 !important;
+            }
 
-        /* Letras */
-        .letra-blanca { color:#fff !important; }
-        .letra-negra  { color:#000 !important; }
-        .letra-columna { font-weight:bold; }
-        .letra-header  { font-weight:bold; text-transform:uppercase; }
+            /* Letras */
+            .letra-blanca {
+                color:#fff !important;
+            }
+            .letra-negra  {
+                color:#000 !important;
+            }
+            .letra-columna {
+                font-weight:bold;
+            }
+            .letra-header  {
+                font-weight:bold;
+                text-transform:uppercase;
+            }
 
-        /* Semántica */
-        .columna-correo { }
-    </style>
-</h:head>
+            /* Semántica */
+            .columna-correo {
+            }
+        </style>
+    </h:head>
 
-<h:body>
+    <h:body>
 
-<nav class="navbar navbar-dark" style="background-color:#225ca8;">
-    <div class="container-fluid">
-        <span class="navbar-brand mb-0 h1">Gestión de Usuarios</span>
-    </div>
-</nav>
+        <nav class="navbar navbar-dark" style="background-color:#225ca8;">
+            <div class="container-fluid">
+                <span class="navbar-brand mb-0 h1">Gestión de Usuarios</span>
+            </div>
+        </nav>
 
-<div class="container py-4">
+        <div class="container py-4">
 
-<h:form>
-<table class="table table-striped table-hover">
+            <h:form>
+                <table class="table table-striped table-hover">
 
-    <thead class="table-primary">
-        <tr>
-            <th>Usuario</th>
-            <th>Nombre</th>
-            <th>Correo</th>
-            <ui:remove>
-            <th class="letra-header">Correo</th>
-            </ui:remove>
-            <th>Módulo</th>
-            <th>Teléfono</th>
-            <th>Estado</th>
-            <th>Rol</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Nombre</th>
+                            <th>Correo</th>
+                            <ui:remove>
+                                <th class="letra-header">Correo</th>
+                            </ui:remove>
+                            <th>Módulo</th>
+                            <th>Teléfono</th>
+                            <th>Estado</th>
+                            <th>Rol</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
 
-    <tbody>
-    <ui:repeat value="#{usuarioBean.usuarios}" var="u">
+                    <tbody>
+                        <ui:repeat value="#{usuarioBean.usuarios}" var="u">
 
-        <tr>
-            <td>#{u.username}</td>
-            <td>#{u.nombreCompleto}</td>
+                            <tr>
+                                <td>#{u.username}</td>
+                                <td>#{u.nombreCompleto}</td>
 
-            <!-- ===== CORREO NORMAL ===== -->
-            <td class="columna-correo">
-                #{u.correoElectronico}
-            </td>
+                                <!-- ===== CORREO NORMAL ===== -->
+                                <td class="columna-correo">
+                                    #{u.correoElectronico}
+                                </td>
 
-            <!-- ===== CORREO EMERGENCIA (DESACTIVADO) ===== -->
-            <ui:remove>
-                <td class="columna-correo fondo-negro letra-blanca letra-columna">
-                    #{u.correoElectronico}
-                </td>
-            </ui:remove>
-            
-            <td class="letra-header">
-                    #{u.modulo != null ? u.modulo.nombre : 'N/A'}
-                </td>
-            <ui:remove>
-            <td>#{u.modulo != null ? u.modulo.nombre : 'N/A'}</td>
-            </ui:remove>
-            <td>#{u.telefono}</td>
+                                <!-- ===== CORREO EMERGENCIA (DESACTIVADO) ===== -->
+                                <ui:remove>
+                                    <td class="columna-correo fondo-negro letra-blanca letra-columna">
+                                        #{u.correoElectronico}
+                                    </td>
+                                </ui:remove>
+                                <ui:remove>
+                                    <td class="letra-header">
+                                        #{u.modulo != null ? u.modulo.nombre : 'N/A'}
+                                    </td>
+                                </ui:remove>
 
-            <td>
-                <span class="#{u.estadoCuenta.nombre eq 'Activo'
-                               ? 'estado-activo'
-                               : 'estado-inactivo'}">
-                    #{u.estadoCuenta.nombre}
-                </span>
-            </td>
+                                <td>#{u.modulo != null ? u.modulo.nombre : 'N/A'}</td>
 
-            <td>#{u.rolInterno != null ? u.rolInterno.nombre : 'N/A'}</td>
+                                <td>#{u.telefono}</td>
 
-            <td>
-                <h:commandButton value="ELIMINAR"
-                                 styleClass="btn btn-sm btn-danger"
-                                 actionListener="#{usuarioBean.eliminar(u.id)}"
-                                 onclick="return confirm('¿Eliminar usuario?');"/>
-            </td>
-        </tr>
+                                <td>
+                                    <span class="#{u.estadoCuenta.nombre eq 'Activo'
+                                                   ? 'estado-activo'
+                                                   : 'estado-inactivo'}">
+                                          #{u.estadoCuenta.nombre}
+                                    </span>
+                                </td>
 
-    </ui:repeat>
-    </tbody>
+                                <td>#{u.rolInterno != null ? u.rolInterno.nombre : 'N/A'}</td>
 
-</table>
-</h:form>
+                                <td>
+                                    <h:commandButton value="ELIMINAR"
+                                                     styleClass="btn btn-sm btn-danger"
+                                                     actionListener="#{usuarioBean.eliminar(u.id)}"
+                                                     onclick="return confirm('¿Eliminar usuario?');"/>
+                                </td>
+                            </tr>
 
-</div>
-</h:body>
+                        </ui:repeat>
+                    </tbody>
+
+                </table>
+            </h:form>
+
+        </div>
+    </h:body>
 </html>
