@@ -245,10 +245,10 @@ VALUES ('admin', '$2a$10$...', 'Administrador', 'admin@sistema.com', 1);
 
 ## 📄 Licencia y Reconocimientos
 
-Este proyecto fue desarrollado para fines educativos como parte de la materia **Programación Web** del **Tecnológico Nacional de México campus Toluca** durante el período **Agosto-Diciembre 2025**.
+Este proyecto fue desarrollado para fines educativos como parte de la materia **Programación Web** del **Tecnológico Nacional de México, Instituto Tecnológico de Toluca* durante el período **Agosto-Diciembre 2025**.
 
 **Materia:** Programación Web  
-**Institución:** Tecnológico Nacional de México, Campus Toluca  
+**Institución:** Tecnológico Nacional de México, Instituto Tecnológico de Toluca  
 **Período:** Agosto - Diciembre 2025  
 **Versión:** 1.0-SNAPSHOT
 
