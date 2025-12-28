@@ -1,68 +1,138 @@
 package mx.tecnm.toluca.usuarios.web;
 
+// Importación para ejecutar lógica después de crear el bean
 import jakarta.annotation.PostConstruct;
+
+// Importaciones para mensajes y contexto JSF
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
+
+// Alcance del bean a nivel de vista
 import jakarta.faces.view.ViewScoped;
+
+// Inyección de dependencias
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
-
+// Importaciones para E/S y serialización
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
+// Importaciones del modelo
 import mx.tecnm.toluca.usuarios.model.*;
+
+// Importación del servicio de usuarios
 import mx.tecnm.toluca.usuarios.service.UsuarioService;
 
+/**
+ * Bean de respaldo para la gestión de usuarios.
+ * Maneja listado, creación, edición, eliminación
+ * y filtrado de usuarios desde la vista JSF.
+ */
 @Named
 @ViewScoped
 public class UsuarioBean implements Serializable {
 
+    /**
+     * Servicio de usuarios.
+     * Proporciona la lógica de negocio relacionada con usuarios.
+     */
     @Inject
     private UsuarioService usuarioService;
 
+    /**
+     * Administrador de sesión.
+     * Se utiliza para verificar autenticación y redirecciones.
+     */
     @Inject
     private SessionManager sessionManager;
 
-    // Parámetro recibido en URL
+    /**
+     * Parámetro recibido por URL (id del usuario).
+     */
     private String idParam;
 
-    // Control del formulario
+    /**
+     * Indica si el formulario está en modo edición.
+     */
     private boolean edicion;
 
-    // Usuario en edición/creación
+    /**
+     * Usuario actualmente seleccionado (crear / editar).
+     */
     private Usuario usuarioSeleccionado = new Usuario();
+
+    /**
+     * Contraseña en texto plano capturada desde el formulario.
+     */
     private String passwordPlano;
 
+    /**
+     * Lista de usuarios mostrados en la vista.
+     */
     private List<Usuario> usuarios;
 
-    // IDs de selects
+    // ---------------- IDS DE SELECTS ----------------
+
+    /**
+     * Identificador del tipo de usuario seleccionado.
+     */
     private Integer tipoUsuarioId;
+
+    /**
+     * Identificador del rol interno seleccionado.
+     */
     private Integer rolId;
+
+    /**
+     * Identificador del estado de cuenta seleccionado.
+     */
     private Integer estadoCuentaId;
+
+    /**
+     * Identificador del módulo seleccionado.
+     */
     private String moduloId;
 
-    // FILTRO GLOBAL
+    // ---------------- FILTRO GLOBAL ----------------
+
+    /**
+     * Texto utilizado para el filtro global de usuarios.
+     */
     private String filtro;
 
     // ================================
+    /**
+     * Método ejecutado después de crear el bean.
+     * Carga inicialmente la lista de usuarios.
+     */
     @PostConstruct
     public void init() {
         cargarUsuarios();
     }
 
     // ================================
+    /**
+     * Verifica si existe una sesión activa.
+     * Si no está autenticado, redirige al login.
+     */
     public void verificarSesion() throws IOException {
         sessionManager.redirigirSiNoAutenticado();
     }
 
     // ================================
+    /**
+     * Inicializa el formulario de usuario.
+     * Determina si se trata de creación o edición
+     * en función del parámetro recibido por URL.
+     */
     public void initForm() {
 
+        // Crear nuevo usuario
         if (idParam == null || idParam.isBlank()) {
-            // Crear nuevo
+
             usuarioSeleccionado = new Usuario();
             edicion = false;
 
@@ -74,7 +144,7 @@ public class UsuarioBean implements Serializable {
             return;
         }
 
-        // Edición
+        // Edición de usuario existente
         try {
             UUID uuid = UUID.fromString(idParam);
             Usuario u = usuarioService.buscarPorId(uuid);
@@ -83,6 +153,7 @@ public class UsuarioBean implements Serializable {
                 usuarioSeleccionado = u;
                 edicion = true;
 
+                // Carga de IDs para los selects
                 tipoUsuarioId  = (u.getTipoUsuario() != null) ? u.getTipoUsuario().getId() : null;
                 rolId          = (u.getRolInterno() != null) ? u.getRolInterno().getId() : null;
                 estadoCuentaId = (u.getEstadoCuenta() != null) ? u.getEstadoCuenta().getId() : null;
@@ -95,16 +166,20 @@ public class UsuarioBean implements Serializable {
     }
 
     // ================================
+    /**
+     * Guarda o actualiza un usuario según el modo.
+     * Incluye validaciones de username y contraseña.
+     */
     public void guardar() {
         try {
 
-            // Asignar entidades con los IDs
+            // Asigna las entidades relacionadas usando los IDs seleccionados
             usuarioSeleccionado.setTipoUsuario(usuarioService.buscarTipoUsuarioPorId(tipoUsuarioId));
             usuarioSeleccionado.setRolInterno(usuarioService.buscarRolPorId(rolId));
             usuarioSeleccionado.setEstadoCuenta(usuarioService.buscarEstadoCuentaPorId(estadoCuentaId));
             usuarioSeleccionado.setModulo(usuarioService.buscarModuloPorId(moduloId));
 
-            // Username obligatorio
+            // Validación de username obligatorio
             if (usuarioSeleccionado.getUsername() == null || usuarioSeleccionado.getUsername().isBlank()) {
                 FacesContext.getCurrentInstance().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -112,7 +187,7 @@ public class UsuarioBean implements Serializable {
                 return;
             }
 
-            // Validar username repetido
+            // Validación de username repetido en alta
             Usuario repetido = usuarioService.buscarPorUsername(usuarioSeleccionado.getUsername());
             if (!edicion && repetido != null) {
                 FacesContext.getCurrentInstance().addMessage(null,
@@ -121,8 +196,10 @@ public class UsuarioBean implements Serializable {
                 return;
             }
 
+            // ---------------- EDICIÓN ----------------
             if (edicion) {
 
+                // Rehash de contraseña solo si se capturó una nueva
                 boolean rehash = passwordPlano != null && !passwordPlano.isBlank();
                 if (rehash) {
                     usuarioSeleccionado.setContrasena(passwordPlano);
@@ -134,8 +211,10 @@ public class UsuarioBean implements Serializable {
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
                                 "Usuario actualizado correctamente", ""));
 
+            // ---------------- ALTA ----------------
             } else {
 
+                // Contraseña obligatoria en alta
                 if (passwordPlano == null || passwordPlano.isBlank()) {
                     FacesContext.getCurrentInstance().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_WARN,
@@ -150,9 +229,12 @@ public class UsuarioBean implements Serializable {
                                 "Usuario registrado correctamente", ""));
             }
 
+            // Recarga la lista de usuarios
             cargarUsuarios();
 
         } catch (Exception ex) {
+
+            // Manejo de error general
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "No se pudo guardar el usuario", ex.getMessage()));
@@ -160,22 +242,35 @@ public class UsuarioBean implements Serializable {
     }
 
     // ================================
+    /**
+     * Elimina un usuario por su identificador.
+     */
     public void eliminar(UUID id) {
+
         usuarioService.eliminar(id);
         cargarUsuarios();
 
-        FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, "Usuario eliminado", ""));
+        FacesContext.getCurrentInstance().addMessage(
+                null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO, "Usuario eliminado", "")
+        );
     }
 
     // ================================
+    /**
+     * Carga la lista completa de usuarios.
+     */
     public void cargarUsuarios() {
         usuarios = usuarioService.listarUsuarios();
     }
 
     // ================================
     // FILTRO GLOBAL
+    /**
+     * Aplica un filtro global por nombre, correo o username.
+     */
     public void filtrar() {
+
         if (filtro == null || filtro.isBlank()) {
             cargarUsuarios();
             return;
@@ -195,81 +290,38 @@ public class UsuarioBean implements Serializable {
     // ================================
     // GETTERS / SETTERS
     // ================================
-    public String getIdParam() {
-        return idParam;
-    }
 
-    public void setIdParam(String idParam) {
-        this.idParam = idParam;
-    }
+    public String getIdParam() { return idParam; }
+    public void setIdParam(String idParam) { this.idParam = idParam; }
 
-    public Usuario getUsuarioSeleccionado() {
-        return usuarioSeleccionado;
-    }
+    public Usuario getUsuarioSeleccionado() { return usuarioSeleccionado; }
+    public void setUsuarioSeleccionado(Usuario u) { this.usuarioSeleccionado = u; }
 
-    public void setUsuarioSeleccionado(Usuario u) {
-        this.usuarioSeleccionado = u;
-    }
+    public String getPasswordPlano() { return passwordPlano; }
+    public void setPasswordPlano(String passwordPlano) { this.passwordPlano = passwordPlano; }
 
-    public String getPasswordPlano() {
-        return passwordPlano;
-    }
+    public boolean isEdicion() { return edicion; }
 
-    public void setPasswordPlano(String passwordPlano) {
-        this.passwordPlano = passwordPlano;
-    }
+    public List<Usuario> getUsuarios() { return usuarios; }
 
-    public boolean isEdicion() {
-        return edicion;
-    }
+    public String getFiltro() { return filtro; }
+    public void setFiltro(String filtro) { this.filtro = filtro; }
 
-    public List<Usuario> getUsuarios() {
-        return usuarios;
-    }
+    public Integer getTipoUsuarioId() { return tipoUsuarioId; }
+    public void setTipoUsuarioId(Integer tipoUsuarioId) { this.tipoUsuarioId = tipoUsuarioId; }
 
-    public String getFiltro() {
-        return filtro;
-    }
+    public Integer getRolId() { return rolId; }
+    public void setRolId(Integer rolId) { this.rolId = rolId; }
 
-    public void setFiltro(String filtro) {
-        this.filtro = filtro;
-    }
+    public Integer getEstadoCuentaId() { return estadoCuentaId; }
+    public void setEstadoCuentaId(Integer estadoCuentaId) { this.estadoCuentaId = estadoCuentaId; }
 
-    public Integer getTipoUsuarioId() {
-        return tipoUsuarioId;
-    }
+    public String getModuloId() { return moduloId; }
+    public void setModuloId(String moduloId) { this.moduloId = moduloId; }
 
-    public void setTipoUsuarioId(Integer tipoUsuarioId) {
-        this.tipoUsuarioId = tipoUsuarioId;
-    }
+    public SessionManager getSessionManager() { return sessionManager; }
 
-    public Integer getRolId() {
-        return rolId;
-    }
-
-    public void setRolId(Integer rolId) {
-        this.rolId = rolId;
-    }
-
-    public Integer getEstadoCuentaId() {
-        return estadoCuentaId;
-    }
-
-    public void setEstadoCuentaId(Integer estadoCuentaId) {
-        this.estadoCuentaId = estadoCuentaId;
-    }
-
-    public String getModuloId() {
-        return moduloId;
-    }
-
-    public void setModuloId(String moduloId) {
-        this.moduloId = moduloId;
-    }
-
-    public SessionManager getSessionManager() {
-        return sessionManager;
-    }
+    // ---------------- CATÁLOGOS ----------------
 
     public List<TipoUsuario> getTiposUsuario() {
         return usuarioService.listarTiposUsuario();
