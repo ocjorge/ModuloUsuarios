@@ -13,8 +13,8 @@ Sistema web de gestión de usuarios desarrollado con Jakarta EE 10, JSF 4.0 y Po
 
 ### Desarrolladores
 
-| Nombre | Rol | GitHub | Contribución Principal |
-|--------|-----|--------|------------------------|
+| Nombre | GitHub | 
+|--------|--------|
 | **Jorge Ortiz Ceballos** | [![GitHub](https://img.shields.io/badge/GitHub-ocjorge-181717?style=flat-square&logo=github)](https://github.com/ocjorge) | 
 | **Brisa Hernández Reyes** | [![GitHub](https://img.shields.io/badge/GitHub-brisahernandezreyes12345-181717?style=flat-square&logo=github)](https://github.com/brisahernandezreyes12345) |
 | **Luis Carlos Romero Corral** | [![GitHub](https://img.shields.io/badge/GitHub-kc0115-181717?style=flat-square&logo=github)](https://github.com/kc0115) | 
