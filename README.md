@@ -15,10 +15,9 @@ Sistema web de gestión de usuarios desarrollado con Jakarta EE 10, JSF 4.0 y Po
 
 | Nombre | Rol | GitHub | Contribución Principal |
 |--------|-----|--------|------------------------|
-| **Jorge Ortiz Ceballos** | Desarrollador Full Stack | [![GitHub](https://img.shields.io/badge/GitHub-ocjorge-181717?style=flat-square&logo=github)](https://github.com/ocjorge) | Arquitectura backend, seguridad, lógica de negocio |
-| **Brisa Hernández Reyes** | Desarrolladora Frontend | [![GitHub](https://img.shields.io/badge/GitHub-brisahernandezreyes12345-181717?style=flat-square&logo=github)](https://github.com/brisahernandezreyes12345) | Diseño UI/UX, vistas JSF, componentes Bootstrap |
-| **Luis Carlos Romero Corral** | Desarrollador Backend & BD | [![GitHub](https://img.shields.io/badge/GitHub-kc0115-181717?style=flat-square&logo=github)](https://github.com/kc0115) | Modelo de datos, consultas SQL, reportes, auditoría |
-
+| **Jorge Ortiz Ceballos** | [![GitHub](https://img.shields.io/badge/GitHub-ocjorge-181717?style=flat-square&logo=github)](https://github.com/ocjorge) | 
+| **Brisa Hernández Reyes** | [![GitHub](https://img.shields.io/badge/GitHub-brisahernandezreyes12345-181717?style=flat-square&logo=github)](https://github.com/brisahernandezreyes12345) |
+| **Luis Carlos Romero Corral** | [![GitHub](https://img.shields.io/badge/GitHub-kc0115-181717?style=flat-square&logo=github)](https://github.com/kc0115) | 
 ### Institución
 **Tecnológico Nacional de México, Campus Toluca**  
 [![Sitio Web](https://img.shields.io/badge/Sitio_Web-TecNM_Toluca-0066CC?style=flat-square&logo=google-chrome)](https://toluca.tecnm.mx/)
